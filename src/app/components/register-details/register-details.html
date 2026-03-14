@@ -1,0 +1,142 @@
+<div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb]">
+  <nav class="sticky top-0 z-50 flex items-center bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md p-4 md:p-5 lg:p-6 justify-between border-b border-gray-100 dark:border-gray-800">
+    <div class="flex items-center gap-3">
+      <a routerLink="/register" class="text-gray-500 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-xl md:text-2xl lg:text-3xl">arrow_back_ios</span>
+      </a>
+      <h1 class="text-[#101819] dark:text-white text-xl md:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight">學生註冊</h1>
+    </div>
+    <div class="size-10 md:size-12 lg:size-14 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+      <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">person_add</span>
+    </div>
+  </nav>
+  
+  <main class="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
+    <div class="text-center mb-8 md:mb-10 lg:mb-12">
+      <div class="inline-block px-3 md:px-4 py-1 rounded-full bg-primary/5 text-primary text-xs md:text-sm font-bold mb-4">歡迎加入</div>
+      <h2 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#101819] dark:text-white mb-2 leading-tight">加入禾笙，<br/>開啟卓越學習之旅</h2>
+      <p class="text-gray-500 text-sm md:text-base">請填寫以下資訊，我們將有專人與您聯繫</p>
+    </div>
+    
+    <form class="space-y-4 md:space-y-5 lg:space-y-6" onsubmit="return false;">
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">學生姓名</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
+          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入學生全名" type="text"/>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">學生出生年月日</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">cake</span>
+          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white" type="date"/>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長姓名</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
+          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入家長或聯絡人姓名" type="text"/>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">聯絡電話</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="09XX-XXX-XXX" type="tel"/>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">目前年級</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">school</span>
+          <select class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
+            <option disabled selected value="">請選擇目前就讀年級</option>
+            <option>國小五年級</option>
+            <option>國小六年級</option>
+            <option>國中一年級</option>
+            <option>國中二年級</option>
+            <option>國中三年級</option>
+            <option>高中一年級</option>
+            <option>高中二年級</option>
+            <option>高中三年級</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">就讀學校</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
+          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入就讀學校名稱" type="text"/>
+        </div>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">感興趣的科目</label>
+        <div class="grid grid-cols-2 gap-3 mt-1">
+          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
+            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">數學科</span>
+          </label>
+          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
+            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">英文科</span>
+          </label>
+          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
+            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">理化科</span>
+          </label>
+          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
+            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">國文科</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="pt-4 md:pt-6">
+        <button class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-4 md:py-5 lg:py-6 rounded-2xl bento-shadow transition-all text-lg md:text-xl flex items-center justify-center gap-2" type="submit">
+          立即註冊
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </form>
+    
+    <div class="mt-10 md:mt-12 lg:mt-14">
+      <div class="relative flex items-center justify-center mb-6 md:mb-8">
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+        <span class="flex-shrink mx-4 text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">快速註冊方式</span>
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+      </div>
+      <div class="flex justify-center gap-4 md:gap-6">
+        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-white dark:bg-gray-800 bento-shadow flex items-center justify-center hover:scale-110 transition-transform">
+          <img alt="Google" class="w-5 h-5 md:w-6 md:h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtuLqVMGI4_27AdkEyekH8WPHMkt8Mht5j99qDiowYSuZ15VDjI1HwFK6CB1gVQ7eBn0TgDws7g9k4Ugr6qWfpON_dZFgy5XxQ6b4b8ibDNHUEK5cNmmZE2EqdHn27IQ6dKrqqlXPltw0cB-UTMeDQGHlTtbibc4i4T13sXj1urte20VmGHyYHBW6f5B9LITvVgIgOAr-VAuwT2G6IYNyMZlkGSEHZoNOqKEBWVecbSGgvqlv3IBTI_1qWhdSP54NxrS0m6gcdw5g"/>
+        </button>
+        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-[#00B900] bento-shadow flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-[#00B900]/20">
+          <img alt="LINE" class="w-6 h-6 md:w-7 md:h-7 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnobeKWAH7KoAeoya--1QwEHQeCEKvsBF40GG2-w-q_Vuko537EwrDdbVpoYNSJITNwgBQS2cKAKktm8GBSlvbXWFKVPQu6V7ADEln-BHHdeCmLVTJcYW2bCHIz6eFHA8EdjlcJoaFDlGeVV8An5YazfqlkvzrLebWmDI9vEzQ439lPStFkSiiJRf9t2Ezj_tkfZQbGqGVbndUbRDoBJBFQYchTcSAU_418g1qwVPVLtxKK2AiSuadyl2JxXvRku0DlWEdCBF4hwE"/>
+        </button>
+        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-black dark:bg-white bento-shadow flex items-center justify-center hover:scale-110 transition-transform">
+          <img alt="Apple" class="w-5 h-5 md:w-6 md:h-6 invert dark:invert-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2tfYoD33bFc7R56mXlrhkxsxfq24c-SnzUwnhJNcWURNo-As5ta5UpioHqN31NRHqB77GN5eSED4BNUTY1ng5wmvW-E_ui_nr6DJ-0Xbh1rzXPk07-fthjo4AXt0RcexjK8BDiEgFHqCOBWWWUNAjiPoLMsfJcxCv2epatoYs4o7lo-HYrvlivQ7AO4py057R2AS8juuguqejIZMgX6qhqbGj8yXks10-wVnV63vutcTf37t9CDlPtHwZ_l4uVEV8hAGirgqqAtY"/>
+        </button>
+      </div>
+    </div>
+    
+    <footer class="mt-12 md:mt-14 lg:mt-16 pb-6 md:pb-8 text-center">
+      <p class="text-xs md:text-sm text-gray-400 leading-relaxed">
+        點擊註冊即表示您同意本校的<br/>
+        <a class="text-primary font-bold" href="#">隱私權條款</a> 與 <a class="text-primary font-bold" href="#">使用規範</a>
+      </p>
+    </footer>
+  </main>
+  
+  <div class="fixed bottom-6 right-6 z-40">
+    <button class="bg-accent-gold text-white size-12 md:size-14 lg:size-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-white dark:ring-gray-800">
+      <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">support_agent</span>
+    </button>
+  </div>
+</div>
