@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] flex flex-col">
+  <nav class="p-4 md:p-5 lg:p-6 flex items-center">
+    <a routerLink="/" class="size-10 md:size-12 lg:size-14 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+      <span class="material-symbols-outlined text-xl md:text-2xl lg:text-3xl">arrow_back_ios_new</span>
+    </a>
+  </nav>
+  
+  <main class="max-w-md md:max-w-lg lg:max-w-xl mx-auto w-full px-4 md:px-6 lg:px-8 flex-grow flex flex-col">
+    <div class="mb-6 md:mb-8 lg:mb-10 text-center">
+      <div class="inline-flex items-center justify-center size-14 md:size-16 lg:size-20 bg-primary/10 rounded-2xl mb-4">
+        <span class="material-symbols-outlined text-3xl md:text-4xl lg:text-5xl text-primary">school</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">禾笙文理補習班</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm md:text-base">啟發潛能，成就卓越未來</p>
+    </div>
+
+    <div class="tab-switcher flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mb-6 md:mb-8">
+      <button 
+        [class]="activeTab() === 'login' ? 'login-toggle-active flex-1 text-center py-2.5 rounded-lg text-sm font-bold cursor-pointer transition-all' : 'flex-1 text-center py-2.5 rounded-lg text-sm font-bold cursor-pointer transition-all text-gray-500'"
+        (click)="setActiveTab('login')">
+        登入
+      </button>
+      <button 
+        [class]="activeTab() === 'register' ? 'login-toggle-active flex-1 text-center py-2.5 rounded-lg text-sm font-bold cursor-pointer transition-all' : 'flex-1 text-center py-2.5 rounded-lg text-sm font-bold cursor-pointer transition-all text-gray-500'"
+        (click)="setActiveTab('register')">
+        註冊
+      </button>
+    </div>
+
+    @if (activeTab() === 'login') {
+      <div class="login-form space-y-4">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">電子郵件或手機號碼</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">person</span>
+            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="example@email.com" type="text"/>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">密碼</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
+            <input [type]="showPassword() ? 'text' : 'password'" class="w-full pl-12 pr-12 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入您的密碼" type="password"/>
+            <button (click)="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <span class="material-symbols-outlined">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <a class="text-xs md:text-sm font-bold text-primary" href="#">忘記密碼？</a>
+        </div>
+        <button class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
+          登入帳號
+        </button>
+      </div>
+    }
+
+    @if (activeTab() === 'register') {
+      <div class="register-form space-y-4">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">學生/家長姓名</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">badge</span>
+            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入姓名" type="text"/>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">手機號碼</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">phone_iphone</span>
+            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="09XX-XXX-XXX" type="tel"/>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">就讀年級</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">grade</span>
+            <select class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary appearance-none text-sm md:text-base">
+              <option disabled selected value="">請選擇年級</option>
+              <option>國小一至三年級</option>
+              <option>國小四至六年級</option>
+              <option>國中一年級</option>
+              <option>國中二年級</option>
+              <option>國中三年級</option>
+              <option>其他</option>
+            </select>
+          </div>
+        </div>
+        <button class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
+          立即註冊
+        </button>
+      </div>
+    }
+
+    <div class="mt-auto pt-8 md:pt-10 lg:pt-12 pb-6 md:pb-8">
+      <div class="relative flex items-center justify-center mb-6 md:mb-8">
+        <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+        <span class="absolute bg-background-light dark:bg-background-dark px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">其他方式</span>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <button class="flex flex-col items-center justify-center gap-2 py-3 md:py-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
+          <img alt="Line" class="size-5 md:size-6 rounded-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD74TmKCvUUud7LzWYYElcYkgjIPX9o4MhOasFOfHtsHzFogr3VNajiquFE_KVN5RSWffNQGkiObEAau7t9G_kVR13svTwxhc642zUFl6ib94xcdypLcEf2gqaOxiwgFqt0BSdG56UR5007_tkIuU_YrImBEYJXQMr-CO4z-_T18xOCRjW0Syn1Nl6kha2lLK6RGd8Ijgt65aT7Px0GP5SLlh8HFCmCtdhB2_apJzYL8Sd97hPQj3zFsmX9sdA_GzcEhP4Barz-NZI"/>
+          <span class="text-[10px] md:text-[11px] font-bold">Line</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-2 py-3 md:py-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
+          <svg class="size-5 md:size-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+          </svg>
+          <span class="text-[10px] md:text-[11px] font-bold">Google</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-2 py-3 md:py-4 bg-black text-white dark:bg-white dark:text-black border border-black dark:border-white rounded-xl shadow-sm transition-colors">
+          <svg class="size-5 md:size-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.05 20.28c-.98.95-2.05 1.78-3.1 1.76-1.06-.02-1.4-.64-2.6-.64-1.21 0-1.58.62-2.6.66-1.03.04-2.2-.95-3.18-1.93-2-2-3.44-5.07-3.44-7.9 0-4.57 3-6.98 5.83-7.02 1.08-.01 2.13.72 2.78.72.65 0 1.93-.89 3.23-.76.54.02 2.06.22 3.04 1.64-.08.05-1.81 1.05-1.81 3.14 0 2.5 2.18 3.33 2.21 3.34-.02.06-.35 1.18-1.16 2.37M13.25 3.1c.57-.69.96-1.65.85-2.61-.83.03-1.83.56-2.43 1.26-.54.63-1.02 1.61-.9 2.54.92.07 1.86-.45 2.48-1.19z"></path>
+          </svg>
+          <span class="text-[10px] md:text-[11px] font-bold">Apple</span>
+        </button>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="p-4 md:p-6 text-center">
+    <p class="text-[10px] md:text-xs text-gray-400 font-medium leading-relaxed">
+      登入即代表您同意禾笙文理補習班的<br/>
+      <a class="underline" href="#">服務條款</a> 與 <a class="underline" href="#">隱私權政策</a>
+    </p>
+  </footer>
+</div>
