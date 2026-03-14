@@ -24,4 +24,8 @@ export class Register {
   goToRegisterDetails() {
     this.router.navigate(['/register-details']);
   }
+
+  goToStudent() {
+    this.router.navigate(['/student']);
+  }
 }
