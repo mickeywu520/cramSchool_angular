@@ -4,6 +4,7 @@ import { Register } from './components/register/register';
 import { RegisterDetails } from './components/register-details/register-details';
 import { Faculty } from './components/faculty/faculty';
 import { StudentProfile } from './components/student-profile/student-profile';
+import { CommunicationBook } from './components/communication-book/communication-book';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'register-details', component: RegisterDetails },
   { path: 'faculty', component: Faculty },
   { path: 'student', component: StudentProfile },
+  { path: 'communication-book', component: CommunicationBook },
   { path: '**', redirectTo: '' }
 ];
