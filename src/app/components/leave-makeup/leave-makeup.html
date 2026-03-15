@@ -146,4 +146,34 @@
   </main>
   
   <div class="h-4 md:h-6"></div>
+  
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
+    <a routerLink="/" class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
+      <span class="text-[10px] md:text-xs font-bold">首頁</span>
+    </a>
+    <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-primary">
+      <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+      <span class="text-[10px] md:text-xs font-bold">請假補課</span>
+    </a>
+    <div class="relative -mt-8 md:-mt-10">
+      <button class="bg-primary size-12 md:size-14 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center text-white ring-4 ring-background-light dark:ring-background-dark">
+        <span class="material-symbols-outlined text-2xl md:text-3xl">qr_code_scanner</span>
+      </button>
+    </div>
+    <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
+      <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
+    </a>
+    <button class="flex flex-col items-center gap-1 text-gray-400">
+      <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
+      <span class="text-[10px] md:text-xs font-bold">個人檔案</span>
+    </button>
+  </nav>
+  
+  <div class="fixed bottom-20 md:bottom-24 right-4 md:right-6 z-40">
+    <button class="bg-accent-gold text-white size-10 md:size-12 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform">
+      <span class="material-symbols-outlined text-lg md:text-xl">support_agent</span>
+    </button>
+  </div>
 </div>
