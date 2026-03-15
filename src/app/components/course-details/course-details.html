@@ -1,0 +1,217 @@
+<div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb]">
+  <nav class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 md:p-5 lg:p-6 justify-between border-b border-gray-100 dark:border-gray-800">
+    <div class="flex items-center gap-2 md:gap-3">
+      <a routerLink="/" class="text-gray-500 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-2xl md:text-3xl">arrow_back_ios</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <div class="text-primary flex size-10 md:size-12 lg:size-14 shrink-0 items-center justify-center bg-primary/10 rounded-lg">
+          <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">school</span>
+        </div>
+        <h2 class="text-[#101819] dark:text-white text-lg md:text-xl lg:text-2xl font-extrabold leading-tight tracking-tight">詳細課程介紹</h2>
+      </div>
+    </div>
+    <button class="text-primary p-2 md:p-3">
+      <span class="material-symbols-outlined text-xl md:text-2xl lg:text-3xl">search</span>
+    </button>
+  </nav>
+  
+  <main class="max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto pb-20 md:pb-24 lg:pb-28">
+    <div class="sticky top-[57px] md:top-[73px] z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex">
+      <button 
+        (click)="setTab('elementary')"
+        [class]="activeTab() === 'elementary' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+      >
+        國小部 (Elementary)
+      </button>
+      <button 
+        (click)="setTab('junior')"
+        [class]="activeTab() === 'junior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+      >
+        國中部 (Junior High)
+      </button>
+    </div>
+    
+    <div class="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
+      @if (activeTab() === 'elementary') {
+        <div class="space-y-4" id="elementary-section">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2 h-5 md:h-6 bg-accent-gold rounded-full"></span>
+            <h3 class="text-lg md:text-xl lg:text-2xl font-extrabold">國小部精選課程</h3>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">calculate</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">資優數學專修班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">國小 4-6 年級</p>
+                </div>
+              </div>
+              <span class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">熱門</span>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              強化邏輯思考，透過趣味題目引發孩子對數學的興趣，建立紮實的運算能力與空間感。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週二、五 17:00 - 19:00</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：陳莎拉 老師</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-green-50 dark:bg-green-900/30 text-green-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">language</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">全美語互動班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">國小 1-6 年級</p>
+                </div>
+              </div>
+              <span class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">小班制</span>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              全英語環境沉浸式學習，注重口說流暢度與聽力訓練，讓孩子敢開口、愛英語。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週一，三、四 16:30 - 18:30</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：James Wilson 老師</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">history_edu</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">創意作文閱讀班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">國小 3-6 年級</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              從閱讀素養出發，訓練遣詞用字與結構佈局，讓文字成為孩子表達自我的有力工具。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週六 09:30 - 11:30</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：林語心 老師</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      
+      @if (activeTab() === 'junior') {
+        <div class="space-y-4" id="junior-section">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2 h-5 md:h-6 bg-primary rounded-full"></span>
+            <h3 class="text-lg md:text-xl lg:text-2xl font-extrabold">國中部專業課程</h3>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-red-50 dark:bg-red-900/30 text-red-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">science</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">國中理化衝刺班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">國中 7-9 年級</p>
+                </div>
+              </div>
+              <span class="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">熱門</span>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              針對會考設計的理化強化課程，實驗操作與觀念講解並重，幫助學生掌握考試重點。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週三、六 18:30 - 21:00</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：林美玲 老師</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-purple-50 dark:bg-purple-900/30 text-purple-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">translate</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">會考英文衝刺班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">國中 7-9 年級</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              會考範圍全面複習，文法、閱讀、寫作三管齊下，協助學生在會考中取得優異成績。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週二、四 19:00 - 21:30</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：James Wilson 老師</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      
+      <div class="relative overflow-hidden rounded-2xl md:rounded-3xl bg-primary p-5 md:p-6 lg:p-8 text-white">
+        <div class="relative z-10">
+          <h3 class="font-bold text-lg md:text-xl lg:text-2xl mb-1">早鳥報名優惠</h3>
+          <p class="text-white/80 text-xs md:text-sm">即日起至本月底，報名兩科以上享 85 折優惠！</p>
+        </div>
+        <span class="material-symbols-outlined absolute -bottom-4 -right-4 text-6xl md:text-7xl lg:text-8xl text-white/10">sell</span>
+      </div>
+    </div>
+  </main>
+  
+  <div class="fixed bottom-6 right-6 z-50">
+    <button class="bg-accent-gold text-white px-5 md:px-6 py-3 md:py-4 rounded-full shadow-2xl flex items-center gap-2 md:gap-3 hover:scale-105 transition-transform active:scale-95">
+      <span class="material-symbols-outlined text-xl md:text-2xl">chat_bubble</span>
+      <span class="font-bold tracking-wider text-sm md:text-base">快速諮詢</span>
+    </button>
+  </div>
+  
+  <footer class="px-4 md:px-6 py-6 md:py-8 text-center bg-gray-50 dark:bg-gray-900/50">
+    <p class="text-xs md:text-sm text-gray-400">© 2024 禾笙文理補習班. 版權所有.</p>
+    <div class="flex justify-center gap-4 md:gap-6 mt-4">
+      <span class="material-symbols-outlined text-gray-300 text-xl md:text-2xl">phone</span>
+      <span class="material-symbols-outlined text-gray-300 text-xl md:text-2xl">location_on</span>
+      <span class="material-symbols-outlined text-gray-300 text-xl md:text-2xl">mail</span>
+    </div>
+  </footer>
+</div>

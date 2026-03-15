@@ -29,3 +29,8 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.tab-active {
+    color: #27889b;
+    border-bottom: 3px solid #27889b;
+}

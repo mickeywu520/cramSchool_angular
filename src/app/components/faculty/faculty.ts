@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -7,9 +7,13 @@ import { RouterLink } from '@angular/router';
   templateUrl: './faculty.html',
   styleUrl: './faculty.scss',
 })
-export class Faculty {
+export class Faculty implements OnInit {
   selectedFilter = signal<string>('all');
   searchQuery = signal<string>('');
+
+  ngOnInit() {
+    window.scrollTo(0, 0);
+  }
 
   filters = [
     { id: 'all', label: '全部師資' },
