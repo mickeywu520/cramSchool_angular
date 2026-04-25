@@ -1,0 +1,48 @@
+export interface Honor {
+  school: string;
+  name: string;
+  department: string;
+}
+
+export const honors: Honor[] = [
+  { school: '南山', name: '許O恩', department: '國立臺灣大學 電機工程學系' },
+  { school: '南山', name: '林O翰', department: '國立臺灣大學 電機工程學系' },
+  { school: '南山', name: '曾O容', department: '國立臺灣大學 物理治療學系' },
+  { school: '南山', name: '陳O心', department: '國立臺灣大學 大氣科學系' },
+  { school: '南山', name: '吳O昀', department: '國立臺灣大學 中國文學系' },
+  { school: '南山', name: '王O涵', department: '國立臺灣大學 資訊管理學系' },
+  { school: '南山', name: '黃O蓉', department: '臺北醫學大學 藥學系' },
+  { school: '南山', name: '鄭O銘', department: '臺北醫學大學 醫學檢驗暨生物技術學系' },
+  { school: '南山', name: '林O樺', department: '臺北醫學大學 醫學系' },
+  { school: '南山', name: '林O皓', department: '國立臺灣師範大學-英語學系' },
+  { school: '南山', name: '陳O愷', department: '國立臺灣科技大學 營建工程系' },
+  { school: '大安高工', name: '林O澔', department: '國立臺灣科技大學 電機工程學系' },
+  { school: '南山', name: '易O岑', department: '國立臺灣科技大學 材料科學與工程學系' },
+  { school: '南山', name: '潘O宇', department: '國立臺灣科技大學 不分系學士班' },
+  { school: '南山', name: '皮O右', department: '國立臺灣科技大學 不分系學士班' },
+  { school: '中正', name: '邱O熙', department: '國立臺北藝術大學 劇場設計學系' },
+  { school: '大安', name: '林O珽', department: '國立臺北科技大學 電機工程系' },
+  { school: '南山', name: '吳O芸', department: '國立臺北科技大學 電資學士班' },
+  { school: '南山', name: '陳O安', department: '國立臺北科技大學 分子科學與工程學系' },
+  { school: '南山', name: '高O均', department: '國立臺北大學 財政學系' },
+  { school: '錦和', name: '陳O鎧', department: '國立臺北大學' },
+  { school: '南山', name: '陳O庠', department: '國立陽明交通大學-光電工程學系' },
+  { school: '南山', name: '趙O旭', department: '國立陽明交通大學 機械工程學系' },
+  { school: '南山', name: '李O澄', department: '國立陽明交通大學 電機工程學系' },
+  { school: '南山', name: '王O俞', department: '國立陽明交通大學 土木工程學系' },
+  { school: '北一女', name: '王O瑜', department: '國立清華大學 醫學科學系' },
+  { school: '南山', name: '賴O睿', department: '國立清華大學 資訊工程學系' },
+  { school: '市大同', name: '胡O喆', department: '國立清華大學 動力機械工程學系' },
+  { school: '南山', name: '王O翔', department: '國立清華大學 材料科學工程學系乙組' },
+  { school: '南山', name: '陳O安', department: '國立政治大學 財務管理學系B組' },
+  { school: '南山', name: '葉O睿', department: '國立政治大學 財務管理學系' },
+  { school: '南山', name: '蔣O佑', department: '國立政治大學 法律學系' },
+  { school: '南山', name: '張O瑋', department: '國立政治大學 地政學系' },
+  { school: '南山', name: '彭O彤', department: '國立政治大學 中文學系' },
+  { school: '東山', name: '張O熙', department: '國立成功大學 都市計劃學系' },
+  { school: '南山', name: '詹O洋', department: '國立成功大學 水利及海洋工程學系' },
+  { school: '南山', name: '謝O家', department: '國立中央大學 財務金融學系' },
+  { school: '景美', name: '劉O廷', department: '國立中央大學 企業管理學系' },
+  { school: '南山', name: '劉O庭', department: '國立中山大學 電機工程學系-全英語組' },
+  { school: '南山', name: '蕭O丞', department: '中山醫學大學 心理學系' },
+];

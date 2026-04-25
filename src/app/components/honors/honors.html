@@ -3,62 +3,39 @@
     <h2 class="text-[#101819] dark:text-white text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight flex items-center gap-2">
       <span class="w-8 md:w-12 lg:w-16 h-[2px] bg-primary"></span> 歷年優良學生與考績
     </h2>
+    <span class="text-xs md:text-sm text-gray-400">{{ honorsData.length }} 位學子錄取頂大</span>
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-5 lg:gap-6">
-    <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-l-4 border-l-primary flex items-center gap-4 md:gap-5 lg:gap-6">
-      <div class="size-14 md:size-16 lg:size-18 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-        <span class="material-symbols-outlined text-primary text-xl md:text-2xl lg:text-3xl">emoji_events</span>
-      </div>
-      <div class="flex-grow">
-        <div class="flex justify-between items-start">
-          <h4 class="font-extrabold text-[#101819] dark:text-white text-lg md:text-xl lg:text-2xl">李同學</h4>
-          <span class="text-xs md:text-sm lg:text-base px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-500 font-bold">2023 榜單</span>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
+    @for (honor of featuredHonors; track honor.name; let i = $index) {
+      <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-gray-50 dark:border-gray-700">
+        <div class="flex items-start gap-4">
+          <div class="size-12 md:size-14 lg:size-16 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-lg md:text-xl lg:text-2xl">school</span>
+          </div>
+          <div class="flex-grow min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs md:text-sm px-2 py-0.5 bg-accent-gold/10 text-accent-gold rounded font-bold">{{ honor.school }}</span>
+              <span class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl truncate">{{ honor.name }}</span>
+            </div>
+            <p class="text-primary font-bold text-sm md:text-base lg:text-lg leading-tight">{{ honor.department }}</p>
+          </div>
         </div>
-        <p class="text-primary font-bold text-sm md:text-base lg:text-lg mt-0.5">錄取：台北市立建國高級中學</p>
-        <p class="text-gray-500 text-xs md:text-sm lg:text-base mt-1">成就：國中教育會考 5A++、數學全縣前 1%</p>
       </div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-l-4 border-l-accent-gold flex items-center gap-4 md:gap-5 lg:gap-6">
-      <div class="size-14 md:size-16 lg:size-18 rounded-full bg-accent-gold/10 flex-shrink-0 flex items-center justify-center">
-        <span class="material-symbols-outlined text-accent-gold text-xl md:text-2xl lg:text-3xl">military_tech</span>
-      </div>
-      <div class="flex-grow">
-        <div class="flex justify-between items-start">
-          <h4 class="font-extrabold text-[#101819] dark:text-white text-lg md:text-xl lg:text-2xl">王同學</h4>
-          <span class="text-xs md:text-sm lg:text-base px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-500 font-bold">2023 榜單</span>
-        </div>
-        <p class="text-primary font-bold text-sm md:text-base lg:text-lg mt-0.5">錄取：台北市立第一女子高級中學</p>
-        <p class="text-gray-500 text-xs md:text-sm lg:text-base mt-1">成就：英文檢定中高級通過、英文 A++</p>
-      </div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-l-4 border-l-primary flex items-center gap-4 md:gap-5 lg:gap-6">
-      <div class="size-14 md:size-16 lg:size-18 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
-        <span class="material-symbols-outlined text-primary text-xl md:text-2xl lg:text-3xl">workspace_premium</span>
-      </div>
-      <div class="flex-grow">
-        <div class="flex justify-between items-start">
-          <h4 class="font-extrabold text-[#101819] dark:text-white text-lg md:text-xl lg:text-2xl">林同學</h4>
-          <span class="text-xs md:text-sm lg:text-base px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-500 font-bold">2022 榜單</span>
-        </div>
-        <p class="text-primary font-bold text-sm md:text-base lg:text-lg mt-0.5">錄取：國立台灣師範大學附屬高級中學</p>
-        <p class="text-gray-500 text-xs md:text-sm lg:text-base mt-1">成就：自然與理化連續三次模擬考滿分</p>
-      </div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-l-4 border-l-accent-gold flex items-center gap-4 md:gap-5 lg:gap-6">
-      <div class="size-14 md:size-16 lg:size-18 rounded-full bg-accent-gold/10 flex-shrink-0 flex items-center justify-center">
-        <span class="material-symbols-outlined text-accent-gold text-xl md:text-2xl lg:text-3xl">stars</span>
-      </div>
-      <div class="flex-grow">
-        <div class="flex justify-between items-start">
-          <h4 class="font-extrabold text-[#101819] dark:text-white text-lg md:text-xl lg:text-2xl">張同學</h4>
-          <span class="text-xs md:text-sm lg:text-base px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-500 font-bold">2022 榜單</span>
-        </div>
-        <p class="text-primary font-bold text-sm md:text-base lg:text-lg mt-0.5">錄取：台北市立成功高級中學</p>
-        <p class="text-gray-500 text-xs md:text-sm lg:text-base mt-1">成就：校排前 5%、全市科展優等</p>
-      </div>
-    </div>
+    }
   </div>
-  <button class="w-full md:w-auto md:px-8 lg:px-12 mt-6 md:mt-8 lg:mt-10 py-3 md:py-4 lg:py-5 border-2 border-primary text-primary font-bold rounded-xl md:rounded-2xl hover:bg-primary hover:text-white transition-colors text-sm md:text-base lg:text-lg">
-    查看更多榮譽榜
-  </button>
+  <div class="flex justify-center mt-6 md:mt-8 lg:mt-10">
+    <button (click)="toggleShowAll()" class="px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5 border-2 border-primary text-primary font-bold rounded-xl md:rounded-2xl hover:bg-primary hover:text-white transition-colors text-sm md:text-base">
+      @if (showAll()) {
+        <span class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">expand_less</span>
+          收合列表
+        </span>
+      } @else {
+        <span class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">expand_more</span>
+          查看更多 ({{ honorsData.length - 6 }} 位)
+        </span>
+      }
+    </button>
+  </div>
 </section>

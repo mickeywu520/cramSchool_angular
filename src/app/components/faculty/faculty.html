@@ -37,7 +37,7 @@
     
     <section class="px-4 md:px-5 lg:px-6 space-y-4 md:space-y-6 lg:space-y-8 mt-2">
       @for (teacher of filteredTeachers; track teacher.name) {
-        <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl overflow-hidden bento-shadow border border-gray-50 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl overflow-hidden bento-shadow border border-gray-50 dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-all" [attr.data-teacher]="teacher.name" (click)="openModal(teacher)">
           <div class="relative aspect-[3/4] bg-gray-100">
             <img [alt]="teacher.name" class="w-full h-full object-cover" [src]="teacher.image"/>
             <div class="absolute top-3 md:top-4 right-3 md:right-4 px-3 md:px-4 py-1 md:py-1.5 bg-accent-gold/90 backdrop-blur-md text-white text-xs md:text-sm font-bold rounded-full">
@@ -50,18 +50,19 @@
                 <h2 class="text-xl md:text-2xl lg:text-3xl font-extrabold text-[#101819] dark:text-white">{{ teacher.name }}</h2>
                 <p class="text-primary font-bold text-sm md:text-base">{{ teacher.degree }}</p>
               </div>
-              <div class="bg-primary/10 text-primary px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold">
-                {{ teacher.experience }} 教學經驗
-              </div>
+              <button class="bg-primary/10 text-primary px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">info</span>
+                了解更多
+              </button>
             </div>
             <div class="space-y-3 md:space-y-4">
               <div>
                 <h3 class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">教學理念</h3>
                 <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed italic">
-                  「{{ teacher.philosophy }}」
+                  「{{ teacher.philosophy.substring(0, 80) }}...」
                 </p>
               </div>
-              <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 md:py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+              <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 md:py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm md:text-base" (click)="$event.stopPropagation()">
                 <span class="material-symbols-outlined text-xl">chat</span> 聯絡導師
               </button>
             </div>
@@ -79,6 +80,46 @@
       <p class="text-xs md:text-sm text-gray-400">© 2024 禾笙文理補習班. 版權所有.</p>
     </footer>
   </main>
+  
+  @if (selectedTeacher()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeModal()"></div>
+      <div class="relative bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <button class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors" (click)="closeModal()">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+        <div class="relative aspect-[3/4]">
+          <img [alt]="selectedTeacher().name" class="w-full h-full object-cover" [src]="selectedTeacher().image"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <span class="inline-block px-3 py-1 bg-primary text-white text-xs font-bold rounded-full mb-2">{{ selectedTeacher().subject }}</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white">{{ selectedTeacher().name }}</h2>
+            <p class="text-white/80 text-sm mt-1">{{ selectedTeacher().degree }}</p>
+          </div>
+        </div>
+        <div class="p-6 md:p-8 space-y-6">
+          <div class="bg-primary/5 dark:bg-primary/10 rounded-xl p-4">
+            <p class="text-primary font-bold text-center italic text-lg">「{{ selectedTeacher().highlight }}」</p>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">老師的話</h3>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{{ selectedTeacher().philosophy }}</p>
+          </div>
+          @if (selectedTeacher().lifePhoto) {
+            <div>
+              <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">老師風采</h3>
+              <div class="rounded-xl overflow-hidden">
+                <img [alt]="selectedTeacher().name + '生活照'" class="w-full h-auto object-cover" [src]="selectedTeacher().lifePhoto"/>
+              </div>
+            </div>
+          }
+          <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-xl">chat</span> 聯絡導師
+          </button>
+        </div>
+      </div>
+    </div>
+  }
   
   <div class="fixed bottom-6 right-6 z-40">
     <button class="bg-accent-gold text-white size-12 md:size-14 lg:size-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-white dark:ring-gray-800">

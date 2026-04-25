@@ -6,25 +6,17 @@
     <a routerLink="/faculty" class="text-xs md:text-sm lg:text-base font-bold text-primary">查看全部</a>
   </div>
   <div class="flex overflow-x-auto gap-4 px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8 no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:gap-6 lg:gap-8">
-    <div class="min-w-[200px] md:min-w-0 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl overflow-hidden bento-shadow flex-shrink-0 md:flex-shrink border border-gray-50 dark:border-gray-700">
-      <div class="relative aspect-[3/4] bg-gray-100">
-        <img alt="陳莎拉 博士" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkvTBu91lHUB21y6TkkoEGc3Fivdqtlz6W4bE3uYBmzePkVcwTCOelCQNCHbLLqIV3GvDj09lgxbX1rRLxHpegn2N-8GYph9BGA3nQaSZKA84wci6Vgf-qn2gTJa1Jt-pkOyUzkPytJv07l04C332H1JyyYlSvhFHgzqTswomN5xsdv4DSCXVsBJjY80qJcoej_DAvv0ABElF7FDVlZcNxiTQ8ERtyeZQXZvB3VWlOtPWJ5ozcdEXJ2zV2EMifMrDVq-A0am89fyI"/>
-        <div class="absolute top-2 right-2 px-2 py-1 bg-accent-gold text-white text-[10px] md:text-xs font-bold rounded">數學專家</div>
-      </div>
-      <div class="p-4 md:p-5 lg:p-6">
-        <h4 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl">陳莎拉 博士</h4>
-        <p class="text-xs md:text-sm lg:text-base text-gray-500 mt-1">超過 10 年教學經驗</p>
-      </div>
-    </div>
-    <div class="min-w-[200px] md:min-w-0 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl overflow-hidden bento-shadow flex-shrink-0 md:flex-shrink border border-gray-50 dark:border-gray-700">
-      <div class="relative aspect-[3/4] bg-gray-100">
-        <img alt="James Wilson" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDS_g2oaNNwslbhYIINmstYGGZKlBED2qfmlg0fg42msvQ57eFGMj33W3xJoleO_LZ97gAvfDak73Viz-meMuDnIq3bgaNXYWOQAfJAsTQqzvsAa7hrkkAwdiKlqlKuVAKi3VA7wvwdCMKkvhB63OYhJnGQwd8-1ib0J3w1Pxya4JOEAjhk8x60P9v-gGUwG8TBjYSPIeeTO9Cgj69sURhVv0gPGY8E0-lZOMkrUdRQ43HdMKYtHP8KuzYxgngUOTtGbvGQrTwXuec"/>
-        <div class="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-[10px] md:text-xs font-bold rounded">英文專家</div>
-      </div>
-      <div class="p-4 md:p-5 lg:p-6">
-        <h4 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl">James Wilson</h4>
-        <p class="text-xs md:text-sm lg:text-base text-gray-500 mt-1">雅思/托福首席導師</p>
-      </div>
-    </div>
+    @for (teacher of featuredTeachers; track teacher.name) {
+      <a [routerLink]="['/faculty']" [queryParams]="{teacher: teacher.name}" class="min-w-[200px] md:min-w-0 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl overflow-hidden bento-shadow flex-shrink-0 md:flex-shrink border border-gray-50 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all block">
+        <div class="relative aspect-[3/4] bg-gray-100">
+          <img [alt]="teacher.name" class="w-full h-full object-cover" [src]="teacher.image"/>
+          <div class="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-[10px] md:text-xs font-bold rounded">{{ teacher.subject }}</div>
+        </div>
+        <div class="p-4 md:p-5 lg:p-6">
+          <h4 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl">{{ teacher.name }}</h4>
+          <p class="text-xs md:text-sm lg:text-base text-gray-500 mt-1">{{ teacher.highlight }}</p>
+        </div>
+      </a>
+    }
   </div>
 </section>

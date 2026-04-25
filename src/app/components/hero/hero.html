@@ -1,20 +1,39 @@
 <section class="p-4 md:p-6 lg:p-8">
   <div class="relative overflow-hidden rounded-xl bg-primary/5 md:rounded-2xl lg:rounded-3xl min-h-[440px] md:min-h-[500px] lg:min-h-[600px] flex flex-col justify-end p-6 md:p-8 lg:p-12 group">
     <div class="absolute inset-0 z-0">
-      <img alt="禾笙文理補習班" class="w-full h-full object-cover brightness-75 group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4B7Jz1h6-Na8KxLcw-HIWIwBTPeKD1zs1uZbom9DkCilyFkpt0yFkUpIZzJRzNdi_ssc4SoBpcB58WxJlhwh8vYAuOGY2eH6CcF9yd4duf-EB995QwsNAq5YxuyAliavQD9qM0mqaoh21g6RrDIoVSWlDNvJ0q2jusk3NGmxyZ-VIOLlTnBCmvvDiKdI-3IJdBDaqGltx4Er84ynyThl9d3yA0BybklgHEMhLaShCsPus49phBCQinYzZQKXTvJvOfU67InCnb04"/>
+      @for (banner of banners; track banner; let i = $index) {
+        <img 
+          [alt]="banner.title" 
+          class="w-full h-full object-cover brightness-75 absolute inset-0"
+          [style.opacity]="i === currentIndex() ? 1 : 0"
+          style="transition: opacity 0.5s ease-in-out"
+          [src]="banner.image"
+        >
+      }
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
     </div>
     <div class="relative z-10 space-y-4 md:space-y-6 lg:space-y-8 max-w-md md:max-w-lg lg:max-w-2xl">
-      <span class="inline-block px-3 py-1 bg-accent-gold text-white text-xs font-bold rounded-full uppercase tracking-widest">招生中</span>
+      <span class="inline-block px-3 py-1 bg-accent-gold text-white text-xs font-bold rounded-full uppercase tracking-widest">{{ banners[currentIndex()].tag }}</span>
       <h1 class="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
-        成就卓越未來<br/>培育學子競爭力
+        {{ banners[currentIndex()].title }}<br/>{{ banners[currentIndex()].titleLine2 }}
       </h1>
       <p class="text-white/90 text-sm md:text-base lg:text-lg font-medium leading-relaxed max-w-[280px] md:max-w-md">
-        禾笙文理補習班，專業師資與溫馨環境，引領學生邁向學術高峰。
+        {{ banners[currentIndex()].description }}
       </p>
       <button class="w-full md:w-auto md:px-8 lg:px-12 bg-primary hover:bg-primary/90 text-white font-bold py-4 md:py-5 lg:py-6 rounded-xl md:rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2">
         諮詢詳情 <span class="material-symbols-outlined">arrow_forward</span>
       </button>
+    </div>
+    <button class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors" (click)="prev()">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <button class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors" (click)="next()">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+    <div class="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      @for (banner of banners; track banner; let i = $index) {
+        <button class="w-2 h-2 md:w-3 md:h-3 rounded-full transition-all" [class.bg-white]="i === currentIndex()" [class.bg-white/50]="i !== currentIndex()" (click)="goTo(i)"></button>
+      }
     </div>
   </div>
 </section>
