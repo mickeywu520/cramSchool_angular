@@ -29,18 +29,23 @@
 
     @if (activeTab() === 'login') {
       <div class="login-form space-y-4">
+        @if (loginError()) {
+          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+            {{ loginError() }}
+          </div>
+        }
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">電子郵件或手機號碼</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">person</span>
-            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="example@email.com" type="text"/>
+            <input [(ngModel)]="loginEmail" name="loginEmail" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="example@email.com" type="text"/>
           </div>
         </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">密碼</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
-            <input [type]="showPassword() ? 'text' : 'password'" class="w-full pl-12 pr-12 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入您的密碼" type="password"/>
+            <input [(ngModel)]="loginPassword" name="loginPassword" [type]="showPassword() ? 'text' : 'password'" class="w-full pl-12 pr-12 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入您的密碼"/>
             <button (click)="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
               <span class="material-symbols-outlined">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
             </button>
@@ -49,7 +54,7 @@
         <div class="flex justify-end">
           <a class="text-xs md:text-sm font-bold text-primary" href="#">忘記密碼？</a>
         </div>
-        <button (click)="goToStudent()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
+        <button (click)="handleLogin()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
           登入帳號
         </button>
       </div>
