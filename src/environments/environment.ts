@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://35.212.242.222:8000/api/v1',
+  apiUrl: 'https://www.gateway2go.bbroot.com/api/v1',
   firebase: {
     apiKey: 'AIzaSyBWHj8Ia3kcJpzI-383guRYVEt4BlEWOfc',
     authDomain: 'cramschool-b4d52.firebaseapp.com',
