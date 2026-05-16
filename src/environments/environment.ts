@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://www.gateway2go.bbroot.com/api/v1',
+  apiUrl: 'https://api.gateway2go.bbroot.com/api/v1',
   firebase: {
     apiKey: 'AIzaSyBWHj8Ia3kcJpzI-383guRYVEt4BlEWOfc',
-    authDomain: 'cramschool-b4d52.firebaseapp.com',
+    authDomain: 'www.gateway2go.bbroot.com',
     projectId: 'cramschool-b4d52',
     storageBucket: 'cramschool-b4d52.firebasestorage.app',
     messagingSenderId: '81636913641',
