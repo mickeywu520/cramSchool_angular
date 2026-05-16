@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -14,8 +15,12 @@ export class Register {
   loginEmail = signal('');
   loginPassword = signal('');
   loginError = signal('');
+  loading = signal(false);
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
   setActiveTab(tab: 'login' | 'register') {
     this.activeTab.set(tab);
@@ -40,16 +45,23 @@ export class Register {
       return;
     }
 
-    // TODO: [API對接] 替換為後端登入 API 呼叫
-    // 目前 hard-coded admin/admin，後續改為 POST /api/auth/login
-    // 後端應回傳 JWT token + role，前端根據 role 判斷跳轉 admin 或 student
-    if (email === 'admin' && password === 'admin') {
-      sessionStorage.setItem('admin_logged_in', 'true');
-      this.router.navigate(['/admin/banners']);
-      return;
-    }
+    // Map 'admin' shorthand to full email for backend API
+    const apiEmail = email === 'admin' ? 'admin@cramschool.com' : email;
 
-    // TODO: [API對接] 一般使用者登入，替換為 API 呼叫後根據 role 跳轉
-    this.router.navigate(['/student']);
+    this.loading.set(true);
+    this.auth.login(apiEmail, password).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.user.role === 'admin') {
+          this.router.navigate(['/admin/banners']);
+        } else {
+          this.router.navigate(['/student']);
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.loginError.set(err.error?.error?.message || '登入失敗，請檢查帳號密碼');
+      },
+    });
   }
 }

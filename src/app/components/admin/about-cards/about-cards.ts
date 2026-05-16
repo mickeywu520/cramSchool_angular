@@ -1,5 +1,6 @@
-import { Component, signal, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 interface AboutCard {
   id: number;
@@ -17,18 +18,8 @@ interface AboutCard {
   styleUrl: './about-cards.scss',
 })
 export class AdminAboutCards implements OnInit {
-  constructor(private cdr: ChangeDetectorRef) {}
-
-  ngOnInit() {
-    this.cdr.detectChanges();
-  }
-
-  // TODO: [API對接] 替換為 GET /api/homepage/about-cards 取得資料
-  // 目前為 hard-coded dummy 資料供 UI 展示
-  cards = signal<AboutCard[]>([
-    { id: 1, title: '我們的使命', content: '禾笙致力於提供最高品質的教育服務，打造優質的學習環境，幫助每位學員達成升學目標。我們相信每位學生都有潛力，透過專業教學與個別輔導，讓孩子在學業上取得優異成績。', icon: 'flag', display_order: 0, is_active: true },
-    { id: 2, title: '老闆的話', content: '今天要不要訂飲料?', icon: 'format_quote', display_order: 1, is_active: true },
-  ]);
+  cards = signal<AboutCard[]>([]);
+  loading = signal(false);
 
   showForm = signal(false);
   isNew = signal(false);
@@ -49,8 +40,25 @@ export class AdminAboutCards implements OnInit {
     { value: 'diamond', label: '鑽石' },
   ];
 
+  constructor(private api: ApiService) {}
+
+  ngOnInit() {
+    this.loadCards();
+  }
+
   get canAdd() {
     return this.cards().length < this.maxCards;
+  }
+
+  loadCards() {
+    this.loading.set(true);
+    this.api.get<{ total: number; cards: AboutCard[] }>('/about-cards/all').subscribe({
+      next: (data) => {
+        this.cards.set(data.cards || []);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   openNewForm() {
@@ -77,54 +85,58 @@ export class AdminAboutCards implements OnInit {
     const data = this.formData();
     if (!data.title || !data.content) return;
 
+    const body = {
+      title: data.title,
+      content: data.content,
+      icon: data.icon || 'star',
+      display_order: data.display_order ?? this.cards().length,
+      is_active: data.is_active ?? true,
+    };
+
     if (this.isNew()) {
-      const newCard: AboutCard = {
-        id: Date.now(),
-        title: data.title || '',
-        content: data.content || '',
-        icon: data.icon || 'star',
-        display_order: data.display_order || 0,
-        is_active: data.is_active ?? true,
-      };
-      this.cards.update(list => [...list, newCard]);
+      this.api.post<AboutCard>('/about-cards', body).subscribe({
+        next: () => { this.loadCards(); this.closeForm(); },
+      });
     } else {
       const editing = this.editingCard();
       if (editing) {
-        this.cards.update(list =>
-          list.map(c => c.id === editing.id ? { ...c, ...data } as AboutCard : c)
-        );
+        this.api.put<AboutCard>(`/about-cards/${editing.id}`, body).subscribe({
+          next: () => { this.loadCards(); this.closeForm(); },
+        });
       }
     }
-    this.closeForm();
   }
 
   deleteCard(card: AboutCard) {
     if (confirm(`確定要刪除「${card.title}」嗎？`)) {
-      this.cards.update(list => list.filter(c => c.id !== card.id));
+      this.api.delete(`/about-cards/${card.id}`).subscribe({
+        next: () => this.loadCards(),
+      });
     }
   }
 
   toggleActive(card: AboutCard) {
-    this.cards.update(list =>
-      list.map(c => c.id === card.id ? { ...c, is_active: !c.is_active } : c)
-    );
+    this.api.put(`/about-cards/${card.id}`, { is_active: !card.is_active }).subscribe({
+      next: () => this.loadCards(),
+    });
   }
 
   moveUp(index: number) {
     if (index === 0) return;
-    this.cards.update(list => {
-      const arr = [...list];
-      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
-      return arr.map((c, i) => ({ ...c, display_order: i }));
-    });
+    this.reorder(index - 1, index);
   }
 
   moveDown(index: number) {
     if (index === this.cards().length - 1) return;
-    this.cards.update(list => {
-      const arr = [...list];
-      [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
-      return arr.map((c, i) => ({ ...c, display_order: i }));
+    this.reorder(index, index + 1);
+  }
+
+  private reorder(from: number, to: number) {
+    const arr = [...this.cards()];
+    [arr[from], arr[to]] = [arr[to], arr[from]];
+    const order = arr.map((c) => c.id);
+    this.api.put('/about-cards/reorder', { order }).subscribe({
+      next: () => this.loadCards(),
     });
   }
 }

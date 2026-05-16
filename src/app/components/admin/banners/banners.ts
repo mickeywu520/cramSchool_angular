@@ -1,5 +1,6 @@
-import { Component, signal, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 interface Banner {
   id: number;
@@ -17,32 +18,36 @@ interface Banner {
   styleUrl: './banners.scss',
 })
 export class AdminBanners implements OnInit {
-  constructor(private cdr: ChangeDetectorRef) {}
-
-  ngOnInit() {
-    this.cdr.detectChanges();
-  }
-
-  // TODO: [API對接] 替換為 GET /api/homepage/banners 取得資料
-  // 目前為 hard-coded dummy 資料供 UI 展示
-  banners = signal<Banner[]>([
-    { id: 1, title: '招生中', image_url: '/banners/home_banner_1.jpg', link_url: '', display_order: 0, is_active: true },
-    { id: 2, title: '新班開課', image_url: '/banners/home_banner_2.png', link_url: '', display_order: 1, is_active: true },
-    { id: 3, title: '限時優惠', image_url: '/banners/home_banner_3.png', link_url: '', display_order: 2, is_active: true },
-    { id: 4, title: '會考衝刺班', image_url: '/banners/home_banner_4.jpg', link_url: '', display_order: 3, is_active: true },
-    { id: 5, title: '暑期營隊', image_url: '/banners/home_banner_5.png', link_url: '', display_order: 4, is_active: true },
-    { id: 6, title: '免費試聽', image_url: '/banners/home_banner_6.png', link_url: '', display_order: 5, is_active: true },
-  ]);
+  banners = signal<Banner[]>([]);
+  loading = signal(false);
 
   editingBanner = signal<Banner | null>(null);
   showForm = signal(false);
   isNew = signal(false);
   formData = signal<Partial<Banner>>({});
   previewImage = signal<string | null>(null);
+  selectedFile = signal<File | null>(null);
   maxBanners = 6;
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit() {
+    this.loadBanners();
+  }
 
   get canAdd() {
     return this.banners().length < this.maxBanners;
+  }
+
+  loadBanners() {
+    this.loading.set(true);
+    this.api.get<Banner[]>('/banners/all').subscribe({
+      next: (data) => {
+        this.banners.set(data || []);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   openNewForm() {
@@ -50,6 +55,7 @@ export class AdminBanners implements OnInit {
     this.isNew.set(true);
     this.formData.set({ title: '', image_url: '', link_url: '', display_order: this.banners().length, is_active: true });
     this.previewImage.set(null);
+    this.selectedFile.set(null);
     this.showForm.set(true);
   }
 
@@ -58,6 +64,7 @@ export class AdminBanners implements OnInit {
     this.editingBanner.set(banner);
     this.formData.set({ ...banner });
     this.previewImage.set(banner.image_url);
+    this.selectedFile.set(null);
     this.showForm.set(true);
   }
 
@@ -66,17 +73,17 @@ export class AdminBanners implements OnInit {
     this.editingBanner.set(null);
     this.formData.set({});
     this.previewImage.set(null);
+    this.selectedFile.set(null);
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      this.selectedFile.set(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result as string;
-        this.previewImage.set(result);
-        this.formData.update(d => ({ ...d, image_url: result }));
+        this.previewImage.set(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -84,56 +91,72 @@ export class AdminBanners implements OnInit {
 
   save() {
     const data = this.formData();
-    if (!data.title || !data.image_url) return;
+    if (!data.title || (!data.image_url && !this.selectedFile())) return;
 
-    if (this.isNew()) {
-      const newBanner: Banner = {
-        id: Date.now(),
-        title: data.title || '',
-        image_url: data.image_url || '',
+    const doSave = (imageUrl: string) => {
+      const body = {
+        title: data.title,
+        image_url: imageUrl,
         link_url: data.link_url || '',
-        display_order: data.display_order || 0,
+        display_order: data.display_order ?? this.banners().length,
         is_active: data.is_active ?? true,
       };
-      this.banners.update(list => [...list, newBanner]);
-    } else {
-      const editing = this.editingBanner();
-      if (editing) {
-        this.banners.update(list =>
-          list.map(b => b.id === editing.id ? { ...b, ...data } as Banner : b)
-        );
+
+      if (this.isNew()) {
+        this.api.post<Banner>('/banners', body).subscribe({
+          next: () => { this.loadBanners(); this.closeForm(); },
+        });
+      } else {
+        const editing = this.editingBanner();
+        if (editing) {
+          this.api.put<Banner>(`/banners/${editing.id}`, body).subscribe({
+            next: () => { this.loadBanners(); this.closeForm(); },
+          });
+        }
       }
+    };
+
+    const file = this.selectedFile();
+    if (file) {
+      this.api.upload<{ url: string }>('/upload/image/banners', file).subscribe({
+        next: (res) => doSave(res.url),
+        error: () => doSave(data.image_url || ''),
+      });
+    } else {
+      doSave(data.image_url || '');
     }
-    this.closeForm();
   }
 
   deleteBanner(banner: Banner) {
     if (confirm(`確定要刪除「${banner.title}」嗎？`)) {
-      this.banners.update(list => list.filter(b => b.id !== banner.id));
+      this.api.delete(`/banners/${banner.id}`).subscribe({
+        next: () => this.loadBanners(),
+      });
     }
   }
 
   toggleActive(banner: Banner) {
-    this.banners.update(list =>
-      list.map(b => b.id === banner.id ? { ...b, is_active: !b.is_active } : b)
-    );
+    this.api.put<Banner>(`/banners/${banner.id}`, { is_active: !banner.is_active }).subscribe({
+      next: () => this.loadBanners(),
+    });
   }
 
   moveUp(index: number) {
     if (index === 0) return;
-    this.banners.update(list => {
-      const arr = [...list];
-      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
-      return arr.map((b, i) => ({ ...b, display_order: i }));
-    });
+    this.reorder(index - 1, index);
   }
 
   moveDown(index: number) {
     if (index === this.banners().length - 1) return;
-    this.banners.update(list => {
-      const arr = [...list];
-      [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
-      return arr.map((b, i) => ({ ...b, display_order: i }));
+    this.reorder(index, index + 1);
+  }
+
+  private reorder(from: number, to: number) {
+    const arr = [...this.banners()];
+    [arr[from], arr[to]] = [arr[to], arr[from]];
+    const order = arr.map((b) => b.id);
+    this.api.put('/banners/reorder', { order }).subscribe({
+      next: () => this.loadBanners(),
     });
   }
 }

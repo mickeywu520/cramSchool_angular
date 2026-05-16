@@ -1,5 +1,6 @@
-import { Component, signal, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 interface Honor {
   id: number;
@@ -18,24 +19,8 @@ interface Honor {
   styleUrl: './honors.scss',
 })
 export class AdminHonors implements OnInit {
-  constructor(private cdr: ChangeDetectorRef) {}
-
-  ngOnInit() {
-    this.cdr.detectChanges();
-  }
-
-  // TODO: [API對接] 替換為 GET /api/homepage/honors 取得資料
-  // 目前為 hard-coded dummy 資料供 UI 展示（8筆範例）
-  honors = signal<Honor[]>([
-    { id: 1, student_name: '許O恩', school: '南山', department: '國立臺灣大學 電機工程學系', year: 114, exam_type: '學測', display_order: 0 },
-    { id: 2, student_name: '林O翰', school: '南山', department: '國立臺灣大學 電機工程學系', year: 114, exam_type: '學測', display_order: 1 },
-    { id: 3, student_name: '曾O容', school: '南山', department: '國立臺灣大學 物理治療學系', year: 114, exam_type: '學測', display_order: 2 },
-    { id: 4, student_name: '陳O心', school: '南山', department: '國立臺灣大學 大氣科學系', year: 114, exam_type: '學測', display_order: 3 },
-    { id: 5, student_name: '吳O昀', school: '南山', department: '國立臺灣大學 中國文學系', year: 114, exam_type: '學測', display_order: 4 },
-    { id: 6, student_name: '王O涵', school: '南山', department: '國立臺灣大學 資訊管理學系', year: 114, exam_type: '學測', display_order: 5 },
-    { id: 7, student_name: '黃O蓉', school: '南山', department: '臺北醫學大學 藥學系', year: 114, exam_type: '學測', display_order: 6 },
-    { id: 8, student_name: '鄭O銘', school: '南山', department: '臺北醫學大學 醫學檢驗暨生物技術學系', year: 114, exam_type: '學測', display_order: 7 },
-  ]);
+  honors = signal<Honor[]>([]);
+  loading = signal(false);
 
   showForm = signal(false);
   isNew = signal(false);
@@ -45,8 +30,25 @@ export class AdminHonors implements OnInit {
 
   examTypeOptions = ['會考', '學測', '指考', '其他'];
 
+  constructor(private api: ApiService) {}
+
+  ngOnInit() {
+    this.loadHonors();
+  }
+
   get canAdd() {
     return this.honors().length < this.maxHonors;
+  }
+
+  loadHonors() {
+    this.loading.set(true);
+    this.api.get<{ total: number; honors: Honor[] }>('/honors').subscribe({
+      next: (data) => {
+        this.honors.set(data.honors || []);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   openNewForm() {
@@ -73,49 +75,53 @@ export class AdminHonors implements OnInit {
     const data = this.formData();
     if (!data.student_name || !data.school || !data.department) return;
 
+    const body = {
+      student_name: data.student_name,
+      school: data.school,
+      department: data.department,
+      year: data.year ?? 114,
+      exam_type: data.exam_type || '學測',
+      display_order: data.display_order ?? this.honors().length,
+    };
+
     if (this.isNew()) {
-      const newHonor: Honor = {
-        id: Date.now(),
-        student_name: data.student_name || '',
-        school: data.school || '',
-        department: data.department || '',
-        year: data.year || 114,
-        exam_type: data.exam_type || '學測',
-        display_order: data.display_order || 0,
-      };
-      this.honors.update(list => [...list, newHonor]);
+      this.api.post<Honor>('/honors', body).subscribe({
+        next: () => { this.loadHonors(); this.closeForm(); },
+      });
     } else {
       const editing = this.editingHonor();
       if (editing) {
-        this.honors.update(list =>
-          list.map(h => h.id === editing.id ? { ...h, ...data } as Honor : h)
-        );
+        this.api.put<Honor>(`/honors/${editing.id}`, body).subscribe({
+          next: () => { this.loadHonors(); this.closeForm(); },
+        });
       }
     }
-    this.closeForm();
   }
 
   deleteHonor(honor: Honor) {
     if (confirm(`確定要刪除「${honor.student_name}」的榜單紀錄嗎？`)) {
-      this.honors.update(list => list.filter(h => h.id !== honor.id));
+      this.api.delete(`/honors/${honor.id}`).subscribe({
+        next: () => this.loadHonors(),
+      });
     }
   }
 
   moveUp(index: number) {
     if (index === 0) return;
-    this.honors.update(list => {
-      const arr = [...list];
-      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
-      return arr.map((h, i) => ({ ...h, display_order: i }));
-    });
+    this.swap(index - 1, index);
   }
 
   moveDown(index: number) {
     if (index === this.honors().length - 1) return;
-    this.honors.update(list => {
-      const arr = [...list];
-      [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
-      return arr.map((h, i) => ({ ...h, display_order: i }));
+    this.swap(index, index + 1);
+  }
+
+  private swap(from: number, to: number) {
+    const arr = [...this.honors()];
+    [arr[from], arr[to]] = [arr[to], arr[from]];
+    arr.forEach((h, i) => {
+      this.api.put(`/honors/${h.id}`, { display_order: i }).subscribe();
     });
+    this.loadHonors();
   }
 }

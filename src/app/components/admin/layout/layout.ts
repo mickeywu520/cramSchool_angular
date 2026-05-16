@@ -1,5 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,7 +10,6 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 })
 export class AdminLayout implements OnInit {
   sidebarOpen = signal(true);
-  currentPage = signal('');
 
   menuItems = [
     { path: '/admin/banners', icon: 'view_carousel', label: 'Banner 輪播管理' },
@@ -18,12 +18,13 @@ export class AdminLayout implements OnInit {
     { path: '/admin/honors', icon: 'emoji_events', label: '歷年榜單管理' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
-  // TODO: [API對接] 登入守衛改用 JWT token 驗證，而非 sessionStorage flag
-  // 後續改為檢查 token 是否存在 + role === 'admin'
   ngOnInit() {
-    if (!sessionStorage.getItem('admin_logged_in')) {
+    if (!this.auth.isAdmin) {
       this.router.navigate(['/register']);
     }
   }
@@ -33,7 +34,6 @@ export class AdminLayout implements OnInit {
   }
 
   logout() {
-    sessionStorage.removeItem('admin_logged_in');
-    this.router.navigate(['/register']);
+    this.auth.logout();
   }
 }

@@ -6,7 +6,7 @@
     <a routerLink="/faculty" class="text-xs md:text-sm lg:text-base font-bold text-primary">查看全部</a>
   </div>
   <div class="flex overflow-x-auto gap-4 px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8 no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:gap-6 lg:gap-8">
-    @for (teacher of featuredTeachers; track teacher.name) {
+    @for (teacher of featuredTeachers(); track teacher.name) {
       <a [routerLink]="['/faculty']" [queryParams]="{teacher: teacher.name}" class="min-w-[200px] md:min-w-0 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl overflow-hidden bento-shadow flex-shrink-0 md:flex-shrink border border-gray-50 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all block">
         <div class="relative aspect-[3/4] bg-gray-100">
           <img [alt]="teacher.name" class="w-full h-full object-cover" [src]="teacher.image"/>

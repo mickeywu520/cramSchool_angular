@@ -3,10 +3,10 @@
     <h2 class="text-[#101819] dark:text-white text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight flex items-center gap-2">
       <span class="w-8 md:w-12 lg:w-16 h-[2px] bg-primary"></span> 歷年優良學生與考績
     </h2>
-    <span class="text-xs md:text-sm text-gray-400">{{ honorsData.length }} 位學子錄取頂大</span>
+    <span class="text-xs md:text-sm text-gray-400">{{ honorsData().length }} 位學子錄取頂大</span>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
-    @for (honor of featuredHonors; track honor.name; let i = $index) {
+    @for (honor of featuredHonors; track honor.student_name; let i = $index) {
       <div class="bg-white dark:bg-gray-800 p-5 md:p-6 lg:p-7 rounded-2xl md:rounded-3xl bento-shadow border border-gray-50 dark:border-gray-700">
         <div class="flex items-start gap-4">
           <div class="size-12 md:size-14 lg:size-16 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
@@ -15,7 +15,7 @@
           <div class="flex-grow min-w-0">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-xs md:text-sm px-2 py-0.5 bg-accent-gold/10 text-accent-gold rounded font-bold">{{ honor.school }}</span>
-              <span class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl truncate">{{ honor.name }}</span>
+              <span class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg lg:text-xl truncate">{{ honor.student_name }}</span>
             </div>
             <p class="text-primary font-bold text-sm md:text-base lg:text-lg leading-tight">{{ honor.department }}</p>
           </div>
@@ -33,7 +33,7 @@
       } @else {
         <span class="flex items-center gap-2">
           <span class="material-symbols-outlined text-lg">expand_more</span>
-          查看更多 ({{ honorsData.length - 6 }} 位)
+          查看更多 ({{ honorsData().length - 6 }} 位)
         </span>
       }
     </button>
