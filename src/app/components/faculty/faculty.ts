@@ -53,10 +53,10 @@ export class Faculty implements OnInit, AfterViewInit {
       this.highlightTeacher.set(decodeURIComponent(teacherName));
     }
 
-    this.api.get<{ id: number; name: string; subject: string; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[]>('/teachers').subscribe({
+    this.api.get<{ total: number; teachers: { id: number; name: string; subject: string; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[] }>('/teachers').subscribe({
       next: (data) => {
         this.teachers.set(
-          (data || []).map((t) => ({
+          ((data && data.teachers) || []).map((t) => ({
             id: t.id,
             name: t.name,
             subject: t.subject + '科',

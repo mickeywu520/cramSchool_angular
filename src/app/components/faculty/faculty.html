@@ -38,8 +38,8 @@
     <section class="px-4 md:px-5 lg:px-6 space-y-4 md:space-y-6 lg:space-y-8 mt-2">
       @for (teacher of filteredTeachers; track teacher.name) {
         <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl overflow-hidden bento-shadow border border-gray-50 dark:border-gray-700 cursor-pointer hover:ring-2 hover:ring-primary transition-all" [attr.data-teacher]="teacher.name" (click)="openModal(teacher)">
-          <div class="relative aspect-[3/4] bg-gray-100">
-            <img [alt]="teacher.name" class="w-full h-full object-cover" [src]="teacher.image"/>
+          <div class="relative h-[264px] md:h-[312px] bg-gray-100 shrink-0">
+            <img [alt]="teacher.name" class="w-full h-full object-contain bg-gray-100" [src]="teacher.image"/>
             <div class="absolute top-3 md:top-4 right-3 md:right-4 px-3 md:px-4 py-1 md:py-1.5 bg-accent-gold/90 backdrop-blur-md text-white text-xs md:text-sm font-bold rounded-full">
               {{ teacher.subject }}
             </div>
