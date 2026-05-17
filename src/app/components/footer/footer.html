@@ -1,14 +1,24 @@
 <footer class="px-4 py-8 text-center">
   <div class="flex justify-center gap-4 mb-4">
-    <div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-      <span class="material-symbols-outlined text-gray-500 text-sm">social_leaderboard</span>
-    </div>
-    <div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-      <span class="material-symbols-outlined text-gray-500 text-sm">chat</span>
-    </div>
-    <div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-      <span class="material-symbols-outlined text-gray-500 text-sm">call</span>
-    </div>
+    <a href="https://line.me/R/ti/p/@hesheng" target="_blank" rel="noopener noreferrer" class="size-10 rounded-full bg-green-500 flex items-center justify-center hover:scale-110 transition-transform" title="LINE">
+      <span class="material-symbols-outlined text-white text-lg">chat</span>
+    </a>
+    <a href="https://www.instagram.com/hesheng_cramschool" target="_blank" rel="noopener noreferrer" class="size-10 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center hover:scale-110 transition-transform" title="Instagram">
+      <span class="material-symbols-outlined text-white text-lg">photo_camera</span>
+    </a>
+    <button (click)="showFBQR()" class="size-10 rounded-full bg-blue-600 flex items-center justify-center hover:scale-110 transition-transform" title="Facebook">
+      <span class="material-symbols-outlined text-white text-lg">thumb_up</span>
+    </button>
   </div>
-  <p class="text-xs text-gray-400">© 2024 禾笙文理補習班. 版權所有.</p>
+  <p class="text-xs text-gray-400">&copy; 2024 禾笙文理補習班. 版權所有.</p>
+
+  @if (fbQRVisible()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" (click)="hideFBQR()">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-xs mx-4" (click)="$event.stopPropagation()">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.facebook.com/heshengcramschool" alt="Facebook QR Code" class="mx-auto" />
+        <p class="text-center text-sm text-gray-500 mt-3">掃描 QR Code 加入 Facebook</p>
+        <button (click)="hideFBQR()" class="mt-3 w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300">關閉</button>
+      </div>
+    </div>
+  }
 </footer>

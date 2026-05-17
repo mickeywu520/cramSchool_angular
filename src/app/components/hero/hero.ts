@@ -1,12 +1,11 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 
-interface Banner {
+interface Slide {
   image: string;
   tag: string;
-  title: string;
-  titleLine2: string;
-  description: string;
+  link_url?: string;
+  is_event?: boolean;
 }
 
 @Component({
@@ -16,26 +15,35 @@ interface Banner {
   styleUrl: './hero.scss',
 })
 export class Hero implements OnInit, OnDestroy {
-  banners = signal<Banner[]>([]);
+  slides = signal<Slide[]>([]);
   currentIndex = signal(0);
+  private intervalMs = 5000;
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.api.get<{ image_url: string; title: string | null }[]>('/banners').subscribe({
+    this.api.get<{
+      banners: { image_url: string; title: string | null; link_url: string | null }[];
+      announcements: { title: string; content: string; published_at: string }[];
+      banner_interval_seconds: number;
+    }>('/homepage').subscribe({
       next: (data) => {
-        const mapped = data.map((b) => ({
+        this.intervalMs = Math.max(3000, Math.min(10000, (data.banner_interval_seconds || 5) * 1000));
+        const bannerSlides: Slide[] = data.banners.map((b) => ({
           image: b.image_url,
           tag: b.title || '',
-          title: '',
-          titleLine2: '',
-          description: '',
+          link_url: b.link_url || undefined,
         }));
-        if (mapped.length === 0) {
-          this.banners.set([]);
-        } else {
-          this.banners.set(mapped);
+        const eventSlides: Slide[] = data.announcements.map((a) => ({
+          image: '',
+          tag: '最新活動',
+          link_url: undefined,
+          is_event: true,
+        }));
+        const all = [...bannerSlides, ...eventSlides];
+        if (all.length > 0) {
+          this.slides.set(all);
           this.startAutoPlay();
         }
       },
@@ -49,8 +57,8 @@ export class Hero implements OnInit, OnDestroy {
   startAutoPlay() {
     this.stopAutoPlay();
     this.intervalId = setInterval(() => {
-      this.currentIndex.update(i => (i + 1) % this.banners().length);
-    }, 5000);
+      this.currentIndex.update(i => (i + 1) % this.slides().length);
+    }, this.intervalMs);
   }
 
   stopAutoPlay() {
@@ -65,10 +73,16 @@ export class Hero implements OnInit, OnDestroy {
   }
 
   prev() {
-    this.currentIndex.update(i => i === 0 ? this.banners().length - 1 : i - 1);
+    this.currentIndex.update(i => (i === 0 ? this.slides().length - 1 : i - 1));
   }
 
   next() {
-    this.currentIndex.update(i => (i + 1) % this.banners().length);
+    this.currentIndex.update(i => (i + 1) % this.slides().length);
+  }
+
+  clickSlide(s: Slide) {
+    if (s.link_url) {
+      window.open(s.link_url, '_blank');
+    }
   }
 }

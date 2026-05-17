@@ -3,38 +3,28 @@
     <h2 class="text-[#101819] dark:text-white text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight flex items-center gap-2">
       <span class="w-8 md:w-12 lg:w-16 h-[2px] bg-primary"></span> 課程內容
     </h2>
-    <a routerLink="/course-details" class="text-xs md:text-sm lg:text-base font-bold text-primary">查看全部</a>
   </div>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 lg:gap-6">
-    <div class="bg-accent-gold text-white p-5 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl flex flex-col justify-between aspect-square md:aspect-auto md:col-span-1 lg:col-span-2">
-      <span class="material-symbols-outlined text-4xl md:text-5xl lg:text-6xl opacity-50 self-end">child_care</span>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+    <a routerLink="/course-details" [queryParams]="{tab: 'elementary'}" class="bg-accent-gold text-white p-6 md:p-8 lg:p-10 rounded-2xl md:rounded-3xl flex flex-col justify-between aspect-video md:aspect-auto hover:scale-[1.02] transition-transform">
+      <span class="material-symbols-outlined text-5xl md:text-6xl opacity-50 self-end">child_care</span>
       <div>
-        <h3 class="text-xl md:text-2xl lg:text-3xl font-extrabold">國小部</h3>
-        <p class="text-white/80 text-[10px] md:text-xs lg:text-sm">基礎扎根與興趣培養</p>
+        <h3 class="text-2xl md:text-3xl lg:text-4xl font-extrabold">國小部</h3>
+        <p class="text-white/80 text-sm md:text-base">基礎扎根與興趣培養</p>
       </div>
-    </div>
-    <div class="bg-primary text-white p-5 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl flex flex-col justify-between aspect-square md:aspect-auto md:col-span-1 lg:col-span-2">
-      <span class="material-symbols-outlined text-4xl md:text-5xl lg:text-6xl opacity-50 self-end">menu_book</span>
+    </a>
+    <a routerLink="/course-details" [queryParams]="{tab: 'junior'}" class="bg-primary text-white p-6 md:p-8 lg:p-10 rounded-2xl md:rounded-3xl flex flex-col justify-between aspect-video md:aspect-auto hover:scale-[1.02] transition-transform">
+      <span class="material-symbols-outlined text-5xl md:text-6xl opacity-50 self-end">menu_book</span>
       <div>
-        <h3 class="text-xl md:text-2xl lg:text-3xl font-extrabold">國中部</h3>
-        <p class="text-white/80 text-[10px] md:text-xs lg:text-sm">精準複習與會考應戰</p>
+        <h3 class="text-2xl md:text-3xl lg:text-4xl font-extrabold">國中部</h3>
+        <p class="text-white/80 text-sm md:text-base">精準複習與會考應戰</p>
       </div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl bento-shadow border border-gray-50 dark:border-gray-700 text-center">
-      <span class="material-symbols-outlined text-primary mb-2 text-2xl md:text-3xl lg:text-4xl">functions</span>
-      <h4 class="font-bold text-sm md:text-base lg:text-lg">數學</h4>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl bento-shadow border border-gray-50 dark:border-gray-700 text-center">
-      <span class="material-symbols-outlined text-primary mb-2 text-2xl md:text-3xl lg:text-4xl">translate</span>
-      <h4 class="font-bold text-sm md:text-base lg:text-lg">英文</h4>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl bento-shadow border border-gray-50 dark:border-gray-700 text-center">
-      <span class="material-symbols-outlined text-primary mb-2 text-2xl md:text-3xl lg:text-4xl">biotech</span>
-      <h4 class="font-bold text-sm md:text-base lg:text-lg">理化</h4>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl bento-shadow border border-gray-50 dark:border-gray-700 text-center">
-      <span class="material-symbols-outlined text-primary mb-2 text-2xl md:text-3xl lg:text-4xl">history_edu</span>
-      <h4 class="font-bold text-sm md:text-base lg:text-lg">國文</h4>
-    </div>
+    </a>
+    <a routerLink="/course-details" [queryParams]="{tab: 'senior'}" class="bg-[#D9B44A] text-white p-6 md:p-8 lg:p-10 rounded-2xl md:rounded-3xl flex flex-col justify-between aspect-video md:aspect-auto hover:scale-[1.02] transition-transform">
+      <span class="material-symbols-outlined text-5xl md:text-6xl opacity-50 self-end">school</span>
+      <div>
+        <h3 class="text-2xl md:text-3xl lg:text-4xl font-extrabold">高中部</h3>
+        <p class="text-white/80 text-sm md:text-base">進階深化與升學衝刺</p>
+      </div>
+    </a>
   </div>
 </section>

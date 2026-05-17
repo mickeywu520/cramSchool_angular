@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 
@@ -19,7 +19,10 @@ interface Banner {
 })
 export class AdminBanners implements OnInit {
   banners = signal<Banner[]>([]);
+  renderKey = signal(0);
   loading = signal(false);
+  bannerInterval = signal(5);
+  savingInterval = signal(false);
 
   editingBanner = signal<Banner | null>(null);
   showForm = signal(false);
@@ -29,21 +32,46 @@ export class AdminBanners implements OnInit {
   selectedFile = signal<File | null>(null);
   maxBanners = 6;
 
+  trackByIndex = (i: number) => i;
+
   constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.loadBanners();
+    this.loadInterval();
   }
 
-  get canAdd() {
-    return this.banners().length < this.maxBanners;
+  loadInterval() {
+    this.api.get<{ seconds: number }>('/settings/banner-interval').subscribe({
+      next: (data) => this.bannerInterval.set(data.seconds),
+    });
   }
+
+  onIntervalChange(event: Event) {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    if (val >= 3 && val <= 10) {
+      this.bannerInterval.set(val);
+    }
+  }
+
+  saveInterval() {
+    const val = this.bannerInterval();
+    if (val < 3 || val > 10) return;
+    this.savingInterval.set(true);
+    this.api.put('/settings/banner-interval', { seconds: val }).subscribe({
+      next: () => this.savingInterval.set(false),
+      error: () => this.savingInterval.set(false),
+    });
+  }
+
+  canAdd = computed(() => this.banners().length < this.maxBanners);
 
   loadBanners() {
     this.loading.set(true);
     this.api.get<Banner[]>('/banners/all').subscribe({
       next: (data) => {
         this.banners.set(data || []);
+        this.renderKey.update(k => k + 1);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

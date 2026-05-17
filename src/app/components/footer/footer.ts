@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-footer',
@@ -6,4 +6,14 @@ import { Component } from '@angular/core';
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
-export class Footer {}
+export class Footer {
+  fbQRVisible = signal(false);
+
+  showFBQR() {
+    this.fbQRVisible.set(true);
+  }
+
+  hideFBQR() {
+    this.fbQRVisible.set(false);
+  }
+}

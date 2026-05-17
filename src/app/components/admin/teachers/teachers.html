@@ -99,8 +99,7 @@
                 @for (sub of subjectOptions; track sub) {
                   <button (click)="formData.update(d => ({ ...d, subject: sub }))"
                     class="px-3 py-1.5 text-sm rounded-lg border transition-colors"
-                    [class.border-primary bg-primary/10 text-primary font-semibold]="formData().subject === sub"
-                    [class.border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400]="formData().subject !== sub">
+                    [ngClass]="formData().subject === sub ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'">
                     {{ sub }}
                   </button>
                 }

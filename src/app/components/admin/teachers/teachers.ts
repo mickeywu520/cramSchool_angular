@@ -1,5 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgClass } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 
 interface Teacher {
@@ -17,7 +18,7 @@ interface Teacher {
 
 @Component({
   selector: 'app-admin-teachers',
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   templateUrl: './teachers.html',
   styleUrl: './teachers.scss',
 })
@@ -44,9 +45,9 @@ export class AdminTeachers implements OnInit {
 
   loadTeachers() {
     this.loading.set(true);
-    this.api.get<Teacher[]>('/teachers').subscribe({
+    this.api.get<{ total: number; teachers: Teacher[] }>('/teachers').subscribe({
       next: (data) => {
-        this.teachers.set(data || []);
+        this.teachers.set(data.teachers || []);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

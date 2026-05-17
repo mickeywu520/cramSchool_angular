@@ -34,4 +34,12 @@ export class Honors implements OnInit {
   toggleShowAll() {
     this.showAll.set(!this.showAll());
   }
+
+  maskName(name: string): string {
+    if (name.length <= 2) return name;
+    const first = name[0];
+    const last = name[name.length - 1];
+    const masked = 'O'.repeat(name.length - 2);
+    return first + masked + last;
+  }
 }

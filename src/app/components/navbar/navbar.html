@@ -5,7 +5,17 @@
     </div>
     <h2 class="text-[#101819] dark:text-white text-xl md:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight">禾笙</h2>
   </a>
-  <a routerLink="/register" class="bg-primary text-white px-4 md:px-6 lg:px-8 py-2 md:py-3 lg:py-4 rounded-lg md:rounded-xl text-sm md:text-base lg:text-lg font-bold tracking-wide">
-    註冊/登入
-  </a>
+
+  @if (auth.currentUser()) {
+    <div class="flex items-center gap-2">
+      <span class="text-sm md:text-base font-bold text-gray-600 dark:text-gray-300">{{ displayName }}</span>
+      <button (click)="logout()" class="bg-primary text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors">
+        登出
+      </button>
+    </div>
+  } @else {
+    <a routerLink="/register" class="bg-primary text-white px-4 md:px-6 lg:px-8 py-2 md:py-3 lg:py-4 rounded-lg md:rounded-xl text-sm md:text-base lg:text-lg font-bold tracking-wide">
+      註冊/登入
+    </a>
+  }
 </nav>

@@ -30,6 +30,12 @@
       >
         國中部 (Junior High)
       </button>
+      <button 
+        (click)="setTab('senior')"
+        [class]="activeTab() === 'senior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+      >
+        高中部 (Senior High)
+      </button>
     </div>
     
     <div class="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
@@ -183,6 +189,70 @@
               <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
                 <span class="material-symbols-outlined text-sm md:text-base">person</span>
                 <span>師資：James Wilson 老師</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      
+      @if (activeTab() === 'senior') {
+        <div class="space-y-4" id="senior-section">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2 h-5 md:h-6 bg-[#D9B44A] rounded-full"></span>
+            <h3 class="text-lg md:text-xl lg:text-2xl font-extrabold">高中部進階課程</h3>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">calculate</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">高中數學頂標班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">高中 1-3 年級</p>
+                </div>
+              </div>
+              <span class="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">頂尖</span>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              涵蓋學測、分科測驗數學範圍，著重邏輯推理與解題技巧，目標頂標以上成績。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週六、日 14:00 - 17:00</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：程昊 老師</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="size-10 md:size-12 lg:size-14 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">translate</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-base md:text-lg lg:text-xl">高中英文強化班</h4>
+                  <p class="text-xs md:text-sm text-gray-400">高中 1-3 年級</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+              字彙、文法、閱讀、寫作全面強化，培養學測與分科測驗高分實力。
+            </p>
+            <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                <span>每週三、五 18:30 - 21:00</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                <span>師資：秦清 老師</span>
               </div>
             </div>
           </div>
