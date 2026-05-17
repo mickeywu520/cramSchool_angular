@@ -1,5 +1,6 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgClass } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 
 interface Banner {
@@ -13,7 +14,7 @@ interface Banner {
 
 @Component({
   selector: 'app-admin-banners',
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   templateUrl: './banners.html',
   styleUrl: './banners.scss',
 })

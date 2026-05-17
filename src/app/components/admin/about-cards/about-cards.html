@@ -43,8 +43,7 @@
           </button>
           <button (click)="toggleActive(card)"
             class="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
-            [class.bg-green-50 text-green-600]="card.is_active"
-            [class.bg-gray-100 text-gray-500]="!card.is_active">
+            [ngClass]="card.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'">
             <span class="material-symbols-outlined text-sm">{{ card.is_active ? 'visibility' : 'visibility_off' }}</span>
           </button>
           <button (click)="moveUp(i)" [disabled]="i === 0"
