@@ -23,19 +23,21 @@
       </div>
     }
   </div>
-  <div class="flex justify-center mt-6 md:mt-8 lg:mt-10">
-    <button (click)="toggleShowAll()" class="px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5 border-2 border-primary text-primary font-bold rounded-xl md:rounded-2xl hover:bg-primary hover:text-white transition-colors text-sm md:text-base">
-      @if (showAll()) {
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-lg">expand_less</span>
-          收合列表
-        </span>
-      } @else {
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-lg">expand_more</span>
-          查看更多 ({{ honorsData().length - 6 }} 位)
-        </span>
-      }
-    </button>
-  </div>
+  @if (honorsData().length > 6) {
+    <div class="flex justify-center mt-6 md:mt-8 lg:mt-10">
+      <button (click)="toggleShowAll()" class="px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5 border-2 border-primary text-primary font-bold rounded-xl md:rounded-2xl hover:bg-primary hover:text-white transition-colors text-sm md:text-base">
+        @if (showAll()) {
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">expand_less</span>
+            收合列表
+          </span>
+        } @else {
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">expand_more</span>
+            查看更多 ({{ honorsData().length - 6 }} 位)
+          </span>
+        }
+      </button>
+    </div>
+  }
 </section>
