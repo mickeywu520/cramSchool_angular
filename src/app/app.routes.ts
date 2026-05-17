@@ -12,6 +12,7 @@ import { AdminBanners } from './components/admin/banners/banners';
 import { AdminAboutCards } from './components/admin/about-cards/about-cards';
 import { AdminTeachers } from './components/admin/teachers/teachers';
 import { AdminHonors } from './components/admin/honors/honors';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -25,6 +26,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayout,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'banners', pathMatch: 'full' },
       { path: 'banners', component: AdminBanners },

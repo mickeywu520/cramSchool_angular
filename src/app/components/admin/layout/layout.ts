@@ -1,5 +1,5 @@
-import { Component, signal, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
-export class AdminLayout implements OnInit {
+export class AdminLayout {
   sidebarOpen = signal(true);
 
   menuItems = [
@@ -19,15 +19,8 @@ export class AdminLayout implements OnInit {
   ];
 
   constructor(
-    private router: Router,
-    private auth: AuthService,
+    public auth: AuthService,
   ) {}
-
-  ngOnInit() {
-    if (!this.auth.isAdmin) {
-      this.router.navigate(['/register']);
-    }
-  }
 
   toggleSidebar() {
     this.sidebarOpen.update(v => !v);
