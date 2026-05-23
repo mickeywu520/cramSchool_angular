@@ -19,90 +19,150 @@
     </div>
     
     <form class="space-y-4 md:space-y-5 lg:space-y-6" onsubmit="return false;">
+      @if (error()) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+          {{ error() }}
+        </div>
+      }
+
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">學生姓名</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          學生姓名 <span class="text-red-500">*</span>
+        </label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
-          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入學生全名" type="text"/>
+          <input [(ngModel)]="studentName" name="studentName" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入學生全名" type="text"/>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          性別 <span class="text-red-500">*</span>
+        </label>
+        <div class="flex gap-4 ml-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="gender" value="男" [checked]="gender() === '男'" (change)="gender.set('男')" class="text-primary focus:ring-primary"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">男</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="gender" value="女" [checked]="gender() === '女'" (change)="gender.set('女')" class="text-primary focus:ring-primary"/>
+            <span class="text-sm md:text-base font-bold dark:text-gray-300">女</span>
+          </label>
         </div>
       </div>
       
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">學生出生年月日</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          學生出生年月日 <span class="text-red-500">*</span>
+        </label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">cake</span>
-          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white" type="date"/>
+          <input [(ngModel)]="birthDate" name="birthDate" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white" type="date"/>
         </div>
       </div>
-      
+
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長姓名</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          就讀學校 <span class="text-red-500">*</span>
+        </label>
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
-          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入家長或聯絡人姓名" type="text"/>
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
+          <input [(ngModel)]="school" name="school" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入就讀學校名稱" type="text"/>
         </div>
       </div>
       
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">聯絡電話</label>
-        <div class="relative">
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
-          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="09XX-XXX-XXX" type="tel"/>
-        </div>
-      </div>
-      
-      <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">目前年級</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          年級 <span class="text-red-500">*</span>
+        </label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">school</span>
-          <select class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
-            <option disabled selected value="">請選擇目前就讀年級</option>
-            <option>國小五年級</option>
-            <option>國小六年級</option>
-            <option>國中一年級</option>
-            <option>國中二年級</option>
-            <option>國中三年級</option>
-            <option>高中一年級</option>
-            <option>高中二年級</option>
-            <option>高中三年級</option>
+          <select [(ngModel)]="grade" name="grade" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
+            <option disabled value="">請選擇目前就讀年級</option>
+            @for (g of gradeOptions; track g) {
+              <option [value]="g">{{ g }}</option>
+            }
           </select>
         </div>
       </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">班級（選填）</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">meeting_room</span>
+          <input [(ngModel)]="className" name="className" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="例如：三年甲班" type="text"/>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          家長姓名 <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
+          <input [(ngModel)]="parentName" name="parentName" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入家長或聯絡人姓名" type="text"/>
+        </div>
+      </div>
       
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">就讀學校</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+          家長1 / 連絡電話 <span class="text-red-500">*</span>
+        </label>
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
-          <input class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入就讀學校名稱" type="text"/>
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+          <input [(ngModel)]="phone" name="phone" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="09XX-XXX-XXX" type="tel"/>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長2 / 連絡電話（選填）</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+          <input [(ngModel)]="parent2Phone" name="parent2Phone" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="第二位家長聯絡電話" type="tel"/>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">住家電話（選填）</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">home</span>
+          <input [(ngModel)]="homePhone" name="homePhone" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="住家電話（選填）" type="tel"/>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">身分證字號（選填）</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">badge</span>
+          <input [(ngModel)]="idNumber" name="idNumber" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="身分證字號（選填）" type="text"/>
         </div>
       </div>
       
       <div class="space-y-2">
         <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">感興趣的科目</label>
         <div class="grid grid-cols-2 gap-3 mt-1">
-          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
-            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
-            <span class="text-sm md:text-base font-bold dark:text-gray-300">數學科</span>
-          </label>
-          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
-            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
-            <span class="text-sm md:text-base font-bold dark:text-gray-300">英文科</span>
-          </label>
-          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
-            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
-            <span class="text-sm md:text-base font-bold dark:text-gray-300">理化科</span>
-          </label>
-          <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all">
-            <input class="rounded text-primary focus:ring-primary mr-3 border-gray-300" type="checkbox"/>
-            <span class="text-sm md:text-base font-bold dark:text-gray-300">國文科</span>
-          </label>
+          @for (entry of subjects() | keyvalue; track entry.key) {
+            <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border transition-all"
+                   [class.border-primary/30 bg-primary/5]="entry.value"
+                   [class.border-transparent]="!entry.value"
+                   (click)="toggleSubject(entry.key)">
+              <input type="checkbox" [checked]="entry.value" class="rounded text-primary focus:ring-primary mr-3 border-gray-300"/>
+              <span class="text-sm md:text-base font-bold dark:text-gray-300">{{ entry.key }}</span>
+            </label>
+          }
         </div>
       </div>
       
       <div class="pt-4 md:pt-6">
-        <button class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-4 md:py-5 lg:py-6 rounded-2xl bento-shadow transition-all text-lg md:text-xl flex items-center justify-center gap-2" type="submit">
-          立即註冊
-          <span class="material-symbols-outlined">arrow_forward</span>
+        <button (click)="submit()" [disabled]="loading()"
+          class="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-extrabold py-4 md:py-5 lg:py-6 rounded-2xl bento-shadow transition-all text-lg md:text-xl flex items-center justify-center gap-2">
+          @if (loading()) {
+            <span class="material-symbols-outlined animate-spin">refresh</span>
+          }
+          {{ loading() ? '註冊中...' : '立即註冊' }}
+          @if (!loading()) {
+            <span class="material-symbols-outlined">arrow_forward</span>
+          }
         </button>
       </div>
     </form>

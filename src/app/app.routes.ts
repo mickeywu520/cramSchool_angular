@@ -13,14 +13,15 @@ import { AdminAboutCards } from './components/admin/about-cards/about-cards';
 import { AdminTeachers } from './components/admin/teachers/teachers';
 import { AdminHonors } from './components/admin/honors/honors';
 import { AuthGuard } from './guards/auth.guard';
+import { StudentAuthGuard } from './guards/student-auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'register', component: Register },
   { path: 'register-details', component: RegisterDetails },
   { path: 'faculty', component: Faculty },
-  { path: 'student', component: StudentProfile },
-  { path: 'communication-book', component: CommunicationBook },
+  { path: 'student', component: StudentProfile, canActivate: [StudentAuthGuard] },
+  { path: 'communication-book', component: CommunicationBook, canActivate: [StudentAuthGuard] },
   { path: 'course-details', component: CourseDetails },
   { path: 'leave-makeup', component: LeaveMakeup },
   {

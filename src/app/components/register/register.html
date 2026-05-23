@@ -62,37 +62,34 @@
 
     @if (activeTab() === 'register') {
       <div class="register-form space-y-4">
+        @if (regError()) {
+          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+            {{ regError() }}
+          </div>
+        }
         <div class="space-y-1">
-          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">學生/家長姓名</label>
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">電子郵件</label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">badge</span>
-            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入姓名" type="text"/>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">mail</span>
+            <input [(ngModel)]="regEmail" name="regEmail" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="example@email.com" type="email"/>
           </div>
         </div>
         <div class="space-y-1">
-          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">手機號碼</label>
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">密碼</label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">phone_iphone</span>
-            <input class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="09XX-XXX-XXX" type="tel"/>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
+            <input [(ngModel)]="regPassword" name="regPassword" type="password" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="至少 6 個字元"/>
           </div>
         </div>
         <div class="space-y-1">
-          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">就讀年級</label>
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">確認密碼</label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">grade</span>
-            <select class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary appearance-none text-sm md:text-base">
-              <option disabled selected value="">請選擇年級</option>
-              <option>國小一至三年級</option>
-              <option>國小四至六年級</option>
-              <option>國中一年級</option>
-              <option>國中二年級</option>
-              <option>國中三年級</option>
-              <option>其他</option>
-            </select>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
+            <input [(ngModel)]="regConfirm" name="regConfirm" type="password" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="再次輸入密碼"/>
           </div>
         </div>
         <button (click)="goToRegisterDetails()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
-          立即註冊
+          下一步
         </button>
       </div>
     }

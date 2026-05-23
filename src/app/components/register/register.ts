@@ -17,6 +17,11 @@ export class Register {
   loginError = signal('');
   loading = signal(false);
 
+  regEmail = signal('');
+  regPassword = signal('');
+  regConfirm = signal('');
+  regError = signal('');
+
   constructor(
     private router: Router,
     private auth: AuthService,
@@ -25,6 +30,7 @@ export class Register {
   setActiveTab(tab: 'login' | 'register') {
     this.activeTab.set(tab);
     this.loginError.set('');
+    this.regError.set('');
   }
 
   togglePassword() {
@@ -32,7 +38,27 @@ export class Register {
   }
 
   goToRegisterDetails() {
-    this.router.navigate(['/register-details']);
+    this.regError.set('');
+    const email = this.regEmail().trim();
+    const password = this.regPassword();
+    const confirm = this.regConfirm();
+
+    if (!email || !password || !confirm) {
+      this.regError.set('請填寫所有欄位');
+      return;
+    }
+    if (password.length < 6) {
+      this.regError.set('密碼至少 6 個字元');
+      return;
+    }
+    if (password !== confirm) {
+      this.regError.set('兩次輸入的密碼不一致');
+      return;
+    }
+
+    this.router.navigate(['/register-details'], {
+      state: { email, password },
+    });
   }
 
   handleLogin() {
@@ -45,7 +71,6 @@ export class Register {
       return;
     }
 
-    // Map 'admin' shorthand to full email for backend API
     const apiEmail = email === 'admin' ? 'admin@cramschool.com' : email;
 
     this.loading.set(true);
