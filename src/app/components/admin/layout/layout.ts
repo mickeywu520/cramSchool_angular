@@ -16,6 +16,8 @@ export class AdminLayout {
     { path: '/admin/about-cards', icon: 'dashboard_customize', label: '關於我們卡片' },
     { path: '/admin/teachers', icon: 'group', label: '師資介紹管理' },
     { path: '/admin/honors', icon: 'emoji_events', label: '歷年榜單管理' },
+    { path: '/admin/courses', icon: 'calendar_month', label: '課程管理' },
+    { path: '/admin/enrollments', icon: 'assignment_ind', label: '選課管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
   ];
 

@@ -153,35 +153,44 @@
         <section>
           <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">家長回饋與簽署</h3>
           <div class="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            @if (entry.parent_feedback?.feedback) {
-              <div class="p-3 md:p-4 bg-primary/5 border-b border-gray-200 dark:border-gray-700">
-                <p class="text-xs text-gray-400 font-bold">您已送出回饋：</p>
-                <p class="text-sm md:text-base mt-1 text-[#101819] dark:text-white">{{ entry.parent_feedback?.feedback }}</p>
+            @if (entry.parent_feedback?.is_signed) {
+              <div class="p-3 md:p-4 bg-green-50 dark:bg-green-900/20 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="material-symbols-outlined text-green-500 text-lg">verified</span>
+                  <span class="text-xs font-bold text-green-600 dark:text-green-400">已簽署 — 內容已鎖定，無法修改</span>
+                </div>
+                @if (entry.parent_feedback?.feedback) {
+                  <p class="text-xs text-gray-500 font-bold mt-2">家長留言：</p>
+                  <p class="text-sm md:text-base mt-1 text-[#101819] dark:text-white bg-white dark:bg-gray-800 p-3 rounded-lg">{{ entry.parent_feedback?.feedback }}</p>
+                }
+              </div>
+            } @else {
+              @if (entry.parent_feedback?.feedback) {
+                <div class="p-3 md:p-4 bg-primary/5 border-b border-gray-200 dark:border-gray-700">
+                  <p class="text-xs text-gray-400 font-bold">已儲存（尚未簽署）：</p>
+                  <p class="text-sm md:text-base mt-1 text-[#101819] dark:text-white">{{ entry.parent_feedback?.feedback }}</p>
+                </div>
+              }
+              <textarea [(ngModel)]="feedbackText" name="feedbackText"
+                class="w-full p-3 md:p-4 text-sm md:text-base border-none focus:ring-0 bg-transparent min-h-[80px] md:min-h-[100px] text-[#101819] dark:text-white placeholder:text-gray-400"
+                placeholder="有任何問題或想對老師說的話，請在此留言..."></textarea>
+              <div class="p-3 md:p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-xl md:text-2xl">edit_note</span>
+                  <span class="text-xs md:text-sm font-medium text-gray-400">尚未簽署</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" [(ngModel)]="isSigned" name="isSigned" class="rounded text-primary focus:ring-primary border-gray-300"/>
+                    <span class="text-xs md:text-sm text-gray-400 font-medium">簽署</span>
+                  </label>
+                  <button (click)="submitFeedback()" [disabled]="submittingFeedback()"
+                    class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-lg text-sm md:text-base shadow-lg shadow-primary/20 transition-all active:scale-95">
+                    {{ submittingFeedback() ? '送出中...' : '送出' }}
+                  </button>
+                </div>
               </div>
             }
-            <textarea [(ngModel)]="feedbackText" name="feedbackText"
-              class="w-full p-3 md:p-4 text-sm md:text-base border-none focus:ring-0 bg-transparent min-h-[80px] md:min-h-[100px] text-[#101819] dark:text-white placeholder:text-gray-400"
-              placeholder="有任何問題或想對老師說的話，請在此留言..."></textarea>
-            <div class="p-3 md:p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-xl md:text-2xl">edit_note</span>
-                <span class="text-xs md:text-sm font-medium"
-                      [class.text-green-500]="entry.parent_feedback?.is_signed"
-                      [class.text-gray-400]="!entry.parent_feedback?.is_signed">
-                  {{ entry.parent_feedback?.is_signed ? '已簽署' : '尚未簽署' }}
-                </span>
-              </div>
-              <div class="flex items-center gap-2">
-                <label class="flex items-center gap-1 cursor-pointer">
-                  <input type="checkbox" [(ngModel)]="isSigned" name="isSigned" class="rounded text-primary focus:ring-primary border-gray-300"/>
-                  <span class="text-xs md:text-sm text-gray-400 font-medium">簽署</span>
-                </label>
-                <button (click)="submitFeedback()" [disabled]="submittingFeedback()"
-                  class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-lg text-sm md:text-base shadow-lg shadow-primary/20 transition-all active:scale-95">
-                  {{ submittingFeedback() ? '送出中...' : '送出' }}
-                </button>
-              </div>
-            </div>
           </div>
         </section>
       } @else {

@@ -4,6 +4,14 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 import { lastValueFrom } from 'rxjs';
 
+interface CourseOption {
+  id: number;
+  name: string;
+  category: string;
+  grade_level: string;
+  subject: string;
+}
+
 interface StudentOption {
   id: number;
   student_name: string;
@@ -66,6 +74,8 @@ type Tab = 'create' | 'view';
 export class AdminCommunication implements OnInit {
   activeTab = signal<Tab>('create');
 
+  courses = signal<CourseOption[]>([]);
+  filterCourseId = signal<number | null>(null);
   students = signal<StudentOption[]>([]);
   loadingStudents = signal(false);
   submitting = signal(false);
@@ -92,15 +102,37 @@ export class AdminCommunication implements OnInit {
 
   constructor(private api: ApiService) {}
 
+  numberFromEvent(value: string): number | null {
+    return value ? Number(value) : null;
+  }
+
   ngOnInit() {
+    this.loadCourses();
+    this.loadStudents();
+  }
+
+  async loadCourses() {
+    try {
+      const res = await lastValueFrom(
+        this.api.get<CourseOption[]>('/admin/courses')
+      );
+      this.courses.set(res);
+    } catch {}
+  }
+
+  async filterStudentsByCourse(courseId: number | null) {
+    this.filterCourseId.set(courseId);
+    this.selectedStudentId.set(null);
     this.loadStudents();
   }
 
   async loadStudents() {
     this.loadingStudents.set(true);
     try {
+      const params: Record<string, any> = {};
+      if (this.filterCourseId()) params['course_id'] = this.filterCourseId();
       const res = await lastValueFrom(
-        this.api.get<StudentOption[]>('/admin/students')
+        this.api.get<StudentOption[]>('/admin/students', params)
       );
       this.students.set(res);
     } catch {
