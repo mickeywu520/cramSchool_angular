@@ -1,14 +1,14 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { KeyValuePipe } from '@angular/common';
+import { CommonModule, KeyValuePipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-register-details',
-  imports: [RouterLink, FormsModule, KeyValuePipe],
+  imports: [RouterLink, FormsModule, CommonModule, KeyValuePipe],
   templateUrl: './register-details.html',
   styleUrl: './register-details.scss',
 })

@@ -137,16 +137,38 @@ export class CommunicationBook implements OnInit {
     return ['日', '一', '二', '三', '四', '五', '六'];
   }
 
-  getWeekDates(): Date[] {
+  /** Parse YYYY-MM-DD to local Date (no timezone shift). */
+  private localDate(dateStr: string): Date {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  /** Format a Date to YYYY-MM-DD in local time. */
+  private fmtLocal(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  getWeekDates(): string[] {
     if (!this.weekStart()) return [];
-    const start = new Date(this.weekStart());
-    const dates: Date[] = [];
+    const start = this.localDate(this.weekStart());
+    const dates: string[] = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
-      dates.push(d);
+      dates.push(this.fmtLocal(d));
     }
     return dates;
+  }
+
+  getWeekDayName(dateStr: string): string {
+    return this.dayNames[this.localDate(dateStr).getDay()];
+  }
+
+  getWeekDayNum(dateStr: string): number {
+    return this.localDate(dateStr).getDate();
   }
 
   getWeekEntrySummary(dateStr: string): WeeklyEntrySummary | undefined {
@@ -154,11 +176,16 @@ export class CommunicationBook implements OnInit {
   }
 
   isToday(dateStr: string): boolean {
-    return dateStr === new Date().toISOString().slice(0, 10);
+    return dateStr === this.fmtLocal(new Date());
   }
 
   isSelected(dateStr: string): boolean {
     return dateStr === this.selectedDate();
+  }
+
+  formatDate(dateStr: string): string {
+    const d = this.localDate(dateStr);
+    return `${d.getMonth() + 1}月${d.getDate()}日`;
   }
 
   focusLabel(score: number): string {

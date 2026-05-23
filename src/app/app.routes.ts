@@ -12,6 +12,7 @@ import { AdminBanners } from './components/admin/banners/banners';
 import { AdminAboutCards } from './components/admin/about-cards/about-cards';
 import { AdminTeachers } from './components/admin/teachers/teachers';
 import { AdminHonors } from './components/admin/honors/honors';
+import { AdminCommunication } from './components/admin/communication/communication';
 import { AuthGuard } from './guards/auth.guard';
 import { StudentAuthGuard } from './guards/student-auth.guard';
 
@@ -34,6 +35,7 @@ export const routes: Routes = [
       { path: 'about-cards', component: AdminAboutCards },
       { path: 'teachers', component: AdminTeachers },
       { path: 'honors', component: AdminHonors },
+      { path: 'communication', component: AdminCommunication },
     ],
   },
   { path: '**', redirectTo: '' }

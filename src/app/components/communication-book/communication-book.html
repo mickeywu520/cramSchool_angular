@@ -46,15 +46,13 @@
       }
 
       <div class="flex overflow-x-auto gap-3 no-scrollbar">
-        @for (d of getWeekDates(); track d.toISOString()) {
-          @let dateStr = d.toISOString().slice(0, 10);
+        @for (dateStr of getWeekDates(); track dateStr) {
           @let summary = getWeekEntrySummary(dateStr);
-          <div (click)="selectDate(dateStr)" class="flex flex-col items-center justify-center min-w-[50px] md:min-w-[56px] h-16 md:h-20 rounded-xl cursor-pointer transition-all"
-               [class.bg-primary text-white shadow-lg shadow-primary/30]="isSelected(dateStr)"
-               [class.bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800]="!isSelected(dateStr)"
+           <div (click)="selectDate(dateStr)" class="flex flex-col items-center justify-center min-w-[50px] md:min-w-[56px] h-16 md:h-20 rounded-xl cursor-pointer transition-all"
+               [ngClass]="isSelected(dateStr) ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800'"
                [class.opacity-50]="!summary && !isToday(dateStr)">
-            <span class="text-xs" [class.text-white]="isSelected(dateStr)" [class.text-gray-400]="!isSelected(dateStr)">{{ dayNames[d.getDay()] }}</span>
-            <span class="text-base md:text-lg font-bold">{{ d.getDate() }}</span>
+            <span class="text-xs" [class.text-white]="isSelected(dateStr)" [class.text-gray-400]="!isSelected(dateStr)">{{ getWeekDayName(dateStr) }}</span>
+            <span class="text-base md:text-lg font-bold">{{ getWeekDayNum(dateStr) }}</span>
           </div>
         }
       </div>
@@ -63,7 +61,7 @@
         <section>
           <div class="flex items-center justify-between mb-3 px-1">
             <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">今日表現</h3>
-            <span class="text-primary text-sm md:text-base font-medium">{{ selectedDate() }}</span>
+            <span class="text-primary text-sm md:text-base font-medium">{{ formatDate(selectedDate()) }}</span>
           </div>
           <div class="grid grid-cols-3 gap-2 md:gap-3">
             <div class="flex flex-col items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark p-3 md:p-4 text-center">
@@ -113,9 +111,8 @@
                       <p class="text-xs md:text-sm text-gray-400">截止：{{ hw.due_date }}</p>
                     }
                   </div>
-                  <span class="text-[10px] md:text-xs px-2 py-1 rounded-full"
-                        [class.bg-green-100 text-green-600 border border-green-200]="hw.is_completed"
-                        [class.bg-primary/10 text-primary border border-primary/20]="!hw.is_completed">
+                   <span class="text-[10px] md:text-xs px-2 py-1 rounded-full"
+                         [ngClass]="hw.is_completed ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-primary/10 text-primary border border-primary/20'">
                     {{ hw.is_completed ? '已完成' : '待完成' }}
                   </span>
                 </div>
@@ -129,8 +126,7 @@
             <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">提醒事項</h3>
             @for (rem of entry.reminders; track rem.id) {
               <div class="p-3 md:p-4 rounded-xl border flex gap-3 mt-2"
-                   [class.border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/50]="rem.priority === 'high'"
-                   [class.border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-900/50]="rem.priority !== 'high'">
+                   [ngClass]="rem.priority === 'high' ? 'border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/50' : 'border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-900/50'">
                 <span class="material-symbols-outlined text-xl md:text-2xl"
                       [class.text-amber-500]="rem.priority === 'high'"
                       [class.text-blue-500]="rem.priority !== 'high'">
@@ -138,8 +134,7 @@
                 </span>
                 <div>
                   <p class="text-sm md:text-base font-bold"
-                     [class.text-amber-800 dark:text-amber-200]="rem.priority === 'high'"
-                     [class.text-blue-800 dark:text-blue-200]="rem.priority !== 'high'">
+                     [ngClass]="rem.priority === 'high' ? 'text-amber-800 dark:text-amber-200' : 'text-blue-800 dark:text-blue-200'">
                     {{ rem.content }}
                   </p>
                 </div>

@@ -64,7 +64,14 @@
       >
         <span class="material-symbols-outlined">{{ sidebarOpen() ? 'menu_open' : 'menu' }}</span>
       </button>
-      <h1 class="text-lg font-bold text-gray-900 dark:text-white">首頁資訊管理</h1>
+      <h1 class="text-lg font-bold text-gray-900 dark:text-white">
+        @for (item of menuItems; track item.path) {
+          @if (item.path === '/admin' + router.url.split('/admin')[1]) {
+            {{ item.label }}
+          }
+        }
+        @if (!router.url.includes('/admin/')) { 首頁資訊管理 }
+      </h1>
     </header>
 
     <!-- Page Content -->

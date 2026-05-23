@@ -134,7 +134,7 @@
         <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">身分證字號（選填）</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">badge</span>
-          <input [(ngModel)]="idNumber" name="idNumber" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="身分證字號（選填）" type="text"/>
+          <input [(ngModel)]="idNumber" name="idNumber" (keydown.enter)="submit()" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="身分證字號（選填）" type="text"/>
         </div>
       </div>
       
@@ -143,8 +143,7 @@
         <div class="grid grid-cols-2 gap-3 mt-1">
           @for (entry of subjects() | keyvalue; track entry.key) {
             <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border transition-all"
-                   [class.border-primary/30 bg-primary/5]="entry.value"
-                   [class.border-transparent]="!entry.value"
+                   [ngClass]="entry.value ? 'border-primary/30 bg-primary/5' : 'border-transparent'"
                    (click)="toggleSubject(entry.key)">
               <input type="checkbox" [checked]="entry.value" class="rounded text-primary focus:ring-primary mr-3 border-gray-300"/>
               <span class="text-sm md:text-base font-bold dark:text-gray-300">{{ entry.key }}</span>

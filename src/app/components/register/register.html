@@ -45,7 +45,7 @@
           <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">密碼</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
-            <input [(ngModel)]="loginPassword" name="loginPassword" [type]="showPassword() ? 'text' : 'password'" class="w-full pl-12 pr-12 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入您的密碼"/>
+            <input [(ngModel)]="loginPassword" name="loginPassword" [type]="showPassword() ? 'text' : 'password'" (keydown.enter)="handleLogin()" class="w-full pl-12 pr-12 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入您的密碼"/>
             <button (click)="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
               <span class="material-symbols-outlined">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
             </button>
@@ -85,7 +85,7 @@
           <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">確認密碼</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
-            <input [(ngModel)]="regConfirm" name="regConfirm" type="password" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="再次輸入密碼"/>
+            <input [(ngModel)]="regConfirm" name="regConfirm" type="password" (keydown.enter)="goToRegisterDetails()" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="再次輸入密碼"/>
           </div>
         </div>
         <button (click)="goToRegisterDetails()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">

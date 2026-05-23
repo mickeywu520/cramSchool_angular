@@ -103,8 +103,7 @@
                 @for (opt of iconOptions; track opt.value) {
                   <button (click)="formData.update(d => ({ ...d, icon: opt.value }))"
                     class="p-2 rounded-lg border text-center transition-colors"
-                    [class.border-primary bg-primary/10 text-primary]="formData().icon === opt.value"
-                    [class.border-gray-200 dark:border-gray-600 text-gray-500]="formData().icon !== opt.value">
+                    [ngClass]="formData().icon === opt.value ? 'border-primary bg-primary/10 text-primary' : 'border-gray-200 dark:border-gray-600 text-gray-500'">
                     <span class="material-symbols-outlined text-lg">{{ opt.value }}</span>
                     <p class="text-[10px] mt-0.5">{{ opt.label }}</p>
                   </button>

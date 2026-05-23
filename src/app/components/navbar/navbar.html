@@ -9,6 +9,12 @@
   @if (auth.currentUser()) {
     <div class="flex items-center gap-2">
       <span class="text-sm md:text-base font-bold text-gray-600 dark:text-gray-300">{{ displayName }}</span>
+      @if (auth.currentUser()?.role === 'student') {
+        <a routerLink="/student" class="bg-green-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold tracking-wide hover:opacity-90 transition-all flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">person</span>
+          學生專區
+        </a>
+      }
       @if (auth.isAdmin) {
         <a routerLink="/admin" class="bg-accent-gold text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold tracking-wide hover:opacity-90 transition-all flex items-center gap-1">
           <span class="material-symbols-outlined text-sm">settings</span>

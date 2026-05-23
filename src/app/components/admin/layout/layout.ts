@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -16,10 +16,12 @@ export class AdminLayout {
     { path: '/admin/about-cards', icon: 'dashboard_customize', label: '關於我們卡片' },
     { path: '/admin/teachers', icon: 'group', label: '師資介紹管理' },
     { path: '/admin/honors', icon: 'emoji_events', label: '歷年榜單管理' },
+    { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
   ];
 
   constructor(
     public auth: AuthService,
+    public router: Router,
   ) {}
 
   toggleSidebar() {
