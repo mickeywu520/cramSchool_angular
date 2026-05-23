@@ -31,9 +31,16 @@
       @if (student(); as s) {
         <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800">
           <div class="flex items-center gap-4 md:gap-6">
-            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 md:h-20 md:w-20 border-2 border-primary"
-                 [style.background-image]="'url(' + (s.avatar_url || 'assets/default-avatar.png') + ')'">
-            </div>
+            @if (s.avatar_url) {
+              <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 md:h-20 md:w-20 border-2 border-primary"
+                   [style.background-image]="'url(' + s.avatar_url + ')'">
+              </div>
+            } @else {
+              <div class="rounded-full h-16 w-16 md:h-20 md:w-20 border-2 border-primary flex items-center justify-center text-white font-extrabold text-xl md:text-2xl"
+                   [style.background-color]="getAvatarColor(s.student_name)">
+                {{ getInitial(s.student_name) }}
+              </div>
+            }
             <div class="flex flex-col">
               <p class="text-[#101819] dark:text-white text-lg md:text-xl font-bold tracking-tight">{{ s.student_name }}</p>
               <p class="text-primary text-sm md:text-base font-medium">禾笙補習班 - {{ s.grade }}</p>
@@ -204,10 +211,10 @@
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
         <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
       </a>
-      <button class="flex flex-col items-center gap-1 text-gray-400">
+      <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
         <span class="text-[10px] md:text-xs font-bold">個人檔案</span>
-      </button>
+      </a>
     </nav>
     
     <div class="fixed bottom-20 md:bottom-24 right-4 md:right-6 z-40">

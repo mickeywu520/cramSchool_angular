@@ -188,6 +188,24 @@ export class CommunicationBook implements OnInit {
     return `${d.getMonth() + 1}月${d.getDate()}日`;
   }
 
+  getInitial(name: string): string {
+    return name?.charAt(0) || '?';
+  }
+
+  private avatarColors = [
+    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+    '#2196F3', '#0097A7', '#009688', '#4CAF50', '#8BC34A',
+    '#FF9800', '#FF5722', '#795548', '#607D8B',
+  ];
+
+  getAvatarColor(name: string): string {
+    let hash = 0;
+    for (let i = 0; i < (name || '').length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return this.avatarColors[Math.abs(hash) % this.avatarColors.length];
+  }
+
   focusLabel(score: number): string {
     if (score >= 8) return '優異';
     if (score >= 5) return '良好';
