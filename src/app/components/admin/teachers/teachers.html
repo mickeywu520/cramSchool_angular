@@ -123,6 +123,17 @@
                 class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none"></textarea>
             </div>
 
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">所屬分校</label>
+              <select [(ngModel)]="formData().branch_id"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+                <option [ngValue]="null">全部</option>
+                @for (b of branches(); track b.id) {
+                  <option [ngValue]="b.id">{{ b.name }}</option>
+                }
+              </select>
+            </div>
+
             <!-- Photo Upload -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">形象照</label>

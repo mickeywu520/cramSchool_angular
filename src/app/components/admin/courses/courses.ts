@@ -9,6 +9,11 @@ interface Teacher {
   name: string;
 }
 
+interface Branch {
+  id: number;
+  name: string;
+}
+
 interface Course {
   id: number;
   name: string;
@@ -21,6 +26,8 @@ interface Course {
   start_time: string | null;
   end_time: string | null;
   location: string | null;
+  branch_id: number | null;
+  branch_name: string | null;
   school_year: string | null;
   semester: string | null;
   is_active: boolean;
@@ -39,6 +46,7 @@ export class AdminCourses implements OnInit {
   SUBJECTS = ['數學', '英文', '國文', '理化', '生物', '社會', '物理', '化學', '數B', '自然'];
   courses = signal<Course[]>([]);
   teachers = signal<Teacher[]>([]);
+  branches = signal<Branch[]>([]);
   loading = signal(false);
   submitting = signal(false);
   error = signal('');
@@ -83,9 +91,10 @@ export class AdminCourses implements OnInit {
   async loadTeachers() {
     try {
       const res = await lastValueFrom(
-        this.api.get<{ teachers: Teacher[] }>('/admin/course-filters')
+        this.api.get<{ teachers: Teacher[]; branches: Branch[] }>('/admin/course-filters')
       );
       this.teachers.set(res.teachers || []);
+      this.branches.set(res.branches || []);
     } catch {}
   }
 
@@ -105,7 +114,7 @@ export class AdminCourses implements OnInit {
     this.form = {
       name: '', category: '小學部', subject: '數學', teacher_id: null,
       grade_level: '國七', day_of_week: 1, start_time: '1830', end_time: '2130',
-      location: '中和', school_year: '115', semester: '上',
+      location: '', branch_id: null, school_year: '115', semester: '上',
       is_active: true, display_order: 0,
     };
     this.showModal.set(true);

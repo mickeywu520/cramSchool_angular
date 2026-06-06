@@ -52,6 +52,22 @@ export class AuthService {
       );
   }
 
+  refreshToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+      this.logout();
+      throw new Error('No refresh token');
+    }
+    return this.http
+      .post<{ access_token: string; refresh_token: string }>(`${this.apiUrl}/auth/refresh`, { refresh_token: refreshToken })
+      .pipe(
+        tap((res) => {
+          localStorage.setItem('access_token', res.access_token);
+          localStorage.setItem('refresh_token', res.refresh_token);
+        }),
+      );
+  }
+
   logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

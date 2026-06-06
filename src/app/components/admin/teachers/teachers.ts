@@ -12,8 +12,14 @@ interface Teacher {
   description: string;
   photo_url: string;
   life_photo_url: string;
+  branch_id: number | null;
   display_order: number;
   is_active: boolean;
+}
+
+interface Branch {
+  id: number;
+  name: string;
 }
 
 @Component({
@@ -24,6 +30,7 @@ interface Teacher {
 })
 export class AdminTeachers implements OnInit {
   teachers = signal<Teacher[]>([]);
+  branches = signal<Branch[]>([]);
   loading = signal(false);
 
   showForm = signal(false);
@@ -37,10 +44,18 @@ export class AdminTeachers implements OnInit {
 
   subjectOptions = ['數學', '英文', '理化', '國文', '作文'];
 
+  async loadBranches() {
+    try {
+      const res: any = await this.api.get('/admin/branches').toPromise();
+      this.branches.set(res || []);
+    } catch {}
+  }
+
   constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.loadTeachers();
+    this.loadBranches();
   }
 
   loadTeachers() {
@@ -56,7 +71,7 @@ export class AdminTeachers implements OnInit {
 
   openNewForm() {
     this.isNew.set(true);
-    this.formData.set({ name: '', subject: '數學', title: '', motto: '', description: '', photo_url: '', life_photo_url: '', display_order: this.teachers().length, is_active: true });
+    this.formData.set({ name: '', subject: '數學', title: '', motto: '', description: '', photo_url: '', life_photo_url: '', branch_id: null, display_order: this.teachers().length, is_active: true });
     this.photoPreview.set(null);
     this.lifePhotoPreview.set(null);
     this.photoFile.set(null);

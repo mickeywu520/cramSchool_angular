@@ -33,6 +33,24 @@
           </button>
         }
       </div>
+      @if (branches().length > 0) {
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button (click)="setBranchFilter(null)"
+            [class]="selectedBranchId() === null
+              ? 'px-4 py-1.5 rounded-full bg-accent-gold text-white text-xs font-bold whitespace-nowrap'
+              : 'px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700 text-xs font-bold whitespace-nowrap'">
+            全部分校
+          </button>
+          @for (b of branches(); track b.id) {
+            <button (click)="setBranchFilter(b.id)"
+              [class]="selectedBranchId() === b.id
+                ? 'px-4 py-1.5 rounded-full bg-accent-gold text-white text-xs font-bold whitespace-nowrap'
+                : 'px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700 text-xs font-bold whitespace-nowrap'">
+              {{ b.name }}
+            </button>
+          }
+        </div>
+      }
     </section>
     
     <section class="px-4 md:px-5 lg:px-6 space-y-4 md:space-y-6 lg:space-y-8 mt-2">
