@@ -1,69 +1,73 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 import { lastValueFrom } from 'rxjs';
 
-interface CourseOption {
-  id: number;
-  name: string;
-  category: string;
-  grade_level: string;
-  subject: string;
+interface Branch {
+  id: number; name: string;
 }
 
-interface StudentOption {
-  id: number;
+interface Course {
+  id: number; name: string; category: string; grade_level: string; subject: string;
+  branch_id: number | null; branch_name?: string;
+}
+
+interface StudentRow {
+  student_id: number;
   student_name: string;
-  grade: string;
-  school: string;
+  arrival_time: string;
+  departure_time: string;
+  progress: string;
+  homework: string;
+  exam_scope: string;
+  announcements: string;
+  handout_completed: boolean;
+  exam_score: number | null;
+  custom_scores: Record<string, number>;
+  tutoring_attendance: boolean;
+  notes: string;
+  parent_feedback: string;
+  parent_signed: boolean;
 }
 
-interface HomeworkRow {
-  subject: string;
-  content: string;
-  due_date: string;
+interface ExamColumn {
+  name: string;
+  display_order: number;
 }
 
-interface ReminderRow {
-  content: string;
-  priority: 'high' | 'normal';
-}
-
-interface HomeworkItem {
+interface SessionData {
   id: number;
-  subject: string;
-  content: string;
-  due_date?: string;
-  is_completed: boolean;
-}
-
-interface ReminderItem {
-  id: number;
-  content: string;
-  priority: string;
-}
-
-interface ParentFeedback {
-  feedback?: string;
-  is_signed: boolean;
-  signed_at?: string;
-}
-
-interface CommunicationEntry {
-  id: number;
+  course_id: number;
   entry_date: string;
-  focus_score?: number;
-  interaction_score?: number;
-  homework_completion?: string;
-  teacher_comment?: string;
-  teacher_name?: string;
-  homework: HomeworkItem[];
-  reminders: ReminderItem[];
-  parent_feedback?: ParentFeedback;
+  tutoring_threshold: number | null;
+  class_progress: string;
+  class_homework: string;
+  class_exam_scope: string;
+  class_announcements: string;
+  exam_columns: ExamColumn[];
+  students: StudentRowResponse[];
 }
 
-type Tab = 'create' | 'view';
+interface StudentRowResponse {
+  student_id: number;
+  student_name: string;
+  arrival_time: string | null;
+  departure_time: string | null;
+  progress: string | null;
+  homework: string | null;
+  exam_scope: string | null;
+  announcements: string | null;
+  handout_completed: boolean;
+  exam_score: number | null;
+  custom_scores: Record<string, number>;
+  tutoring_attendance: boolean;
+  notes: string | null;
+  parent_feedback: string | null;
+  parent_signed: boolean;
+}
+
+type ViewMode = 'list' | 'editor';
 
 @Component({
   selector: 'app-admin-communication',
@@ -72,198 +76,324 @@ type Tab = 'create' | 'view';
   styleUrl: './communication.scss',
 })
 export class AdminCommunication implements OnInit {
-  activeTab = signal<Tab>('create');
+  viewMode = signal<ViewMode>('list');
 
-  courses = signal<CourseOption[]>([]);
-  filterCourseId = signal<number | null>(null);
-  students = signal<StudentOption[]>([]);
-  loadingStudents = signal(false);
-  submitting = signal(false);
+  branches = signal<Branch[]>([]);
+  selectedBranchId = signal<number | null>(null);
+  courses = signal<Course[]>([]);
+
+  selectedCourse = signal<Course | null>(null);
+  sessionId: number | null = null;
+  entryDate = signal(new Date().toISOString().slice(0, 10));
+  tutoringThreshold = signal<number | null>(null);
+  classProgress = signal('');
+  classHomework = signal('');
+  classExamScope = signal('');
+  classAnnouncements = signal('');
+  examColumns = signal<ExamColumn[]>([]);
+  students = signal<StudentRow[]>([]);
+  newColumnName = signal('');
+
+  saving = signal(false);
+  loading = signal(false);
   success = signal('');
   error = signal('');
 
-  // Create form
-  selectedStudentId = signal<number | null>(null);
-  entryDate = signal(new Date().toISOString().slice(0, 10));
-  focusScore = signal<number>(5);
-  interactionScore = signal<number>(5);
-  homeworkCompletion = signal<string>('已完成');
-  teacherComment = signal('');
-  homeworkList = signal<HomeworkRow[]>([]);
-  reminderList = signal<ReminderRow[]>([]);
-  completionOptions = ['已完成', '部分完成', '未完成'];
-
-  // View tab
-  viewStudentId = signal<number | null>(null);
-  viewDate = signal(new Date().toISOString().slice(0, 10));
-  viewEntry = signal<CommunicationEntry | null>(null);
-  viewLoading = signal(false);
-  viewStudentName = signal('');
-
   constructor(private api: ApiService) {}
 
-  numberFromEvent(value: string): number | null {
-    return value ? Number(value) : null;
-  }
-
   ngOnInit() {
+    this.loadBranches();
     this.loadCourses();
-    this.loadStudents();
   }
 
-  async loadCourses() {
+  async loadBranches() {
     try {
       const res = await lastValueFrom(
-        this.api.get<CourseOption[]>('/admin/courses')
+        this.api.get<{ id: number; name: string }[]>('/admin/branches')
       );
-      this.courses.set(res);
+      this.branches.set(res);
     } catch {}
   }
 
-  async filterStudentsByCourse(courseId: number | null) {
-    this.filterCourseId.set(courseId);
-    this.selectedStudentId.set(null);
-    this.loadStudents();
-  }
-
-  async loadStudents() {
-    this.loadingStudents.set(true);
+  async loadCourses() {
+    this.loading.set(true);
     try {
       const params: Record<string, any> = {};
-      if (this.filterCourseId()) params['course_id'] = this.filterCourseId();
+      if (this.selectedBranchId()) params['branch_id'] = this.selectedBranchId();
       const res = await lastValueFrom(
-        this.api.get<StudentOption[]>('/admin/students', params)
+        this.api.get<Course[]>('/admin/courses', params)
       );
-      this.students.set(res);
+      this.courses.set(res);
+    } catch {
+      this.error.set('無法載入課程列表');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  filterByBranch(branchId: string) {
+    this.selectedBranchId.set(branchId ? Number(branchId) : null);
+    this.loadCourses();
+  }
+
+  async selectCourse(course: Course) {
+    this.selectedCourse.set(course);
+    this.sessionId = null;
+    this.entryDate.set(new Date().toISOString().slice(0, 10));
+    this.resetClassFields();
+    this.examColumns.set([]);
+    this.students.set([]);
+    this.error.set('');
+    this.success.set('');
+
+    await this.tryLoadExistingSession();
+    this.viewMode.set('editor');
+  }
+
+  private resetClassFields() {
+    this.tutoringThreshold.set(null);
+    this.classProgress.set('');
+    this.classHomework.set('');
+    this.classExamScope.set('');
+    this.classAnnouncements.set('');
+  }
+
+  async tryLoadExistingSession() {
+    const course = this.selectedCourse();
+    if (!course) return;
+    this.loading.set(true);
+    try {
+      const sessions = await lastValueFrom(
+        this.api.get<any[]>('/admin/communication-sessions', {
+          course_id: course.id,
+        })
+      ) as any[];
+      const today = this.entryDate();
+      const match = sessions.find((s: any) => s.entry_date === today);
+      if (match) {
+        await this.loadSession(match.id);
+      } else {
+        await this.loadStudentsList();
+      }
+    } catch {
+      await this.loadStudentsList();
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async loadSession(id: number) {
+    try {
+      const data = await lastValueFrom(
+        this.api.get<SessionData>(`/admin/communication-sessions/${id}`)
+      );
+      this.sessionId = data.id;
+      this.tutoringThreshold.set(data.tutoring_threshold);
+      this.classProgress.set(data.class_progress || '');
+      this.classHomework.set(data.class_homework || '');
+      this.classExamScope.set(data.class_exam_scope || '');
+      this.classAnnouncements.set(data.class_announcements || '');
+      this.examColumns.set(data.exam_columns || []);
+      this.entryDate.set(data.entry_date);
+      this.students.set(data.students.map(s => ({
+        student_id: s.student_id,
+        student_name: s.student_name,
+        arrival_time: s.arrival_time || '',
+        departure_time: s.departure_time || '',
+        progress: s.progress || '',
+        homework: s.homework || '',
+        exam_scope: s.exam_scope || '',
+        announcements: s.announcements || '',
+        handout_completed: s.handout_completed,
+        exam_score: s.exam_score,
+        custom_scores: s.custom_scores || {},
+        tutoring_attendance: s.tutoring_attendance,
+        notes: s.notes || '',
+        parent_feedback: s.parent_feedback || '',
+        parent_signed: s.parent_signed,
+      })));
+    } catch {
+      this.error.set('無法載入聯絡簿記錄');
+    }
+  }
+
+  async loadStudentsList() {
+    const course = this.selectedCourse();
+    if (!course) return;
+    try {
+      const list = await lastValueFrom(
+        this.api.get<any[]>('/admin/students', { course_id: course.id })
+      );
+      this.students.set(list.map(s => ({
+        student_id: s.id,
+        student_name: s.student_name,
+        arrival_time: '',
+        departure_time: '',
+        progress: '',
+        homework: '',
+        exam_scope: '',
+        announcements: '',
+        handout_completed: false,
+        exam_score: null,
+        custom_scores: {},
+        tutoring_attendance: false,
+        notes: '',
+        parent_feedback: '',
+        parent_signed: false,
+      })));
     } catch {
       this.error.set('無法載入學生列表');
-    } finally {
-      this.loadingStudents.set(false);
+      this.students.set([]);
     }
   }
 
-  switchTab(tab: Tab) {
-    this.activeTab.set(tab);
+  onChangeDate() {
+    if (this.selectedCourse()) {
+      this.tryLoadExistingSession();
+    }
+  }
+
+  goBack() {
+    this.viewMode.set('list');
+    this.selectedCourse.set(null);
+    this.sessionId = null;
     this.error.set('');
     this.success.set('');
   }
 
-  // ── Create Tab ──
-
-  addHomework() {
-    this.homeworkList.update(list => [...list, { subject: '', content: '', due_date: '' }]);
+  recalcTutoring() {
+    const threshold = this.tutoringThreshold();
+    this.students.update(list =>
+      list.map(s => ({
+        ...s,
+        tutoring_attendance: s.exam_score != null && threshold != null
+          ? s.exam_score < threshold
+          : false,
+      }))
+    );
   }
 
-  removeHomework(index: number) {
-    this.homeworkList.update(list => list.filter((_, i) => i !== index));
+  onExamScoreChange() {
+    this.recalcTutoring();
   }
 
-  addReminder() {
-    this.reminderList.update(list => [...list, { content: '', priority: 'normal' }]);
+  onThresholdChange() {
+    this.recalcTutoring();
   }
 
-  removeReminder(index: number) {
-    this.reminderList.update(list => list.filter((_, i) => i !== index));
+  syncToStudents(field: string, value: string) {
+    this.students.update(list =>
+      list.map(s => {
+        const cur = (s as any)[field] as string;
+        if (!cur) {
+          return { ...s, [field]: value };
+        }
+        return s;
+      })
+    );
   }
 
-  async submit() {
+  addExamColumn() {
+    const name = this.newColumnName().trim();
+    if (!name) return;
+    const existing = this.examColumns();
+    if (existing.some(c => c.name === name)) {
+      this.error.set('欄位名稱已存在');
+      return;
+    }
+    this.examColumns.update(list => [
+      ...list,
+      { name, display_order: list.length },
+    ]);
+    this.students.update(list =>
+      list.map(s => ({ ...s, custom_scores: { ...s.custom_scores, [name]: 0 } }))
+    );
+    this.newColumnName.set('');
+    this.error.set('');
+  }
+
+  removeExamColumn(index: number) {
+    const col = this.examColumns()[index];
+    if (!col) return;
+    this.examColumns.update(list => list.filter((_, i) => i !== index));
+    this.students.update(list =>
+      list.map(s => {
+        const cs = { ...s.custom_scores };
+        delete cs[col.name];
+        return { ...s, custom_scores: cs };
+      })
+    );
+  }
+
+  async save() {
+    const course = this.selectedCourse();
+    if (!course) return;
     this.error.set('');
     this.success.set('');
+    this.saving.set(true);
 
-    if (!this.selectedStudentId()) {
-      this.error.set('請選擇學生');
-      return;
-    }
-    if (!this.entryDate()) {
-      this.error.set('請選擇日期');
-      return;
-    }
-
-    this.submitting.set(true);
     try {
-      const homework = this.homeworkList()
-        .filter(h => h.subject || h.content)
-        .map(h => ({
-          subject: h.subject,
-          content: h.content,
-          due_date: h.due_date || null,
-        }));
-      const reminders = this.reminderList()
-        .filter(r => r.content)
-        .map(r => ({
-          content: r.content,
-          priority: r.priority,
-        }));
+      const payload: any = {
+        course_id: course.id,
+        entry_date: this.entryDate(),
+        tutoring_threshold: this.tutoringThreshold(),
+        class_progress: this.classProgress() || null,
+        class_homework: this.classHomework() || null,
+        class_exam_scope: this.classExamScope() || null,
+        class_announcements: this.classAnnouncements() || null,
+        exam_columns: this.examColumns().map((c, i) => ({
+          name: c.name,
+          display_order: i,
+        })),
+        students: this.students().map(s => ({
+          student_id: s.student_id,
+          arrival_time: s.arrival_time || null,
+          departure_time: s.departure_time || null,
+          progress: s.progress || null,
+          homework: s.homework || null,
+          exam_scope: s.exam_scope || null,
+          announcements: s.announcements || null,
+          handout_completed: s.handout_completed,
+          exam_score: s.exam_score,
+          custom_scores: s.custom_scores,
+          tutoring_attendance: s.tutoring_attendance,
+          notes: s.notes || null,
+        })),
+      };
 
-      await lastValueFrom(
-        this.api.post('/communication/entries', {
-          student_id: this.selectedStudentId(),
-          teacher_id: 0,
-          entry_date: this.entryDate(),
-          focus_score: this.focusScore(),
-          interaction_score: this.interactionScore(),
-          homework_completion: this.homeworkCompletion(),
-          teacher_comment: this.teacherComment() || null,
-          homework,
-          reminders,
-        })
-      );
-      this.success.set('聯絡簿記錄已成功建立！');
-      this.resetForm();
+      if (this.sessionId) {
+        await lastValueFrom(
+          this.api.put(`/admin/communication-sessions/${this.sessionId}`, payload)
+        );
+      } else {
+        const created = await lastValueFrom(
+          this.api.post<any>('/admin/communication-sessions', payload)
+        );
+        this.sessionId = created.id;
+      }
+      this.success.set('聯絡簿記錄已儲存！');
     } catch (err: any) {
-      this.error.set(err.error?.detail || '建立失敗，請稍後再試');
+      this.error.set(err.error?.detail || '儲存失敗，請稍後再試');
     } finally {
-      this.submitting.set(false);
+      this.saving.set(false);
     }
   }
 
-  private resetForm() {
-    this.selectedStudentId.set(null);
-    this.entryDate.set(new Date().toISOString().slice(0, 10));
-    this.focusScore.set(5);
-    this.interactionScore.set(5);
-    this.homeworkCompletion.set('已完成');
-    this.teacherComment.set('');
-    this.homeworkList.set([]);
-    this.reminderList.set([]);
-  }
-
-  // ── View Tab ──
-
-  async loadEntry() {
-    this.error.set('');
-    this.viewEntry.set(null);
-
-    if (!this.viewStudentId()) {
-      this.error.set('請選擇學生');
-      return;
-    }
-    if (!this.viewDate()) {
-      this.error.set('請選擇日期');
-      return;
-    }
-
-    this.viewLoading.set(true);
+  async deleteSession() {
+    if (!this.sessionId) return;
+    if (!confirm('確定刪除此聯絡簿記錄？所有學生的資料將一併刪除。')) return;
     try {
-      const res = await lastValueFrom(
-        this.api.get<{ student: any; entries: CommunicationEntry[] }>('/admin/entries', {
-          student_id: this.viewStudentId(),
-          date_from: this.viewDate(),
-          date_to: this.viewDate(),
-        })
+      await lastValueFrom(
+        this.api.delete(`/admin/communication-sessions/${this.sessionId}`)
       );
-      this.viewStudentName.set(res.student.student_name);
-      this.viewEntry.set(res.entries.length > 0 ? res.entries[0] : null);
+      this.success.set('已刪除');
+      this.goBack();
     } catch {
-      this.error.set('查詢失敗，請稍後再試');
-    } finally {
-      this.viewLoading.set(false);
+      this.error.set('刪除失敗');
     }
   }
 
-  focusLabel(score: number): string {
-    if (score >= 8) return '優異';
-    if (score >= 5) return '良好';
-    return '待加強';
+  trackByStudent(index: number, s: StudentRow): number {
+    return s.student_id;
   }
 }
