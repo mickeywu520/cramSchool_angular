@@ -4,6 +4,7 @@ import { Register } from './components/register/register';
 import { RegisterDetails } from './components/register-details/register-details';
 import { Faculty } from './components/faculty/faculty';
 import { StudentProfile } from './components/student-profile/student-profile';
+import { EditProfile } from './components/edit-profile/edit-profile';
 import { CommunicationBook } from './components/communication-book/communication-book';
 import { CourseDetails } from './components/course-details/course-details';
 import { LeaveMakeup } from './components/leave-makeup/leave-makeup';
@@ -25,9 +26,11 @@ export const routes: Routes = [
   { path: 'register-details', component: RegisterDetails },
   { path: 'faculty', component: Faculty },
   { path: 'student', component: StudentProfile, canActivate: [StudentAuthGuard] },
+  { path: 'edit-profile', component: EditProfile, canActivate: [StudentAuthGuard] },
   { path: 'communication-book', component: CommunicationBook, canActivate: [StudentAuthGuard] },
   { path: 'course-details', component: CourseDetails },
   { path: 'leave-makeup', component: LeaveMakeup },
+  { path: 'order', redirectTo: '/student' },
   {
     path: 'admin',
     component: AdminLayout,

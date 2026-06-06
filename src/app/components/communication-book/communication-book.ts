@@ -13,43 +13,30 @@ interface StudentInfo {
   avatar_url?: string;
 }
 
-interface HomeworkItem {
+interface SessionEntry {
   id: number;
-  subject: string;
-  content: string;
-  due_date?: string;
-  is_completed: boolean;
-}
-
-interface ReminderItem {
-  id: number;
-  content: string;
-  priority: string;
-}
-
-interface ParentFeedback {
-  feedback?: string;
-  is_signed: boolean;
-  signed_at?: string;
-}
-
-interface CommunicationEntry {
-  id: number;
+  session_id: number;
   entry_date: string;
-  focus_score?: number;
-  interaction_score?: number;
-  homework_completion?: string;
-  teacher_comment?: string;
-  teacher_name?: string;
-  homework: HomeworkItem[];
-  reminders: ReminderItem[];
-  parent_feedback?: ParentFeedback;
+  course_name: string | null;
+  tutor_name: string | null;
+  class_progress: string | null;
+  class_homework: string | null;
+  class_exam_scope: string | null;
+  class_announcements: string | null;
+  arrival_time: string | null;
+  departure_time: string | null;
+  handout_completed: boolean;
+  exam_score: number | null;
+  custom_scores: Record<string, number>;
+  tutoring_attendance: boolean;
+  notes: string | null;
+  parent_signed: boolean;
+  parent_signed_at: string | null;
 }
 
 interface WeeklyEntrySummary {
   id: number;
   entry_date: string;
-  has_feedback: boolean;
   is_signed: boolean;
 }
 
@@ -61,21 +48,17 @@ interface WeeklyEntrySummary {
 })
 export class CommunicationBook implements OnInit {
   loading = signal(true);
+  signing = signal(false);
   error = signal('');
 
   student = signal<StudentInfo | null>(null);
-  entries = signal<CommunicationEntry[]>([]);
+  entries = signal<SessionEntry[]>([]);
   weekEntries = signal<WeeklyEntrySummary[]>([]);
   weekStart = signal('');
   weekEnd = signal('');
 
   selectedDate = signal('');
-  selectedEntry = signal<CommunicationEntry | null>(null);
-
-  // Feedback
-  feedbackText = signal('');
-  isSigned = signal(false);
-  submittingFeedback = signal(false);
+  selectedEntry = signal<SessionEntry | null>(null);
 
   constructor(private api: ApiService) {}
 
@@ -91,7 +74,7 @@ export class CommunicationBook implements OnInit {
       const today = new Date().toISOString().slice(0, 10);
       const [entriesRes, weeklyRes] = await Promise.all([
         lastValueFrom(
-          this.api.get<{ student: StudentInfo; entries: CommunicationEntry[] }>('/communication/entries', {
+          this.api.get<{ student: StudentInfo; entries: SessionEntry[] }>('/communication/entries', {
             date_from: today,
             date_to: today,
           })
@@ -120,7 +103,7 @@ export class CommunicationBook implements OnInit {
     this.loading.set(true);
     try {
       const res = await lastValueFrom(
-        this.api.get<{ entries: CommunicationEntry[] }>('/communication/entries', {
+        this.api.get<{ entries: SessionEntry[] }>('/communication/entries', {
           date_from: dateStr,
           date_to: dateStr,
         })
@@ -133,17 +116,34 @@ export class CommunicationBook implements OnInit {
     }
   }
 
+  async signEntry() {
+    const entry = this.selectedEntry();
+    if (!entry || entry.parent_signed) return;
+
+    this.signing.set(true);
+    try {
+      await lastValueFrom(
+        this.api.post(`/communication/entries/${entry.id}/feedback`, {
+          is_signed: true,
+        })
+      );
+      await this.selectDate(this.selectedDate());
+    } catch {
+      this.error.set('簽署失敗，請稍後再試');
+    } finally {
+      this.signing.set(false);
+    }
+  }
+
   get dayNames() {
     return ['日', '一', '二', '三', '四', '五', '六'];
   }
 
-  /** Parse YYYY-MM-DD to local Date (no timezone shift). */
   private localDate(dateStr: string): Date {
     const [y, m, d] = dateStr.split('-').map(Number);
     return new Date(y, m - 1, d);
   }
 
-  /** Format a Date to YYYY-MM-DD in local time. */
   private fmtLocal(date: Date): string {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -204,32 +204,5 @@ export class CommunicationBook implements OnInit {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return this.avatarColors[Math.abs(hash) % this.avatarColors.length];
-  }
-
-  focusLabel(score: number): string {
-    if (score >= 8) return '優異';
-    if (score >= 5) return '良好';
-    return '待加強';
-  }
-
-  async submitFeedback() {
-    const entry = this.selectedEntry();
-    if (!entry) return;
-
-    this.submittingFeedback.set(true);
-    try {
-      await lastValueFrom(
-        this.api.post(`/communication/entries/${entry.id}/feedback`, {
-          feedback: this.feedbackText() || null,
-          is_signed: this.isSigned(),
-        })
-      );
-      await this.selectDate(this.selectedDate());
-      this.isSigned.set(false);
-    } catch {
-      this.error.set('送出回饋失敗');
-    } finally {
-      this.submittingFeedback.set(false);
-    }
   }
 }

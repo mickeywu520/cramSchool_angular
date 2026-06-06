@@ -1,7 +1,8 @@
 import { Component, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { lastValueFrom } from 'rxjs';
 
 interface StudentData {
@@ -85,7 +86,11 @@ export class StudentProfile implements OnInit {
   homework = signal<HomeworkSummary[]>([]);
   announcements = signal<Announcement[]>([]);
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.loadAll();
@@ -154,6 +159,11 @@ export class StudentProfile implements OnInit {
     if (this.exams().length === 0) return '無資料';
     const sorted = [...this.exams()].sort((a, b) => b.id - a.id);
     return `${sorted[0].score}分`;
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 
   formatDate(dateStr: string): string {

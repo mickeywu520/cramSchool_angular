@@ -247,8 +247,13 @@
                       class="w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800" placeholder="備註"></textarea>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 text-xs text-gray-500 max-w-[120px] truncate">
-                    @if (s.parent_feedback) {
-                      <span [class.text-green-600]="s.parent_signed">{{ s.parent_feedback }}</span>
+                    @if (s.parent_signed) {
+                      <span class="text-green-600 font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">verified</span> 已簽署
+                      </span>
+                      @if (s.parent_feedback) {
+                        <span class="block mt-0.5">{{ s.parent_feedback }}</span>
+                      }
                     } @else {
                       <span class="text-gray-300 italic">-</span>
                     }

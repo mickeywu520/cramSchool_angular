@@ -1,0 +1,256 @@
+@if (loading()) {
+  <div class="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
+    <div class="flex flex-col items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-4xl animate-spin">refresh</span>
+      <p class="text-sm text-gray-400 font-bold">載入中...</p>
+    </div>
+  </div>
+} @else {
+  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24">
+    @if (student(); as s) {
+      <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-16 md:pb-20 lg:pb-24 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+        <div class="relative z-10 flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="relative">
+              @if (s.avatar_url) {
+                <div class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 border-white/30 overflow-hidden bg-white/20"
+                     [style.background-image]="'url(' + s.avatar_url + ')'"
+                     [style.background-size]="'cover'" [style.background-position]="'center'">
+                </div>
+              } @else {
+                <div class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 border-white/30 flex items-center justify-center text-white font-extrabold text-xl md:text-2xl"
+                     [style.background-color]="getAvatarColor(s.student_name)">
+                  {{ getInitial(s.student_name) }}
+                </div>
+              }
+            </div>
+            <div>
+              <h2 class="text-white text-lg md:text-xl lg:text-2xl font-extrabold">{{ s.student_name }}</h2>
+              <p class="text-white/80 text-sm">{{ s.email }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button (click)="logout()" type="button"
+              class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span>
+              登出
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="px-4 md:px-6 lg:px-8 -mt-8 md:-mt-10 lg:-mt-12 relative z-20 space-y-4 md:space-y-6">
+        <form class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800 space-y-4 md:space-y-5" onsubmit="return false;">
+          @if (error()) {
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              {{ error() }}
+            </div>
+          }
+          @if (success()) {
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">check_circle</span>
+              {{ success() }}
+            </div>
+          }
+
+          <div class="space-y-2">
+            <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+              學生姓名 <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
+              <input [(ngModel)]="studentName" name="studentName"
+                class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                placeholder="輸入學生全名" type="text"/>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+              性別 <span class="text-red-500">*</span>
+            </label>
+            <div class="flex gap-4 ml-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="gender" value="男" [checked]="gender() === '男'" (change)="gender.set('男')" class="text-primary focus:ring-primary"/>
+                <span class="text-sm md:text-base font-bold dark:text-gray-300">男</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="gender" value="女" [checked]="gender() === '女'" (change)="gender.set('女')" class="text-primary focus:ring-primary"/>
+                <span class="text-sm md:text-base font-bold dark:text-gray-300">女</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+                出生年月日
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">cake</span>
+                <input [(ngModel)]="birthDate" name="birthDate"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"
+                  type="date"/>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+                年級 <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">school</span>
+                <select [(ngModel)]="grade" name="grade"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
+                  <option disabled value="">請選擇年級</option>
+                  @for (g of gradeOptions; track g) {
+                    <option [value]="g">{{ g }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+                就讀學校 <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
+                <input [(ngModel)]="school" name="school"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="學校名稱" type="text"/>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">班級（選填）</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">meeting_room</span>
+                <input [(ngModel)]="className" name="className"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="例如：三年甲班" type="text"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+              家長姓名 <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
+              <input [(ngModel)]="parentName" name="parentName"
+                class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                placeholder="家長或聯絡人姓名" type="text"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+                家長1 / 連絡電話 <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+                <input [(ngModel)]="phone" name="phone"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="09XX-XXX-XXX" type="tel"/>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長2 / 連絡電話（選填）</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+                <input [(ngModel)]="parent2Phone" name="parent2Phone"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="第二位家長電話" type="tel"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">住家電話（選填）</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">home</span>
+                <input [(ngModel)]="homePhone" name="homePhone"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="住家電話" type="tel"/>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">身分證字號（選填）</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">badge</span>
+                <input [(ngModel)]="idNumber" name="idNumber"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="身分證字號" type="text"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">感興趣的科目</label>
+            <div class="grid grid-cols-2 gap-3 mt-1">
+              @for (entry of subjects() | keyvalue; track entry.key) {
+                <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border transition-all"
+                       [ngClass]="entry.value ? 'border-primary/30 bg-primary/5' : 'border-transparent'"
+                       (click)="toggleSubject(entry.key)">
+                  <input type="checkbox" [checked]="entry.value" class="rounded text-primary focus:ring-primary mr-3 border-gray-300"/>
+                  <span class="text-sm md:text-base font-bold dark:text-gray-300">{{ entry.key }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button (click)="save()" [disabled]="saving()"
+              class="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-extrabold py-4 md:py-5 rounded-2xl bento-shadow transition-all text-lg md:text-xl flex items-center justify-center gap-2">
+              @if (saving()) {
+                <span class="material-symbols-outlined animate-spin">refresh</span>
+              }
+              {{ saving() ? '儲存中...' : '儲存資料' }}
+              @if (!saving()) {
+                <span class="material-symbols-outlined">check</span>
+              }
+            </button>
+          </div>
+        </form>
+      </main>
+    }
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
+      <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
+        <span class="text-[10px] md:text-xs font-bold">首頁</span>
+      </a>
+      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
+      </a>
+      <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
+        <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
+      </a>
+      <a routerLink="/order" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">restaurant_menu</span>
+        <span class="text-[10px] md:text-xs font-bold">訂餐系統</span>
+      </a>
+      <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
+        <span class="text-[10px] md:text-xs font-bold">個人資料</span>
+      </a>
+    </nav>
+
+    <div class="fixed bottom-20 md:bottom-24 right-4 md:right-6 z-40">
+      <button class="bg-accent-gold text-white size-10 md:size-12 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform">
+        <span class="material-symbols-outlined text-lg md:text-xl">support_agent</span>
+      </button>
+    </div>
+  </div>
+}
