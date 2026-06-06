@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
@@ -23,6 +23,9 @@ interface Course {
   teacher_name: string | null;
   grade_level: string | null;
   day_of_week: number | null;
+  days_of_week: string | null;
+  start_date: string | null;
+  end_date: string | null;
   start_time: string | null;
   end_time: string | null;
   location: string | null;
@@ -61,6 +64,13 @@ export class AdminCourses implements OnInit {
   showModal = signal(false);
   editMode = signal(false);
   form: any = {};
+  dragX = 0;
+  dragY = 0;
+  dragging = false;
+  dragStartX = 0;
+  dragStartY = 0;
+  dragMouseX = 0;
+  dragMouseY = 0;
 
   constructor(private api: ApiService) {}
 
@@ -113,17 +123,46 @@ export class AdminCourses implements OnInit {
     this.editMode.set(false);
     this.form = {
       name: '', category: '小學部', subject: '數學', teacher_id: null,
-      grade_level: '國七', day_of_week: 1, start_time: '1830', end_time: '2130',
+      grade_level: '國七', day_of_week: 1, days_of_week: '1',
+      start_date: '', end_date: '',
+      start_time: '1830', end_time: '2130',
       location: '', branch_id: null, school_year: '115', semester: '上',
       is_active: true, display_order: 0,
     };
+    this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
   }
 
   openEdit(course: Course) {
     this.editMode.set(true);
     this.form = { ...course };
+    this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
+  }
+
+  get modalTransform(): string {
+    return `translate(calc(-50% + ${this.dragX}px), calc(-50% + ${this.dragY}px))`;
+  }
+
+  startDrag(e: MouseEvent) {
+    this.dragging = true;
+    this.dragStartX = this.dragX;
+    this.dragStartY = this.dragY;
+    this.dragMouseX = e.clientX;
+    this.dragMouseY = e.clientY;
+    e.preventDefault();
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDrag(e: MouseEvent) {
+    if (!this.dragging) return;
+    this.dragX = this.dragStartX + (e.clientX - this.dragMouseX);
+    this.dragY = this.dragStartY + (e.clientY - this.dragMouseY);
+  }
+
+  @HostListener('document:mouseup')
+  stopDrag() {
+    this.dragging = false;
   }
 
   async save() {
@@ -166,6 +205,27 @@ export class AdminCourses implements OnInit {
 
   dayName(d: number | null): string {
     return d ? this.DAY_NAMES[d] || '' : '';
+  }
+
+  daysLabel(days: string | null): string {
+    if (!days) return '';
+    return days.split(',').map(d => this.DAY_NAMES[Number(d)] || '').filter(Boolean).join(', ');
+  }
+
+  checkedDays(): number[] {
+    const d = this.form.days_of_week;
+    return d ? d.split(',').map(Number) : (this.form.day_of_week ? [this.form.day_of_week] : []);
+  }
+
+  toggleDay(day: number) {
+    let days = this.checkedDays();
+    if (days.includes(day)) {
+      days = days.filter(d => d !== day);
+    } else {
+      days = [...days, day].sort();
+    }
+    this.form.days_of_week = days.length ? days.join(',') : null;
+    this.form.day_of_week = days.length ? days[0] : null;
   }
 
   numberFromEvent(value: string): number | null {
