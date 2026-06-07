@@ -127,13 +127,17 @@
               </div>
             }
             <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
-                 [class.border-green-200]="entry.handout_completed">
+                 [class.border-green-200]="entry.handout_status === '完成'">
               <span class="material-symbols-outlined text-xl"
-                    [class.text-green-500]="entry.handout_completed"
-                    [class.text-gray-300]="!entry.handout_completed">description</span>
-              <p class="text-xs text-gray-500 mt-1">講義</p>
-              <p class="text-sm font-bold" [class.text-green-600]="entry.handout_completed">
-                {{ entry.handout_completed ? '已完成' : '未完成' }}
+                    [class.text-green-500]="entry.handout_status === '完成'"
+                    [class.text-amber-500]="entry.handout_status && entry.handout_status !== '完成'"
+                    [class.text-gray-300]="!entry.handout_status">description</span>
+              <p class="text-xs text-gray-500 mt-1">作業</p>
+              <p class="text-sm font-bold"
+                 [class.text-green-600]="entry.handout_status === '完成'"
+                 [class.text-amber-600]="entry.handout_status && entry.handout_status !== '完成'"
+                 [class.text-gray-400]="!entry.handout_status">
+                {{ entry.handout_status || '-' }}
               </p>
             </div>
             <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">

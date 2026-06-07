@@ -22,7 +22,7 @@ interface StudentRow {
   homework: string;
   exam_scope: string;
   announcements: string;
-  handout_completed: boolean;
+  handout_status: string;
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
@@ -58,7 +58,7 @@ interface StudentRowResponse {
   homework: string | null;
   exam_scope: string | null;
   announcements: string | null;
-  handout_completed: boolean;
+  handout_status: string | null;
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
@@ -204,7 +204,7 @@ export class AdminCommunication implements OnInit {
         homework: s.homework || '',
         exam_scope: s.exam_scope || '',
         announcements: s.announcements || '',
-        handout_completed: s.handout_completed,
+        handout_status: s.handout_status || '',
         exam_score: s.exam_score,
         custom_scores: s.custom_scores || {},
         tutoring_attendance: s.tutoring_attendance,
@@ -233,7 +233,7 @@ export class AdminCommunication implements OnInit {
         homework: '',
         exam_scope: '',
         announcements: '',
-        handout_completed: false,
+        handout_status: '',
         exam_score: null,
         custom_scores: {},
         tutoring_attendance: false,
@@ -281,11 +281,15 @@ export class AdminCommunication implements OnInit {
     this.recalcTutoring();
   }
 
+  private lastSynced: Record<string, string> = {};
+
   syncToStudents(field: string, value: string) {
+    const prev = this.lastSynced[field] ?? '';
+    this.lastSynced[field] = value;
     this.students.update(list =>
       list.map(s => {
         const cur = (s as any)[field] as string;
-        if (!cur) {
+        if (!cur || cur === prev) {
           return { ...s, [field]: value };
         }
         return s;
@@ -353,7 +357,7 @@ export class AdminCommunication implements OnInit {
           homework: s.homework || null,
           exam_scope: s.exam_scope || null,
           announcements: s.announcements || null,
-          handout_completed: s.handout_completed,
+          handout_status: s.handout_status || null,
           exam_score: s.exam_score,
           custom_scores: s.custom_scores,
           tutoring_attendance: s.tutoring_attendance,
