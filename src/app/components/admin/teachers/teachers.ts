@@ -42,7 +42,7 @@ export class AdminTeachers implements OnInit {
   photoFile = signal<File | null>(null);
   lifePhotoFile = signal<File | null>(null);
 
-  subjectOptions = ['數學', '英文', '理化', '國文', '作文'];
+  subjectOptions = ['國文', '英文', '數學', '自然', '社會'];
 
   async loadBranches() {
     try {

@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
@@ -11,6 +11,7 @@ interface Branch {
 interface Course {
   id: number; name: string; category: string; grade_level: string; subject: string;
   branch_id: number | null; branch_name?: string;
+  day_of_week?: number; days_of_week?: string;
 }
 
 interface StudentRow {
@@ -23,6 +24,7 @@ interface StudentRow {
   exam_scope: string;
   announcements: string;
   handout_status: string;
+  vocab: string;
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
@@ -59,6 +61,7 @@ interface StudentRowResponse {
   exam_scope: string | null;
   announcements: string | null;
   handout_status: string | null;
+  vocab: string | null;
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
@@ -75,12 +78,13 @@ type ViewMode = 'list' | 'editor';
   templateUrl: './communication.html',
   styleUrl: './communication.scss',
 })
-export class AdminCommunication implements OnInit {
+export class AdminCommunication implements OnInit, OnDestroy {
   viewMode = signal<ViewMode>('list');
 
   branches = signal<Branch[]>([]);
   selectedBranchId = signal<number | null>(null);
   courses = signal<Course[]>([]);
+  filterDate = signal(new Date().toISOString().slice(0, 10));
 
   selectedCourse = signal<Course | null>(null);
   sessionId: number | null = null;
@@ -93,6 +97,10 @@ export class AdminCommunication implements OnInit {
   examColumns = signal<ExamColumn[]>([]);
   students = signal<StudentRow[]>([]);
   newColumnName = signal('');
+  templateMode = signal<'default' | 'english'>('default');
+  handoutOptions = ['完成', '未完成', '遲交', '未帶', '請假'];
+  vocabOptions = ['優異', '普通', '待加強', '請假'];
+  draftTimer: any = null;
 
   saving = signal(false);
   loading = signal(false);
@@ -104,6 +112,10 @@ export class AdminCommunication implements OnInit {
   ngOnInit() {
     this.loadBranches();
     this.loadCourses();
+  }
+
+  ngOnDestroy() {
+    this.stopDraftTimer();
   }
 
   async loadBranches() {
@@ -136,6 +148,30 @@ export class AdminCommunication implements OnInit {
     this.loadCourses();
   }
 
+  onFilterDateChange() {
+    // re-render filtered list
+  }
+
+  private getDayNumber(dateStr: string): number {
+    const d = new Date(dateStr + 'T00:00:00');
+    const jsDay = d.getDay();
+    return jsDay === 0 ? 7 : jsDay;
+  }
+
+  getFilteredCourses() {
+    const dayOfWeek = this.getDayNumber(this.filterDate());
+    return this.courses().filter(c => {
+      if (c.days_of_week) {
+        const days = c.days_of_week.split(',').map(Number);
+        return days.includes(dayOfWeek);
+      }
+      if (c.day_of_week) {
+        return c.day_of_week === dayOfWeek;
+      }
+      return true;
+    });
+  }
+
   async selectCourse(course: Course) {
     this.selectedCourse.set(course);
     this.sessionId = null;
@@ -148,6 +184,7 @@ export class AdminCommunication implements OnInit {
 
     await this.tryLoadExistingSession();
     this.viewMode.set('editor');
+    this.startDraftTimer();
   }
 
   private resetClassFields() {
@@ -205,6 +242,7 @@ export class AdminCommunication implements OnInit {
         exam_scope: s.exam_scope || '',
         announcements: s.announcements || '',
         handout_status: s.handout_status || '',
+        vocab: s.vocab || '優異',
         exam_score: s.exam_score,
         custom_scores: s.custom_scores || {},
         tutoring_attendance: s.tutoring_attendance,
@@ -233,7 +271,8 @@ export class AdminCommunication implements OnInit {
         homework: '',
         exam_scope: '',
         announcements: '',
-        handout_status: '',
+        handout_status: '完成',
+        vocab: '優異',
         exam_score: null,
         custom_scores: {},
         tutoring_attendance: false,
@@ -254,6 +293,7 @@ export class AdminCommunication implements OnInit {
   }
 
   goBack() {
+    this.stopDraftTimer();
     this.viewMode.set('list');
     this.selectedCourse.set(null);
     this.sessionId = null;
@@ -337,33 +377,7 @@ export class AdminCommunication implements OnInit {
     this.saving.set(true);
 
     try {
-      const payload: any = {
-        course_id: course.id,
-        entry_date: this.entryDate(),
-        tutoring_threshold: this.tutoringThreshold(),
-        class_progress: this.classProgress() || null,
-        class_homework: this.classHomework() || null,
-        class_exam_scope: this.classExamScope() || null,
-        class_announcements: this.classAnnouncements() || null,
-        exam_columns: this.examColumns().map((c, i) => ({
-          name: c.name,
-          display_order: i,
-        })),
-        students: this.students().map(s => ({
-          student_id: s.student_id,
-          arrival_time: s.arrival_time || null,
-          departure_time: s.departure_time || null,
-          progress: s.progress || null,
-          homework: s.homework || null,
-          exam_scope: s.exam_scope || null,
-          announcements: s.announcements || null,
-          handout_status: s.handout_status || null,
-          exam_score: s.exam_score,
-          custom_scores: s.custom_scores,
-          tutoring_attendance: s.tutoring_attendance,
-          notes: s.notes || null,
-        })),
-      };
+      const payload = this.buildPayload();
 
       if (this.sessionId) {
         await lastValueFrom(
@@ -395,6 +409,69 @@ export class AdminCommunication implements OnInit {
     } catch {
       this.error.set('刪除失敗');
     }
+  }
+
+  startDraftTimer() {
+    this.stopDraftTimer();
+    this.draftTimer = setInterval(() => {
+      if (this.selectedCourse()) {
+        this.saveDraft();
+      }
+    }, 30000);
+  }
+
+  stopDraftTimer() {
+    if (this.draftTimer) {
+      clearInterval(this.draftTimer);
+      this.draftTimer = null;
+    }
+  }
+
+  async saveDraft() {
+    if (!this.selectedCourse() || this.saving()) return;
+    this.saving.set(true);
+    try {
+      const payload = this.buildPayload();
+      if (this.sessionId) {
+        await lastValueFrom(this.api.put(`/admin/communication-sessions/${this.sessionId}`, payload));
+      } else {
+        const created = await lastValueFrom(this.api.post<any>('/admin/communication-sessions', payload));
+        this.sessionId = created.id;
+      }
+    } catch {
+      // silent
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  private buildPayload() {
+    const course = this.selectedCourse()!;
+    return {
+      course_id: course.id,
+      entry_date: this.entryDate(),
+      tutoring_threshold: this.tutoringThreshold(),
+      class_progress: this.classProgress() || null,
+      class_homework: this.classHomework() || null,
+      class_exam_scope: this.classExamScope() || null,
+      class_announcements: this.classAnnouncements() || null,
+      exam_columns: this.examColumns().map((c, i) => ({ name: c.name, display_order: i })),
+      students: this.students().map(s => ({
+        student_id: s.student_id,
+        arrival_time: s.arrival_time || null,
+        departure_time: s.departure_time || null,
+        progress: s.progress || null,
+        homework: s.homework || null,
+        exam_scope: s.exam_scope || null,
+        announcements: s.announcements || null,
+        handout_status: s.handout_status || null,
+        vocab: s.vocab || null,
+        exam_score: s.exam_score,
+        custom_scores: s.custom_scores,
+        tutoring_attendance: s.tutoring_attendance,
+        notes: s.notes || null,
+      })),
+    };
   }
 
   trackByStudent(index: number, s: StudentRow): number {

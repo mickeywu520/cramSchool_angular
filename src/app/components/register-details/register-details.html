@@ -6,8 +6,8 @@
       </a>
       <h1 class="text-[#101819] dark:text-white text-xl md:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight">學生註冊</h1>
     </div>
-    <div class="size-10 md:size-12 lg:size-14 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-      <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">person_add</span>
+    <div class="size-10 md:size-12 lg:size-14 shrink-0 flex items-center justify-center">
+      <img src="/logo.png" alt="禾笙教育" class="size-full object-contain" />
     </div>
   </nav>
   
@@ -90,7 +90,7 @@
         <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">班級（選填）</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">meeting_room</span>
-          <input [(ngModel)]="className" name="className" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="例如：三年甲班" type="text"/>
+          <input [(ngModel)]="className" name="className" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入班級" type="text"/>
         </div>
       </div>
 
@@ -98,9 +98,19 @@
         <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
           家長姓名 <span class="text-red-500">*</span>
         </label>
-        <div class="relative">
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
-          <input [(ngModel)]="parentName" name="parentName" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入家長或聯絡人姓名" type="text"/>
+        <div class="flex gap-3">
+          <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
+            <input [(ngModel)]="parentName" name="parentName" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="輸入家長姓名" type="text"/>
+          </div>
+          <div class="relative w-28 shrink-0">
+            <select [(ngModel)]="parentTitle" name="parentTitle" class="w-full pl-3 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
+              <option value="">稱謂</option>
+              @for (t of parentTitleOptions; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
         </div>
       </div>
       
@@ -114,11 +124,23 @@
         </div>
       </div>
 
-      <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長2 / 連絡電話（選填）</label>
+      <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl space-y-4">
+        <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400">第二位家長（選填）</h3>
+        <div class="flex gap-3">
+          <div class="relative flex-1">
+            <input [(ngModel)]="parent2Name" name="parent2Name" class="w-full pl-4 pr-4 py-3 bg-white dark:bg-gray-800 border-none rounded-xl bento-shadow text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="第二位家長姓名" type="text"/>
+          </div>
+          <div class="relative w-24 shrink-0">
+            <select [(ngModel)]="parent2Title" name="parent2Title" class="w-full pl-3 pr-4 py-3 bg-white dark:bg-gray-800 border-none rounded-xl bento-shadow text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white appearance-none">
+              <option value="">稱謂</option>
+              @for (t of parentTitleOptions; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+        </div>
         <div class="relative">
-          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
-          <input [(ngModel)]="parent2Phone" name="parent2Phone" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="第二位家長聯絡電話" type="tel"/>
+          <input [(ngModel)]="parent2Phone" name="parent2Phone" class="w-full pl-4 pr-4 py-3 bg-white dark:bg-gray-800 border-none rounded-xl bento-shadow text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="第二位家長連絡電話" type="tel"/>
         </div>
       </div>
 
@@ -131,24 +153,10 @@
       </div>
 
       <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">身分證字號（選填）</label>
+        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">身分證字號 <span class="text-red-500">*</span></label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">badge</span>
-          <input [(ngModel)]="idNumber" name="idNumber" (keydown.enter)="submit()" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="身分證字號（選填）" type="text"/>
-        </div>
-      </div>
-      
-      <div class="space-y-2">
-        <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">感興趣的科目</label>
-        <div class="grid grid-cols-2 gap-3 mt-1">
-          @for (entry of subjects() | keyvalue; track entry.key) {
-            <label class="flex items-center p-3 md:p-4 bg-white dark:bg-gray-800 rounded-xl bento-shadow cursor-pointer border transition-all"
-                   [ngClass]="entry.value ? 'border-primary/30 bg-primary/5' : 'border-transparent'"
-                   (click)="toggleSubject(entry.key)">
-              <input type="checkbox" [checked]="entry.value" class="rounded text-primary focus:ring-primary mr-3 border-gray-300"/>
-              <span class="text-sm md:text-base font-bold dark:text-gray-300">{{ entry.key }}</span>
-            </label>
-          }
+          <input [(ngModel)]="idNumber" name="idNumber" (keydown.enter)="submit()" class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400" placeholder="請輸入學生身分證字號" type="text"/>
         </div>
       </div>
       
@@ -166,25 +174,6 @@
       </div>
     </form>
     
-    <div class="mt-10 md:mt-12 lg:mt-14">
-      <div class="relative flex items-center justify-center mb-6 md:mb-8">
-        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-        <span class="flex-shrink mx-4 text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">快速註冊方式</span>
-        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-      </div>
-      <div class="flex justify-center gap-4 md:gap-6">
-        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-white dark:bg-gray-800 bento-shadow flex items-center justify-center hover:scale-110 transition-transform">
-          <img alt="Google" class="w-5 h-5 md:w-6 md:h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtuLqVMGI4_27AdkEyekH8WPHMkt8Mht5j99qDiowYSuZ15VDjI1HwFK6CB1gVQ7eBn0TgDws7g9k4Ugr6qWfpON_dZFgy5XxQ6b4b8ibDNHUEK5cNmmZE2EqdHn27IQ6dKrqqlXPltw0cB-UTMeDQGHlTtbibc4i4T13sXj1urte20VmGHyYHBW6f5B9LITvVgIgOAr-VAuwT2G6IYNyMZlkGSEHZoNOqKEBWVecbSGgvqlv3IBTI_1qWhdSP54NxrS0m6gcdw5g"/>
-        </button>
-        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-[#00B900] bento-shadow flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-[#00B900]/20">
-          <img alt="LINE" class="w-6 h-6 md:w-7 md:h-7 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnobeKWAH7KoAeoya--1QwEHQeCEKvsBF40GG2-w-q_Vuko537EwrDdbVpoYNSJITNwgBQS2cKAKktm8GBSlvbXWFKVPQu6V7ADEln-BHHdeCmLVTJcYW2bCHIz6eFHA8EdjlcJoaFDlGeVV8An5YazfqlkvzrLebWmDI9vEzQ439lPStFkSiiJRf9t2Ezj_tkfZQbGqGVbndUbRDoBJBFQYchTcSAU_418g1qwVPVLtxKK2AiSuadyl2JxXvRku0DlWEdCBF4hwE"/>
-        </button>
-        <button class="size-12 md:size-14 lg:size-16 rounded-full bg-black dark:bg-white bento-shadow flex items-center justify-center hover:scale-110 transition-transform">
-          <img alt="Apple" class="w-5 h-5 md:w-6 md:h-6 invert dark:invert-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2tfYoD33bFc7R56mXlrhkxsxfq24c-SnzUwnhJNcWURNo-As5ta5UpioHqN31NRHqB77GN5eSED4BNUTY1ng5wmvW-E_ui_nr6DJ-0Xbh1rzXPk07-fthjo4AXt0RcexjK8BDiEgFHqCOBWWWUNAjiPoLMsfJcxCv2epatoYs4o7lo-HYrvlivQ7AO4py057R2AS8juuguqejIZMgX6qhqbGj8yXks10-wVnV63vutcTf37t9CDlPtHwZ_l4uVEV8hAGirgqqAtY"/>
-        </button>
-      </div>
-    </div>
-    
     <footer class="mt-12 md:mt-14 lg:mt-16 pb-6 md:pb-8 text-center">
       <p class="text-xs md:text-sm text-gray-400 leading-relaxed">
         點擊註冊即表示您同意本校的<br/>
@@ -192,10 +181,4 @@
       </p>
     </footer>
   </main>
-  
-  <div class="fixed bottom-6 right-6 z-40">
-    <button class="bg-accent-gold text-white size-12 md:size-14 lg:size-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-white dark:ring-gray-800">
-      <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">support_agent</span>
-    </button>
-  </div>
 </div>

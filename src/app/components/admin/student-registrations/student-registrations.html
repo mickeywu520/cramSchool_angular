@@ -1,0 +1,79 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between flex-wrap gap-3">
+    <h2 class="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">person_add</span>
+      報名註冊管理
+    </h2>
+    <div class="flex items-center gap-2 flex-wrap">
+      <input [(ngModel)]="search" name="search" placeholder="搜尋姓名..."
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-28"
+        (keyup.enter)="load()"/>
+      <select [(ngModel)]="filterStatus" name="filterStatus" (ngModelChange)="load()"
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white">
+        <option value="">全部狀態</option>
+        @for (opt of statusOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+      <input [(ngModel)]="filterGrade" name="filterGrade" placeholder="年級..."
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-24"
+        (keyup.enter)="load()"/>
+      <input [(ngModel)]="filterSchool" name="filterSchool" placeholder="學校..."
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-28"
+        (keyup.enter)="load()"/>
+      <button (click)="load()" type="button"
+        class="px-3 py-1.5 text-sm font-bold text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">refresh</span>
+        重新整理
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-12 text-gray-400 text-sm">載入中...</div>
+  } @else if (students().length === 0) {
+    <div class="text-center py-12 text-gray-400 text-sm">尚無註冊資料</div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-gray-50 dark:bg-gray-700/50">
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">姓名</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">年級</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">學校</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長/稱謂</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">電話</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">第二位家長</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">Email</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">註冊日期</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">跟進狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of students(); track s.id) {
+            <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+              <td class="px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-200">{{ s.student_name }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.grade }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.school }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent_name }}{{ s.parent_title ? ' (' + s.parent_title + ')' : '' }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.phone }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_name || '-' }}{{ s.parent2_title ? ' (' + s.parent2_title + ')' : '' }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 max-w-[160px] truncate">{{ s.email }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ formatDate(s.created_at) }}</td>
+              <td class="px-3 py-2 text-center">
+                <select [ngModel]="s.followup_status"
+                  (ngModelChange)="updateStatus(s.id, $event)"
+                  [disabled]="savingId() === s.id"
+                  class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white disabled:opacity-50">
+                  @for (opt of statusOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

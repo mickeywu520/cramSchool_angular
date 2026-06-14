@@ -136,15 +136,29 @@
             </div>
           </div>
 
-          <div class="space-y-2">
-            <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
-              家長姓名 <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
-              <input [(ngModel)]="parentName" name="parentName"
-                class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
-                placeholder="家長或聯絡人姓名" type="text"/>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">
+                家長姓名 <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">family_restroom</span>
+                <input [(ngModel)]="parentName" name="parentName"
+                  class="w-full pl-12 pr-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="家長或聯絡人姓名" type="text"/>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">稱謂</label>
+              <select [(ngModel)]="parentTitle" name="parentTitle"
+                class="w-full px-4 py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white">
+                <option value="">選擇稱謂</option>
+                <option value="爸爸">爸爸</option>
+                <option value="媽媽">媽媽</option>
+                <option value="爺爺">爺爺</option>
+                <option value="奶奶">奶奶</option>
+                <option value="其他">其他</option>
+              </select>
             </div>
           </div>
 
@@ -160,14 +174,37 @@
                   placeholder="09XX-XXX-XXX" type="tel"/>
               </div>
             </div>
+          </div>
 
-            <div class="space-y-2">
-              <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">家長2 / 連絡電話（選填）</label>
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
-                <input [(ngModel)]="parent2Phone" name="parent2Phone"
-                  class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
-                  placeholder="第二位家長電話" type="tel"/>
+          <div class="border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+            <h3 class="text-sm font-bold text-gray-500 mb-3">家長2（選填）</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+              <div class="space-y-2">
+                <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">姓名</label>
+                <input [(ngModel)]="parent2Name" name="parent2Name"
+                  class="w-full px-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                  placeholder="第二位家長姓名" type="text"/>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">稱謂</label>
+                <select [(ngModel)]="parent2Title" name="parent2Title"
+                  class="w-full px-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white">
+                  <option value="">選擇稱謂</option>
+                  <option value="爸爸">爸爸</option>
+                  <option value="媽媽">媽媽</option>
+                  <option value="爺爺">爺爺</option>
+                  <option value="奶奶">奶奶</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 ml-1">連絡電話</label>
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">call</span>
+                  <input [(ngModel)]="parent2Phone" name="parent2Phone"
+                    class="w-full pl-12 pr-4 py-3 md:py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl bento-shadow text-sm md:text-base focus:ring-2 focus:ring-primary focus:outline-none dark:text-white placeholder:text-gray-400"
+                    placeholder="第二位家長電話" type="tel"/>
+                </div>
               </div>
             </div>
           </div>
@@ -246,11 +283,5 @@
         <span class="text-[10px] md:text-xs font-bold">個人資料</span>
       </a>
     </nav>
-
-    <div class="fixed bottom-20 md:bottom-24 right-4 md:right-6 z-40">
-      <button class="bg-accent-gold text-white size-10 md:size-12 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform">
-        <span class="material-symbols-outlined text-lg md:text-xl">support_agent</span>
-      </button>
-    </div>
   </div>
 }

@@ -80,9 +80,6 @@
                   「{{ teacher.philosophy.substring(0, 80) }}...」
                 </p>
               </div>
-              <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 md:py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm md:text-base" (click)="$event.stopPropagation()">
-                <span class="material-symbols-outlined text-xl">chat</span> 聯絡導師
-              </button>
             </div>
           </div>
         </div>
@@ -91,11 +88,11 @@
     
     <section class="px-6 md:px-8 lg:px-10 py-10 md:py-12 lg:py-16 text-center space-y-4">
       <p class="text-gray-500 text-sm md:text-base">沒找到理想的學科老師？</p>
-      <button class="text-primary font-extrabold border-b-2 border-primary pb-1 text-sm md:text-base">諮詢客製化教學方案</button>
+      <button (click)="showLINEQR()" class="text-primary font-extrabold border-b-2 border-primary pb-1 text-sm md:text-base">聯絡我們</button>
     </section>
     
     <footer class="px-4 md:px-6 lg:px-8 py-6 md:py-8 text-center border-t border-gray-100 dark:border-gray-800">
-      <p class="text-xs md:text-sm text-gray-400">© 2024 禾笙文理補習班. 版權所有.</p>
+      <p class="text-xs md:text-sm text-gray-400">© 2024 禾笙教育有限公司 統一編號：94016384</p>
     </footer>
   </main>
   
@@ -131,17 +128,25 @@
               </div>
             </div>
           }
-          <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-xl">chat</span> 聯絡導師
-          </button>
         </div>
       </div>
     </div>
   }
-  
-  <div class="fixed bottom-6 right-6 z-40">
-    <button class="bg-accent-gold text-white size-12 md:size-14 lg:size-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-white dark:ring-gray-800">
-      <span class="material-symbols-outlined text-2xl md:text-3xl">support_agent</span>
-    </button>
-  </div>
+
+  @if (lineQRVisible()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" (click)="hideLINEQR()">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-xs mx-4" (click)="$event.stopPropagation()">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://lin.ee/nrn1FgR" alt="LINE QR Code" class="mx-auto" />
+        <p class="text-center text-sm text-gray-500 mt-3">掃描 QR Code 加入 LINE</p>
+        <a href="https://lin.ee/nrn1FgR" target="_blank"
+          class="mt-3 block w-full text-center px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
+          直接開啟 LINE
+        </a>
+        <button (click)="hideLINEQR()"
+          class="mt-2 w-full px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          關閉
+        </button>
+      </div>
+    </div>
+  }
 </div>

@@ -19,6 +19,7 @@ export class AdminLayout {
     { path: '/admin/branches', icon: 'business', label: '分校管理' },
     { path: '/admin/courses', icon: 'calendar_month', label: '課程管理' },
     { path: '/admin/enrollments', icon: 'assignment_ind', label: '選課管理' },
+    { path: '/admin/student-registrations', icon: 'person_add', label: '報名註冊管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
   ];
 

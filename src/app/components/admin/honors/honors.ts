@@ -28,7 +28,7 @@ export class AdminHonors implements OnInit {
   formData = signal<Partial<Honor>>({});
   maxHonors = 40;
 
-  examTypeOptions = ['會考', '學測', '指考', '其他'];
+  examTypeOptions = ['會考', '學測', '分科', '其他'];
 
   constructor(private api: ApiService) {}
 
@@ -54,7 +54,7 @@ export class AdminHonors implements OnInit {
   openNewForm() {
     if (!this.canAdd) return;
     this.isNew.set(true);
-    this.formData.set({ student_name: '', school: '', department: '', year: 114, exam_type: '學測', display_order: this.honors().length });
+    this.formData.set({ student_name: '', school: '', department: '', year: new Date().getFullYear() - 1911, exam_type: '學測', display_order: this.honors().length });
     this.showForm.set(true);
   }
 
@@ -79,7 +79,7 @@ export class AdminHonors implements OnInit {
       student_name: data.student_name,
       school: data.school,
       department: data.department,
-      year: data.year ?? 114,
+      year: data.year ?? new Date().getFullYear() - 1911,
       exam_type: data.exam_type || '學測',
       display_order: data.display_order ?? this.honors().length,
     };

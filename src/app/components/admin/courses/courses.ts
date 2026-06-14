@@ -45,8 +45,18 @@ interface Course {
 export class AdminCourses implements OnInit {
   DAY_NAMES = ['', '一', '二', '三', '四', '五', '六', '日'];
   CATEGORIES = ['小學部', '國中部', '高中部'];
-  GRADE_LEVELS = ['小四', '小五', '小六', '國七', '國八', '國九', '高一', '高二', '高三'];
-  SUBJECTS = ['數學', '英文', '國文', '理化', '生物', '社會', '物理', '化學', '數B', '自然'];
+  GRADE_LEVEL_MAP: Record<string, string[]> = {
+    '小學部': ['小四', '小五', '小六'],
+    '國中部': ['國七', '國八', '國九'],
+    '高中部': ['高一', '高二', '高三'],
+  };
+  SUBJECT_MAP: Record<string, string[]> = {
+    '小學部': ['數學', '英文', '國文', '自然'],
+    '國中部': ['數學', '英文', '國文', '理化', '生物', '社會'],
+    '高中部': ['數學', '英文', '國文', '物理', '化學', '數B', '自然', '社會'],
+  };
+  GRADE_LEVELS = [...this.GRADE_LEVEL_MAP['小學部'], ...this.GRADE_LEVEL_MAP['國中部'], ...this.GRADE_LEVEL_MAP['高中部']];
+  SUBJECTS = [...new Set(Object.values(this.SUBJECT_MAP).flat())];
   courses = signal<Course[]>([]);
   teachers = signal<Teacher[]>([]);
   branches = signal<Branch[]>([]);
@@ -71,6 +81,37 @@ export class AdminCourses implements OnInit {
   dragStartY = 0;
   dragMouseX = 0;
   dragMouseY = 0;
+
+  currentGradeLevels = signal<string[]>(this.GRADE_LEVEL_MAP['小學部']);
+  currentSubjects = signal<string[]>(this.SUBJECT_MAP['小學部']);
+
+  onCategoryChange() {
+    const cat = this.form.category;
+    const grades = this.GRADE_LEVEL_MAP[cat] || this.GRADE_LEVELS;
+    const subjects = this.SUBJECT_MAP[cat] || this.SUBJECTS;
+    this.currentGradeLevels.set(grades);
+    this.currentSubjects.set(subjects);
+    if (!grades.includes(this.form.grade_level)) {
+      this.form.grade_level = grades[0] || '';
+    }
+    if (grades.length && !subjects.includes(this.form.subject)) {
+      this.form.subject = subjects[0] || '';
+    }
+    this.autoName();
+  }
+
+  onGradeLevelChange() {
+    this.autoName();
+  }
+
+  onSubjectChange() {
+    this.autoName();
+  }
+
+  autoName() {
+    const parts = [this.form.category, this.form.grade_level, this.form.subject].filter(Boolean);
+    this.form.name = parts.join(' ');
+  }
 
   constructor(private api: ApiService) {}
 
@@ -121,15 +162,17 @@ export class AdminCourses implements OnInit {
 
   openCreate() {
     this.editMode.set(false);
+    const sy = String(new Date().getFullYear() - 1911);
     this.form = {
       name: '', category: '小學部', subject: '數學', teacher_id: null,
-      grade_level: '國七', day_of_week: 1, days_of_week: '1',
+      grade_level: '小四', day_of_week: 1, days_of_week: '1',
       start_date: '', end_date: '',
       start_time: '1830', end_time: '2130',
-      location: '', branch_id: null, school_year: '115', semester: '上',
+      location: '', branch_id: null, school_year: sy, semester: '上',
       is_active: true, display_order: 0,
     };
     this.dragX = 0; this.dragY = 0;
+    this.onCategoryChange();
     this.showModal.set(true);
   }
 
@@ -230,5 +273,20 @@ export class AdminCourses implements OnInit {
 
   numberFromEvent(value: string): number | null {
     return value ? Number(value) : null;
+  }
+
+  formatTime(t: string | null): string {
+    if (!t) return '';
+    return t.length === 4 ? t.slice(0, 2) + ':' + t.slice(2) : t;
+  }
+
+  getFilterGradeLevels(): string[] {
+    const cat = this.filterCategory();
+    return cat ? (this.GRADE_LEVEL_MAP[cat] || []) : this.GRADE_LEVELS;
+  }
+
+  getFilterSubjects(): string[] {
+    const cat = this.filterCategory();
+    return cat ? (this.SUBJECT_MAP[cat] || []) : this.SUBJECTS;
   }
 }

@@ -16,6 +16,7 @@ import { AdminHonors } from './components/admin/honors/honors';
 import { AdminCommunication } from './components/admin/communication/communication';
 import { AdminCourses } from './components/admin/courses/courses';
 import { AdminEnrollments } from './components/admin/enrollments/enrollments';
+import { AdminStudentRegistrations } from './components/admin/student-registrations/student-registrations';
 import { AdminBranches } from './components/admin/branches/branches';
 import { AuthGuard } from './guards/auth.guard';
 import { StudentAuthGuard } from './guards/student-auth.guard';
@@ -44,6 +45,7 @@ export const routes: Routes = [
       { path: 'branches', component: AdminBranches },
       { path: 'courses', component: AdminCourses },
       { path: 'enrollments', component: AdminEnrollments },
+      { path: 'student-registrations', component: AdminStudentRegistrations },
       { path: 'communication', component: AdminCommunication },
     ],
   },

@@ -15,11 +15,14 @@ interface StudentData {
   grade: string;
   class_name?: string;
   parent_name: string;
+  parent_title?: string;
   phone: string;
+  parent2_name?: string;
+  parent2_title?: string;
   parent2_phone?: string;
   home_phone?: string;
   id_number?: string;
-  interested_subjects: string[];
+  interested_subjects?: string[];
   avatar_url?: string;
   student_number?: string;
   email: string;
@@ -52,7 +55,10 @@ export class EditProfile implements OnInit {
   grade = signal('');
   className = signal('');
   parentName = signal('');
+  parentTitle = signal('');
   phone = signal('');
+  parent2Name = signal('');
+  parent2Title = signal('');
   parent2Phone = signal('');
   homePhone = signal('');
   idNumber = signal('');
@@ -93,13 +99,17 @@ export class EditProfile implements OnInit {
       this.grade.set(data.grade);
       this.className.set(data.class_name || '');
       this.parentName.set(data.parent_name);
+      this.parentTitle.set(data.parent_title || '');
       this.phone.set(data.phone);
+      this.parent2Name.set(data.parent2_name || '');
+      this.parent2Title.set(data.parent2_title || '');
       this.parent2Phone.set(data.parent2_phone || '');
       this.homePhone.set(data.home_phone || '');
       this.idNumber.set(data.id_number || '');
       const subs: Record<string, boolean> = {};
+      const subjects = data.interested_subjects || [];
       for (const key of ['數學科', '英文科', '理化科', '國文科']) {
-        subs[key] = data.interested_subjects.includes(key);
+        subs[key] = subjects.includes(key);
       }
       this.subjects.set(subs);
     } catch {
@@ -133,7 +143,10 @@ export class EditProfile implements OnInit {
           grade: this.grade(),
           class_name: this.className() || null,
           parent_name: this.parentName(),
+          parent_title: this.parentTitle() || null,
           phone: this.phone(),
+          parent2_name: this.parent2Name() || null,
+          parent2_title: this.parent2Title() || null,
           parent2_phone: this.parent2Phone() || null,
           home_phone: this.homePhone() || null,
           id_number: this.idNumber() || null,

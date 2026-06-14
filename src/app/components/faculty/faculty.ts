@@ -16,10 +16,12 @@ interface Teacher {
 }
 
 const SUBJECT_MAP: Record<string, string> = {
-  '數學': 'math',
-  '英文': 'english',
-  '理化': 'science',
   '國文': 'chinese',
+  '英文': 'english',
+  '數學': 'math',
+  '自然': 'science',
+  '理化': 'science',
+  '社會': 'social',
   '地科': 'science',
   '物理': 'science',
   '化學': 'science',
@@ -108,14 +110,25 @@ export class Faculty implements OnInit, AfterViewInit {
 
   filters = [
     { id: 'all', label: '全部師資' },
-    { id: 'math', label: '數學科' },
-    { id: 'english', label: '英文科' },
-    { id: 'science', label: '理化科' },
     { id: 'chinese', label: '國文科' },
+    { id: 'english', label: '英文科' },
+    { id: 'math', label: '數學科' },
+    { id: 'science', label: '自然科' },
+    { id: 'social', label: '社會科' },
   ];
 
   setFilter(filterId: string) {
     this.selectedFilter.set(filterId);
+  }
+
+  lineQRVisible = signal(false);
+
+  showLINEQR() {
+    this.lineQRVisible.set(true);
+  }
+
+  hideLINEQR() {
+    this.lineQRVisible.set(false);
   }
 
   openModal(teacher: Teacher) {
