@@ -392,3 +392,15 @@ npm run build
 - **CP15**: 英文模板「英語背誦」欄位名稱改為「英文單字」
 - 後端新增 `homework_material` / `homework_workbook` 兩欄位 + 自動 migration
 - 學生聯絡簿頁面同步顯示講義作業/題本作業
+
+### v2.2.0 (2026-06-27) - 底部導航精簡 + 頁面頂部按鈕統一
+- 三個學生頁面（student / communication-book / edit-profile）底部 nav 移除「請假補課」和「訂餐系統」
+- communication-book 右上角加入「回禾笙首頁」+「登出」按鈕（比照 student 頁面）
+- edit-profile 右上角補上「回禾笙首頁」按鈕
+- edit-profile 移除「感興趣的科目」區塊
+
+### v2.3.0 (2026-06-27) - 課程介紹頁面動態化 + 啟用開關
+- course-details 頁面改為動態：切 tab 時呼叫 `GET /api/courses?category=小學部|國中部|高中部` 載入課程
+- 移除硬編碼的 8 堂課程卡片，改為 `@for` 動態渲染
+- 新增 `getIcon(subject)` 科目→Material Symbols 圖示對照
+- 課程管理編輯視窗加入「啟用」checkbox（預設 true），不啟用則不顯示於前台

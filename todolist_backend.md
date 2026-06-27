@@ -346,3 +346,7 @@ pytest
 - `routers/admin.py`: CRUD create/update/response 傳入 `homework_material`、`homework_workbook`
 - `services/communication_service.py`: `_format_student_entry` 回傳新欄位供學生端顯示
 - `database.py`: 自動 migration 加入 `homework_material` / `homework_workbook` 欄位
+
+### v0.12.0 (2026-06-27) - 公開課程 API 加入 is_active 篩選
+- `services/course_service.py`: `get_courses()` 新增 `is_active` 參數
+- `routers/course.py`: `GET /api/courses` 傳入 `is_active=True`，前台只顯示啟用課程
