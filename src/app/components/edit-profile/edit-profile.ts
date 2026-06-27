@@ -1,6 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { CommonModule, KeyValuePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
@@ -36,7 +36,7 @@ const AVATAR_COLORS = [
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [RouterLink, CommonModule, FormsModule, KeyValuePipe],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.scss',
 })

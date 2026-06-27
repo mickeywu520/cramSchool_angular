@@ -15,9 +15,20 @@
           <span class="material-symbols-outlined text-xl md:text-2xl">arrow_back_ios_new</span>
         </a>
         <h1 class="text-white text-lg md:text-xl lg:text-2xl font-extrabold tracking-wide">數位聯絡簿</h1>
-        <button class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
-          <span class="material-symbols-outlined text-xl md:text-2xl">notifications</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">home</span>
+            回禾笙首頁
+          </a>
+          <button (click)="logout()" type="button"
+            class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">logout</span>
+            登出
+          </button>
+          <button class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
+            <span class="material-symbols-outlined text-xl md:text-2xl">notifications</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -252,17 +263,9 @@
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
         <span class="text-[10px] md:text-xs font-bold">首頁</span>
       </a>
-      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
-        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
-        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
-      </a>
       <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-primary">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
         <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
-      </a>
-      <a routerLink="/order" class="flex flex-col items-center gap-1 text-gray-400">
-        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">restaurant_menu</span>
-        <span class="text-[10px] md:text-xs font-bold">訂餐系統</span>
       </a>
       <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined text-xl md:text-2xl">person</span>

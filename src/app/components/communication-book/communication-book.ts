@@ -1,8 +1,9 @@
 import { Component, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { lastValueFrom } from 'rxjs';
 
 interface StudentInfo {
@@ -62,7 +63,7 @@ export class CommunicationBook implements OnInit {
   selectedDate = signal('');
   selectedEntries = signal<SessionEntry[]>([]);
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.selectedDate.set(new Date().toISOString().slice(0, 10));
@@ -192,6 +193,11 @@ export class CommunicationBook implements OnInit {
 
   getInitial(name: string): string {
     return name?.charAt(0) || '?';
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 
   private avatarColors = [
