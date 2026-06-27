@@ -50,8 +50,9 @@ export class AdminEnrollments implements OnInit {
 
   sortedCourses = computed(() => {
     const gradeOrder: Record<string, number> = {
-      '七年級': 7, '八年級': 8, '九年級': 9,
-      '高一': 10, '高二': 11, '高三': 12,
+      '小四': 1, '小五': 2, '小六': 3,
+      '國七': 4, '國八': 5, '國九': 6,
+      '高一': 7, '高二': 8, '高三': 9,
     };
     return [...this.courses()].sort((a, b) => {
       const ga = gradeOrder[a.grade_level] ?? 99;
