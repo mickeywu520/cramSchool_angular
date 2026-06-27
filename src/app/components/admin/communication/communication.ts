@@ -28,6 +28,7 @@ interface StudentRow {
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
+  reschedule_date: string;
   notes: string;
   parent_feedback: string;
   parent_signed: boolean;
@@ -65,6 +66,7 @@ interface StudentRowResponse {
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;
+  reschedule_date: string | null;
   notes: string | null;
   parent_feedback: string | null;
   parent_signed: boolean;
@@ -98,7 +100,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
   students = signal<StudentRow[]>([]);
   newColumnName = signal('');
   templateMode = signal<'default' | 'english'>('default');
-  handoutOptions = ['完成', '未完成', '遲交', '未帶', '請假'];
+  handoutOptions = ['完成', '未完成', '遲交', '未帶', '請假', '調課 (交換)'];
   vocabOptions = ['優異', '普通', '待加強', '請假'];
   draftTimer: any = null;
 
@@ -246,6 +248,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_score: s.exam_score,
         custom_scores: s.custom_scores || {},
         tutoring_attendance: s.tutoring_attendance,
+        reschedule_date: s.reschedule_date || '',
         notes: s.notes || '',
         parent_feedback: s.parent_feedback || '',
         parent_signed: s.parent_signed,
@@ -276,6 +279,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_score: null,
         custom_scores: {},
         tutoring_attendance: false,
+        reschedule_date: '',
         notes: '',
         parent_feedback: '',
         parent_signed: false,
@@ -315,6 +319,41 @@ export class AdminCommunication implements OnInit, OnDestroy {
 
   onExamScoreChange() {
     this.recalcTutoring();
+  }
+
+  onExamScoreKeydown(event: KeyboardEvent) {
+    if (event.key !== 'Enter' && event.key !== 'ArrowDown') return;
+    event.preventDefault();
+
+    const current = event.target as HTMLInputElement;
+    const studentList = this.students();
+    const columns = this.examColumns();
+    const numStudents = studentList.length;
+    const numCols = 1 + columns.length; // exam_score + custom columns
+    if (numStudents === 0 || numCols === 0) return;
+
+    const allInputs = document.querySelectorAll<HTMLInputElement>('.exam-score-input');
+    const currentIdx = Array.from(allInputs).indexOf(current);
+    if (currentIdx === -1) return;
+
+    // DOM order: group by student, each student has exam_score + custom cols
+    // So currentIdx = row * numCols + col
+    const col = currentIdx % numCols;
+    const row = Math.floor(currentIdx / numCols);
+
+    // Next position: same column, next row
+    let nextRow = row + 1;
+    let nextCol = col;
+    if (nextRow >= numStudents) {
+      // Finished this column, move to next column, first student
+      nextRow = 0;
+      nextCol = (col + 1) % numCols;
+    }
+
+    const nextInputIdx = nextRow * numCols + nextCol;
+    const nextInput = allInputs[nextInputIdx];
+    nextInput?.focus();
+    nextInput?.select();
   }
 
   onThresholdChange() {
@@ -469,6 +508,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_score: s.exam_score,
         custom_scores: s.custom_scores,
         tutoring_attendance: s.tutoring_attendance,
+        reschedule_date: s.reschedule_date || null,
         notes: s.notes || null,
       })),
     };

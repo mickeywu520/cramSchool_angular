@@ -26,16 +26,16 @@
     </div>
     <div class="space-y-1">
       <label class="text-xs font-bold text-gray-500">年級</label>
-      <select [(ngModel)]="filterGradeLevel" (change)="applyFilters()" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm">
+      <select [(ngModel)]="filterGradeLevel" (change)="onFilterGradeLevelChange(); applyFilters()" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm">
         <option value="">全部</option>
-        @for (g of GRADE_LEVELS; track g) { <option [value]="g">{{ g }}</option> }
+        @for (g of getFilterGradeLevels(); track g) { <option [value]="g">{{ g }}</option> }
       </select>
     </div>
     <div class="space-y-1">
       <label class="text-xs font-bold text-gray-500">科目</label>
       <select [(ngModel)]="filterSubject" (change)="applyFilters()" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm">
         <option value="">全部</option>
-        @for (s of SUBJECTS; track s) { <option [value]="s">{{ s }}</option> }
+        @for (s of getFilterSubjects(); track s) { <option [value]="s">{{ s }}</option> }
       </select>
     </div>
     <button (click)="clearFilters()" class="text-xs text-gray-400 hover:text-primary px-2 py-1">清除</button>

@@ -53,150 +53,159 @@
         </section>
       }
 
-      <!-- Week date selector -->
-      <div class="flex overflow-x-auto gap-3 no-scrollbar">
-        @for (dateStr of getWeekDates(); track dateStr) {
-          @let summary = getWeekEntrySummary(dateStr);
-          <div (click)="selectDate(dateStr)"
-               class="flex flex-col items-center justify-center min-w-[50px] md:min-w-[56px] h-16 md:h-20 rounded-xl cursor-pointer transition-all"
-               [ngClass]="isSelected(dateStr) ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800'"
-               [class.opacity-50]="!summary && !isToday(dateStr)">
-            <span class="text-xs" [class.text-white]="isSelected(dateStr)" [class.text-gray-400]="!isSelected(dateStr)">
-              {{ getWeekDayName(dateStr) }}
-            </span>
-            <span class="text-base md:text-lg font-bold">{{ getWeekDayNum(dateStr) }}</span>
-          </div>
-        }
+      <!-- Date picker + Week date selector -->
+      <div class="space-y-3">
+        <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="selectDate($event)"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-sm font-bold focus:ring-2 focus:ring-primary focus:outline-none"/>
+
+        <div class="flex overflow-x-auto gap-3 no-scrollbar">
+          @for (dateStr of getWeekDates(); track dateStr) {
+            @let summary = getWeekEntrySummary(dateStr);
+            <div (click)="selectDate(dateStr)"
+                 class="flex flex-col items-center justify-center min-w-[50px] md:min-w-[56px] h-16 md:h-20 rounded-xl cursor-pointer transition-all"
+                 [ngClass]="isSelected(dateStr) ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800'"
+                 [class.opacity-50]="!summary && !isToday(dateStr)">
+              <span class="text-xs" [class.text-white]="isSelected(dateStr)" [class.text-gray-400]="!isSelected(dateStr)">
+                {{ getWeekDayName(dateStr) }}
+              </span>
+              <span class="text-base md:text-lg font-bold">{{ getWeekDayNum(dateStr) }}</span>
+            </div>
+          }
+        </div>
       </div>
 
-      @if (selectedEntry(); as entry) {
-        <!-- Course info -->
-        <section class="bg-white dark:bg-card-dark rounded-2xl p-4 md:p-5 bento-shadow border border-gray-100 dark:border-gray-800">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">
-              {{ entry.course_name || '課程' }}
-            </h3>
-            <span class="text-primary text-sm font-medium">{{ formatDate(selectedDate()) }}</span>
-          </div>
-          @if (entry.tutor_name) {
-            <p class="text-xs text-gray-400 mb-3">授課老師：{{ entry.tutor_name }}</p>
-          }
+      @if (selectedEntries().length > 0) {
+        @for (entry of selectedEntries(); track entry.id) {
+          <div class="border-2 border-gray-300 dark:border-gray-600 rounded-2xl p-4 md:p-5 space-y-4 bg-white dark:bg-card-dark">
+            <!-- Course info -->
+            <section>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">
+                  {{ entry.course_name || '課程' }}
+                </h3>
+                <span class="text-primary text-sm font-medium">{{ formatDate(selectedDate()) }}</span>
+              </div>
+              @if (entry.tutor_name) {
+                <p class="text-xs text-gray-400 mb-3">授課老師：{{ entry.tutor_name }}</p>
+              }
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            @if (entry.class_progress) {
-              <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <p class="text-xs font-bold text-gray-500 mb-1">課程進度</p>
-                <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_progress }}</p>
-              </div>
-            }
-            @if (entry.class_homework) {
-              <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <p class="text-xs font-bold text-gray-500 mb-1">回家作業</p>
-                <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_homework }}</p>
-              </div>
-            }
-            @if (entry.class_exam_scope) {
-              <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <p class="text-xs font-bold text-gray-500 mb-1">下次考試範圍</p>
-                <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_exam_scope }}</p>
-              </div>
-            }
-            @if (entry.class_announcements) {
-              <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <p class="text-xs font-bold text-gray-500 mb-1">導師宣布事項</p>
-                <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_announcements }}</p>
-              </div>
-            }
-          </div>
-        </section>
-
-        <!-- Per-student details -->
-        <section class="bg-white dark:bg-card-dark rounded-2xl p-4 md:p-5 bento-shadow border border-gray-100 dark:border-gray-800">
-          <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3">個人紀錄</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
-              <span class="material-symbols-outlined text-primary text-xl">schedule</span>
-              <p class="text-xs text-gray-500 mt-1">到班時間</p>
-              <p class="text-sm font-bold">{{ entry.arrival_time || '-' }}</p>
-            </div>
-            @if (entry.departure_time) {
-              <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
-                <span class="material-symbols-outlined text-primary text-xl">logout</span>
-                <p class="text-xs text-gray-500 mt-1">離班時間</p>
-                <p class="text-sm font-bold">{{ entry.departure_time }}</p>
-              </div>
-            }
-            <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
-                 [class.border-green-200]="entry.handout_status === '完成'">
-              <span class="material-symbols-outlined text-xl"
-                    [class.text-green-500]="entry.handout_status === '完成'"
-                    [class.text-amber-500]="entry.handout_status && entry.handout_status !== '完成'"
-                    [class.text-gray-300]="!entry.handout_status">description</span>
-              <p class="text-xs text-gray-500 mt-1">作業</p>
-              <p class="text-sm font-bold"
-                 [class.text-green-600]="entry.handout_status === '完成'"
-                 [class.text-amber-600]="entry.handout_status && entry.handout_status !== '完成'"
-                 [class.text-gray-400]="!entry.handout_status">
-                {{ entry.handout_status || '-' }}
-              </p>
-            </div>
-            <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
-              <span class="material-symbols-outlined text-xl text-primary">score</span>
-              <p class="text-xs text-gray-500 mt-1">考試分數</p>
-              <p class="text-sm font-bold">{{ entry.exam_score != null ? entry.exam_score + '分' : '-' }}</p>
-            </div>
-            <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
-                 [class.border-amber-200]="entry.tutoring_attendance">
-              <span class="material-symbols-outlined text-xl"
-                    [class.text-amber-500]="entry.tutoring_attendance"
-                    [class.text-gray-300]="!entry.tutoring_attendance">school</span>
-              <p class="text-xs text-gray-500 mt-1">輔導課</p>
-              <p class="text-sm font-bold"
-                 [class.text-amber-600]="entry.tutoring_attendance"
-                 [class.text-gray-500]="!entry.tutoring_attendance">
-                {{ entry.tutoring_attendance ? '需要' : '不需要' }}
-              </p>
-            </div>
-          </div>
-
-          @if (entry.notes) {
-            <div class="mt-3 p-3 rounded-xl bg-primary/5 border-l-4 border-primary">
-              <p class="text-xs font-bold text-gray-500 mb-1">備註</p>
-              <p class="text-sm text-[#101819] dark:text-white">{{ entry.notes }}</p>
-            </div>
-          }
-        </section>
-
-        <!-- Parent sign section -->
-        <section>
-          <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">家長簽署</h3>
-          <div class="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            @if (entry.parent_signed) {
-              <div class="p-4 md:p-5 text-center">
-                <span class="material-symbols-outlined text-green-500 text-4xl">verified</span>
-                <p class="text-sm font-bold text-green-600 dark:text-green-400 mt-2">已簽署</p>
-                @if (entry.parent_signed_at) {
-                  <p class="text-xs text-gray-400 mt-1">{{ entry.parent_signed_at }}</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @if (entry.class_progress) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <p class="text-xs font-bold text-gray-500 mb-1">課程進度</p>
+                    <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_progress }}</p>
+                  </div>
+                }
+                @if (entry.class_homework) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <p class="text-xs font-bold text-gray-500 mb-1">回家作業</p>
+                    <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_homework }}</p>
+                  </div>
+                }
+                @if (entry.class_exam_scope) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <p class="text-xs font-bold text-gray-500 mb-1">下次考試範圍</p>
+                    <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_exam_scope }}</p>
+                  </div>
+                }
+                @if (entry.class_announcements) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <p class="text-xs font-bold text-gray-500 mb-1">導師宣布事項</p>
+                    <p class="text-sm text-[#101819] dark:text-white">{{ entry.class_announcements }}</p>
+                  </div>
                 }
               </div>
-            } @else {
-              <div class="p-4 md:p-5 text-center">
-                <span class="material-symbols-outlined text-gray-300 text-4xl">rate_review</span>
-                <p class="text-sm text-gray-500 mt-2 mb-4">請確認聯絡簿內容後簽署</p>
-                <button (click)="signEntry()" [disabled]="signing()"
-                  class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all active:scale-95 inline-flex items-center gap-2">
-                  @if (signing()) {
-                    <span class="material-symbols-outlined animate-spin text-lg">refresh</span>
-                    送出中...
-                  } @else {
-                    <span class="material-symbols-outlined text-lg">draw</span>
-                    簽署
-                  }
-                </button>
+            </section>
+
+            <!-- Per-student details -->
+            <section>
+              <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3">個人紀錄</h3>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                  <span class="material-symbols-outlined text-primary text-xl">schedule</span>
+                  <p class="text-xs text-gray-500 mt-1">到班時間</p>
+                  <p class="text-sm font-bold">{{ entry.arrival_time || '-' }}</p>
+                </div>
+                @if (entry.departure_time) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                    <span class="material-symbols-outlined text-primary text-xl">logout</span>
+                    <p class="text-xs text-gray-500 mt-1">離班時間</p>
+                    <p class="text-sm font-bold">{{ entry.departure_time }}</p>
+                  </div>
+                }
+                <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
+                     [class.border-green-200]="entry.handout_status === '完成'">
+                  <span class="material-symbols-outlined text-xl"
+                        [class.text-green-500]="entry.handout_status === '完成'"
+                        [class.text-amber-500]="entry.handout_status && entry.handout_status !== '完成'"
+                        [class.text-gray-300]="!entry.handout_status">description</span>
+                  <p class="text-xs text-gray-500 mt-1">作業</p>
+                  <p class="text-sm font-bold"
+                     [class.text-green-600]="entry.handout_status === '完成'"
+                     [class.text-amber-600]="entry.handout_status && entry.handout_status !== '完成'"
+                     [class.text-gray-400]="!entry.handout_status">
+                    {{ entry.handout_status || '-' }}
+                  </p>
+                </div>
+                <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                  <span class="material-symbols-outlined text-xl text-primary">score</span>
+                  <p class="text-xs text-gray-500 mt-1">考試分數</p>
+                  <p class="text-sm font-bold">{{ entry.exam_score != null ? entry.exam_score + '分' : '-' }}</p>
+                </div>
+                <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
+                     [class.border-amber-200]="entry.tutoring_attendance">
+                  <span class="material-symbols-outlined text-xl"
+                        [class.text-amber-500]="entry.tutoring_attendance"
+                        [class.text-gray-300]="!entry.tutoring_attendance">school</span>
+                  <p class="text-xs text-gray-500 mt-1">輔導課</p>
+                  <p class="text-sm font-bold"
+                     [class.text-amber-600]="entry.tutoring_attendance"
+                     [class.text-gray-500]="!entry.tutoring_attendance">
+                    {{ entry.tutoring_attendance ? '需要' : '不需要' }}
+                  </p>
+                </div>
               </div>
-            }
+
+              @if (entry.notes) {
+                <div class="mt-3 p-3 rounded-xl bg-primary/5 border-l-4 border-primary">
+                  <p class="text-xs font-bold text-gray-500 mb-1">備註</p>
+                  <p class="text-sm text-[#101819] dark:text-white">{{ entry.notes }}</p>
+                </div>
+              }
+            </section>
+
+            <!-- Parent sign section -->
+            <section>
+              <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">家長簽署</h3>
+              <div class="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                @if (entry.parent_signed) {
+                  <div class="p-4 md:p-5 text-center">
+                    <span class="material-symbols-outlined text-green-500 text-4xl">verified</span>
+                    <p class="text-sm font-bold text-green-600 dark:text-green-400 mt-2">已簽署</p>
+                    @if (entry.parent_signed_at) {
+                      <p class="text-xs text-gray-400 mt-1">{{ entry.parent_signed_at }}</p>
+                    }
+                  </div>
+                } @else {
+                  <div class="p-4 md:p-5 text-center">
+                    <span class="material-symbols-outlined text-gray-300 text-4xl">rate_review</span>
+                    <p class="text-sm text-gray-500 mt-2 mb-4">請確認聯絡簿內容後簽署</p>
+                    <button (click)="signEntry(entry.id)" [disabled]="signing()"
+                      class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all active:scale-95 inline-flex items-center gap-2">
+                      @if (signing()) {
+                        <span class="material-symbols-outlined animate-spin text-lg">refresh</span>
+                        送出中...
+                      } @else {
+                        <span class="material-symbols-outlined text-lg">draw</span>
+                        簽署
+                      }
+                    </button>
+                  </div>
+                }
+              </div>
+            </section>
           </div>
-        </section>
+        }
       } @else {
         <div class="text-center py-12">
           <span class="material-symbols-outlined text-4xl text-gray-300">menu_book</span>

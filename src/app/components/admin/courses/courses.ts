@@ -55,6 +55,17 @@ export class AdminCourses implements OnInit {
     '國中部': ['數學', '英文', '國文', '理化', '生物', '社會'],
     '高中部': ['數學', '英文', '國文', '物理', '化學', '數B', '自然', '社會'],
   };
+  GRADE_SUBJECT_MAP: Record<string, string[]> = {
+    '小四': ['數學'],
+    '小五': ['數學'],
+    '小六': ['數學', '英文', '國文'],
+    '國七': ['數學', '英文', '生物'],
+    '國八': ['數學', '英文', '理化'],
+    '國九': ['數學', '英文', '理化', '國文', '社會'],
+    '高一': ['數學', '英文', '物理', '化學'],
+    '高二': ['數學', '英文', '數B', '物理', '化學'],
+    '高三': ['數學', '英文', '數B', '自然'],
+  };
   GRADE_LEVELS = [...this.GRADE_LEVEL_MAP['小學部'], ...this.GRADE_LEVEL_MAP['國中部'], ...this.GRADE_LEVEL_MAP['高中部']];
   SUBJECTS = [...new Set(Object.values(this.SUBJECT_MAP).flat())];
   courses = signal<Course[]>([]);
@@ -167,7 +178,7 @@ export class AdminCourses implements OnInit {
       name: '', category: '小學部', subject: '數學', teacher_id: null,
       grade_level: '小四', day_of_week: 1, days_of_week: '1',
       start_date: '', end_date: '',
-      start_time: '1830', end_time: '2130',
+      start_time: '18:30', end_time: '21:30',
       location: '', branch_id: null, school_year: sy, semester: '上',
       is_active: true, display_order: 0,
     };
@@ -178,7 +189,11 @@ export class AdminCourses implements OnInit {
 
   openEdit(course: Course) {
     this.editMode.set(true);
-    this.form = { ...course };
+    this.form = {
+      ...course,
+      start_time: this.toTimeDisplay(course.start_time),
+      end_time: this.toTimeDisplay(course.end_time),
+    };
     this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
   }
@@ -213,14 +228,19 @@ export class AdminCourses implements OnInit {
     this.error.set('');
     this.success.set('');
     try {
+      const payload = {
+        ...this.form,
+        start_time: this.toTimeStorage(this.form.start_time),
+        end_time: this.toTimeStorage(this.form.end_time),
+      };
       if (this.editMode()) {
         await lastValueFrom(
-          this.api.put(`/admin/courses/${this.form.id}`, this.form)
+          this.api.put(`/admin/courses/${this.form.id}`, payload)
         );
         this.success.set('課程已更新');
       } else {
         await lastValueFrom(
-          this.api.post('/admin/courses', this.form)
+          this.api.post('/admin/courses', payload)
         );
         this.success.set('課程已建立');
       }
@@ -280,13 +300,33 @@ export class AdminCourses implements OnInit {
     return t.length === 4 ? t.slice(0, 2) + ':' + t.slice(2) : t;
   }
 
+  toTimeDisplay(t: string | null): string {
+    if (!t) return '';
+    return t.length === 4 ? t.slice(0, 2) + ':' + t.slice(2) : t;
+  }
+
+  toTimeStorage(t: string | null): string | null {
+    if (!t) return null;
+    return t.replace(':', '');
+  }
+
   getFilterGradeLevels(): string[] {
     const cat = this.filterCategory();
     return cat ? (this.GRADE_LEVEL_MAP[cat] || []) : this.GRADE_LEVELS;
   }
 
   getFilterSubjects(): string[] {
+    const grade = this.filterGradeLevel();
+    if (grade) return this.GRADE_SUBJECT_MAP[grade] || [];
     const cat = this.filterCategory();
     return cat ? (this.SUBJECT_MAP[cat] || []) : this.SUBJECTS;
+  }
+
+  onFilterGradeLevelChange() {
+    const current = this.filterSubject();
+    const available = this.getFilterSubjects();
+    if (current && !available.includes(current)) {
+      this.filterSubject.set('');
+    }
   }
 }

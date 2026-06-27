@@ -245,12 +245,16 @@
                   </td>
                   <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
                     <select [(ngModel)]="s.handout_status" [name]="'handout_' + s.student_id"
-                      class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
+                      class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                       <option value="">-</option>
                       @for (opt of handoutOptions; track opt) {
                         <option [value]="opt">{{ opt }}</option>
                       }
                     </select>
+                    @if (s.handout_status === '調課 (交換)') {
+                      <input type="date" [(ngModel)]="s.reschedule_date" [name]="'resched_' + s.student_id"
+                        class="ml-1 w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    }
                   </td>
                   @if (templateMode() === 'english') {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
@@ -265,13 +269,15 @@
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
                     <input type="number" [(ngModel)]="s.exam_score" [name]="'exam_' + s.student_id"
                       (ngModelChange)="onExamScoreChange()"
-                      class="no-spinner w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                      (keydown)="onExamScoreKeydown($event)"
+                      class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                   </td>
                   @for (col of examColumns(); track col.name) {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
                       <input type="number" [(ngModel)]="s.custom_scores[col.name]"
                         [name]="'cs_' + s.student_id + '_' + col.name"
-                        class="no-spinner w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                        (keydown)="onExamScoreKeydown($event)"
+                        class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                     </td>
                   }
                   <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">

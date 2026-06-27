@@ -26,6 +26,11 @@
         <span class="material-symbols-outlined text-lg">refresh</span>
         重新整理
       </button>
+      <button (click)="exportToExcel()" type="button"
+        class="px-3 py-1.5 text-sm font-bold text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">download</span>
+        匯出 Excel
+      </button>
     </div>
   </div>
 
@@ -43,8 +48,7 @@
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">學校</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長/稱謂</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">電話</th>
-            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">第二位家長</th>
-            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">Email</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長2電話</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">註冊日期</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">跟進狀態</th>
           </tr>
@@ -52,13 +56,14 @@
         <tbody>
           @for (s of students(); track s.id) {
             <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-              <td class="px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-200">{{ s.student_name }}</td>
+              <td class="px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-200">
+                <button (click)="showDetail(s)" class="hover:text-primary transition-colors text-left">{{ s.student_name }}</button>
+              </td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.grade }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.school }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent_name }}{{ s.parent_title ? ' (' + s.parent_title + ')' : '' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.phone }}</td>
-              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_name || '-' }}{{ s.parent2_title ? ' (' + s.parent2_title + ')' : '' }}</td>
-              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 max-w-[160px] truncate">{{ s.email }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_phone || '-' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ formatDate(s.created_at) }}</td>
               <td class="px-3 py-2 text-center">
                 <select [ngModel]="s.followup_status"
@@ -77,3 +82,37 @@
     </div>
   }
 </div>
+
+@if (selectedStudent(); as s) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="closeDetail()">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">學生詳細資料</h3>
+          <button (click)="closeDetail()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="space-y-3 text-sm">
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">姓名</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.student_name }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">性別</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.gender }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">出生年月日</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.birth_date }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">身分證字號</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.id_number || '-' }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">學校</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.school }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">年級</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.grade }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">班級</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.class_name || '-' }}</span></div>
+          <div class="border-t border-gray-100 dark:border-gray-700 my-3"></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">家長</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.parent_name }}{{ s.parent_title ? ' (' + s.parent_title + ')' : '' }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">家長電話</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.phone }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">家長2</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.parent2_name || '-' }}{{ s.parent2_title ? ' (' + s.parent2_title + ')' : '' }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">家長2電話</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.parent2_phone || '-' }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">住家電話</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.home_phone || '-' }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">Email</span><span class="col-span-2 text-gray-900 dark:text-white break-all">{{ s.email }}</span></div>
+          <div class="border-t border-gray-100 dark:border-gray-700 my-3"></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">跟進狀態</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.followup_status }}</span></div>
+          <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">註冊日期</span><span class="col-span-2 text-gray-900 dark:text-white">{{ formatDate(s.created_at) }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

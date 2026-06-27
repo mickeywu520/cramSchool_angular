@@ -58,7 +58,7 @@ export class CommunicationBook implements OnInit {
   weekEnd = signal('');
 
   selectedDate = signal('');
-  selectedEntry = signal<SessionEntry | null>(null);
+  selectedEntries = signal<SessionEntry[]>([]);
 
   constructor(private api: ApiService) {}
 
@@ -85,8 +85,7 @@ export class CommunicationBook implements OnInit {
       ]);
 
       this.student.set(entriesRes.student);
-      this.entries.set(entriesRes.entries);
-      this.selectedEntry.set(entriesRes.entries.length > 0 ? entriesRes.entries[0] : null);
+      this.selectedEntries.set(entriesRes.entries);
 
       this.weekStart.set(weeklyRes.week_start);
       this.weekEnd.set(weeklyRes.week_end);
@@ -103,21 +102,22 @@ export class CommunicationBook implements OnInit {
     this.loading.set(true);
     try {
       const res = await lastValueFrom(
-        this.api.get<{ entries: SessionEntry[] }>('/communication/entries', {
+        this.api.get<{ entries: SessionEntry[]; student: StudentInfo }>('/communication/entries', {
           date_from: dateStr,
           date_to: dateStr,
         })
       );
-      this.selectedEntry.set(res.entries.length > 0 ? res.entries[0] : null);
+      this.selectedEntries.set(res.entries);
+      this.student.set(res.student);
     } catch {
-      this.selectedEntry.set(null);
+      this.selectedEntries.set([]);
     } finally {
       this.loading.set(false);
     }
   }
 
-  async signEntry() {
-    const entry = this.selectedEntry();
+  async signEntry(entryId: number) {
+    const entry = this.selectedEntries().find(e => e.id === entryId);
     if (!entry || entry.parent_signed) return;
 
     this.signing.set(true);

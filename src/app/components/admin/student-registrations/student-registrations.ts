@@ -46,6 +46,7 @@ export class AdminStudentRegistrations implements OnInit {
   filterSchool = signal('');
   savingId = signal<number | null>(null);
   statusOptions = STATUS_OPTIONS;
+  selectedStudent = signal<Registration | null>(null);
 
   constructor(private api: ApiService) {}
 
@@ -89,10 +90,34 @@ export class AdminStudentRegistrations implements OnInit {
     }
   }
 
+  showDetail(s: Registration) {
+    this.selectedStudent.set(s);
+  }
+
+  closeDetail() {
+    this.selectedStudent.set(null);
+  }
+
   formatDate(d: string): string {
     if (!d) return '-';
     return new Date(d).toLocaleDateString('zh-TW', {
       year: 'numeric', month: '2-digit', day: '2-digit',
     });
+  }
+
+  exportToExcel() {
+    const headers = '姓名,年級,學校,家長,電話,家長2電話,註冊日期,跟進狀態';
+    const rows = this.students().map(s => {
+      const parent = `${s.parent_name}${s.parent_title ? '(' + s.parent_title + ')' : ''}`;
+      return [s.student_name, s.grade, s.school, parent, s.phone, s.parent2_phone || '', this.formatDate(s.created_at), s.followup_status].join(',');
+    });
+    const csv = '\uFEFF' + headers + '\r\n' + rows.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `報名註冊學生名單_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 }
