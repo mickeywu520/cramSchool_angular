@@ -26,6 +26,8 @@ interface SessionEntry {
   arrival_time: string | null;
   departure_time: string | null;
   handout_status: string | null;
+  homework_material: string | null;
+  homework_workbook: string | null;
   exam_score: number | null;
   custom_scores: Record<string, number>;
   tutoring_attendance: boolean;

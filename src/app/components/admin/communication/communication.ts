@@ -24,6 +24,8 @@ interface StudentRow {
   exam_scope: string;
   announcements: string;
   handout_status: string;
+  homework_material: string;
+  homework_workbook: string;
   vocab: string;
   exam_score: number | null;
   custom_scores: Record<string, number>;
@@ -62,6 +64,8 @@ interface StudentRowResponse {
   exam_scope: string | null;
   announcements: string | null;
   handout_status: string | null;
+  homework_material: string | null;
+  homework_workbook: string | null;
   vocab: string | null;
   exam_score: number | null;
   custom_scores: Record<string, number>;
@@ -99,8 +103,10 @@ export class AdminCommunication implements OnInit, OnDestroy {
   examColumns = signal<ExamColumn[]>([]);
   students = signal<StudentRow[]>([]);
   newColumnName = signal('');
-  templateMode = signal<'default' | 'english'>('default');
+  templateMode = signal<'default' | 'english' | 'math'>('default');
   handoutOptions = ['完成', '未完成', '遲交', '未帶', '請假', '調課 (交換)'];
+  homeworkMaterialOptions = ['完成', '未完成', '遲交', '未帶', '請假'];
+  homeworkWorkbookOptions = ['完成', '未完成', '無計算過程', '未帶', '請假'];
   vocabOptions = ['優異', '普通', '待加強', '請假'];
   draftTimer: any = null;
 
@@ -244,6 +250,8 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_scope: s.exam_scope || '',
         announcements: s.announcements || '',
         handout_status: s.handout_status || '',
+        homework_material: s.homework_material || '',
+        homework_workbook: s.homework_workbook || '',
         vocab: s.vocab || '優異',
         exam_score: s.exam_score,
         custom_scores: s.custom_scores || {},
@@ -275,6 +283,8 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_scope: '',
         announcements: '',
         handout_status: '完成',
+        homework_material: '',
+        homework_workbook: '',
         vocab: '優異',
         exam_score: null,
         custom_scores: {},
@@ -504,6 +514,8 @@ export class AdminCommunication implements OnInit, OnDestroy {
         exam_scope: s.exam_scope || null,
         announcements: s.announcements || null,
         handout_status: s.handout_status || null,
+        homework_material: s.homework_material || null,
+        homework_workbook: s.homework_workbook || null,
         vocab: s.vocab || null,
         exam_score: s.exam_score,
         custom_scores: s.custom_scores,

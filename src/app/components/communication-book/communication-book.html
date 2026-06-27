@@ -147,6 +147,38 @@
                     {{ entry.handout_status || '-' }}
                   </p>
                 </div>
+                @if (entry.homework_material) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
+                       [class.border-green-200]="entry.homework_material === '完成'">
+                    <span class="material-symbols-outlined text-xl"
+                          [class.text-green-500]="entry.homework_material === '完成'"
+                          [class.text-amber-500]="entry.homework_material && entry.homework_material !== '完成'"
+                          [class.text-gray-300]="!entry.homework_material">book</span>
+                    <p class="text-xs text-gray-500 mt-1">講義作業</p>
+                    <p class="text-sm font-bold"
+                       [class.text-green-600]="entry.homework_material === '完成'"
+                       [class.text-amber-600]="entry.homework_material && entry.homework_material !== '完成'"
+                       [class.text-gray-400]="!entry.homework_material">
+                      {{ entry.homework_material || '-' }}
+                    </p>
+                  </div>
+                }
+                @if (entry.homework_workbook) {
+                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
+                       [class.border-green-200]="entry.homework_workbook === '完成'">
+                    <span class="material-symbols-outlined text-xl"
+                          [class.text-green-500]="entry.homework_workbook === '完成'"
+                          [class.text-amber-500]="entry.homework_workbook && entry.homework_workbook !== '完成'"
+                          [class.text-gray-300]="!entry.homework_workbook">assignment</span>
+                    <p class="text-xs text-gray-500 mt-1">題本作業</p>
+                    <p class="text-sm font-bold"
+                       [class.text-green-600]="entry.homework_workbook === '完成'"
+                       [class.text-amber-600]="entry.homework_workbook && entry.homework_workbook !== '完成'"
+                       [class.text-gray-400]="!entry.homework_workbook">
+                      {{ entry.homework_workbook || '-' }}
+                    </p>
+                  </div>
+                }
                 <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
                   <span class="material-symbols-outlined text-xl text-primary">score</span>
                   <p class="text-xs text-gray-500 mt-1">考試分數</p>

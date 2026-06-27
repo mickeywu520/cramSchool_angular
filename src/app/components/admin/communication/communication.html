@@ -171,6 +171,14 @@
                 [class.shadow-sm]="templateMode() === 'english'">
                 英文模板
               </button>
+              <button (click)="templateMode.set('math')" type="button"
+                class="px-3 py-1 text-xs font-bold rounded-md transition-colors"
+                [class.bg-white]="templateMode() === 'math'"
+                [class.text-primary]="templateMode() === 'math'"
+                [class.text-gray-500]="templateMode() !== 'math'"
+                [class.shadow-sm]="templateMode() === 'math'">
+                國中數學模板
+              </button>
             </div>
             <input [(ngModel)]="newColumnName" name="newCol" placeholder="新增考試欄位名稱"
               class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-36"
@@ -194,9 +202,15 @@
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">回家作業</th>
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">考試範圍</th>
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">宣布事項</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">作業狀態</th>
+                @if (templateMode() !== 'math') {
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">作業狀態</th>
+                }
                 @if (templateMode() === 'english') {
-                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">英語背誦</th>
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">英文單字</th>
+                }
+                @if (templateMode() === 'math') {
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">講義作業</th>
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">題本作業</th>
                 }
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[80px]">考試分數</th>
                 @for (col of examColumns(); track col.name) {
@@ -243,25 +257,47 @@
                     <textarea [(ngModel)]="s.announcements" [name]="'ann_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
                   </td>
-                  <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                    <select [(ngModel)]="s.handout_status" [name]="'handout_' + s.student_id"
-                      class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
-                      <option value="">-</option>
-                      @for (opt of handoutOptions; track opt) {
-                        <option [value]="opt">{{ opt }}</option>
+                  @if (templateMode() !== 'math') {
+                    <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
+                      <select [(ngModel)]="s.handout_status" [name]="'handout_' + s.student_id"
+                        class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
+                        <option value="">-</option>
+                        @for (opt of handoutOptions; track opt) {
+                          <option [value]="opt">{{ opt }}</option>
+                        }
+                      </select>
+                      @if (s.handout_status === '調課 (交換)') {
+                        <input type="date" [(ngModel)]="s.reschedule_date" [name]="'resched_' + s.student_id"
+                          class="ml-1 w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                       }
-                    </select>
-                    @if (s.handout_status === '調課 (交換)') {
-                      <input type="date" [(ngModel)]="s.reschedule_date" [name]="'resched_' + s.student_id"
-                        class="ml-1 w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
-                    }
-                  </td>
+                    </td>
+                  }
                   @if (templateMode() === 'english') {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
                       <select [(ngModel)]="s.vocab" [name]="'vocab_' + s.student_id"
                         class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                         @for (v of vocabOptions; track v) {
                           <option [value]="v">{{ v }}</option>
+                        }
+                      </select>
+                    </td>
+                  }
+                  @if (templateMode() === 'math') {
+                    <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
+                      <select [(ngModel)]="s.homework_material" [name]="'material_' + s.student_id"
+                        class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
+                        <option value="">-</option>
+                        @for (opt of homeworkMaterialOptions; track opt) {
+                          <option [value]="opt">{{ opt }}</option>
+                        }
+                      </select>
+                    </td>
+                    <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
+                      <select [(ngModel)]="s.homework_workbook" [name]="'workbook_' + s.student_id"
+                        class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
+                        <option value="">-</option>
+                        @for (opt of homeworkWorkbookOptions; track opt) {
+                          <option [value]="opt">{{ opt }}</option>
                         }
                       </select>
                     </td>
