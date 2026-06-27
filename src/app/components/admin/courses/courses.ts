@@ -93,8 +93,40 @@ export class AdminCourses implements OnInit {
   dragMouseX = 0;
   dragMouseY = 0;
 
+  hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+  startHour = '18';
+  startMinute = '30';
+  endHour = '21';
+  endMinute = '30';
+
   currentGradeLevels = signal<string[]>(this.GRADE_LEVEL_MAP['小學部']);
   currentSubjects = signal<string[]>(this.SUBJECT_MAP['小學部']);
+
+  syncStartTime() {
+    this.form.start_time = `${this.startHour}:${this.startMinute}`;
+  }
+
+  syncEndTime() {
+    this.form.end_time = `${this.endHour}:${this.endMinute}`;
+  }
+
+  syncStartFromForm() {
+    const t = this.form.start_time || '';
+    if (t) {
+      const parts = t.split(':');
+      this.startHour = parts[0] || '18';
+      this.startMinute = parts[1] === '30' ? '30' : '00';
+    }
+  }
+
+  syncEndFromForm() {
+    const t = this.form.end_time || '';
+    if (t) {
+      const parts = t.split(':');
+      this.endHour = parts[0] || '21';
+      this.endMinute = parts[1] === '30' ? '30' : '00';
+    }
+  }
 
   onCategoryChange() {
     const cat = this.form.category;
@@ -182,6 +214,8 @@ export class AdminCourses implements OnInit {
       location: '', branch_id: null, school_year: sy, semester: '上',
       is_active: true, display_order: 0,
     };
+    this.startHour = '18'; this.startMinute = '30';
+    this.endHour = '21'; this.endMinute = '30';
     this.dragX = 0; this.dragY = 0;
     this.onCategoryChange();
     this.showModal.set(true);
@@ -194,6 +228,8 @@ export class AdminCourses implements OnInit {
       start_time: this.toTimeDisplay(course.start_time),
       end_time: this.toTimeDisplay(course.end_time),
     };
+    this.syncStartFromForm();
+    this.syncEndFromForm();
     this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
   }
