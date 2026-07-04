@@ -24,7 +24,7 @@ const SUBJECT_ICONS: Record<string, string> = {
   '國文': 'history_edu',
   '自然': 'biotech',
   '理化': 'science',
-  '生物': 'pet_products',
+  '生物': 'eco',
   '物理': 'science',
   '化學': 'science',
   '社會': 'public',

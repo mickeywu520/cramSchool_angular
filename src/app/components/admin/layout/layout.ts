@@ -21,6 +21,7 @@ export class AdminLayout {
     { path: '/admin/enrollments', icon: 'assignment_ind', label: '選課管理' },
     { path: '/admin/student-registrations', icon: 'person_add', label: '報名註冊管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
+    { path: '/admin/users', icon: 'admin_panel_settings', label: '帳號管理' },
   ];
 
   constructor(

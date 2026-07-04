@@ -17,6 +17,7 @@ import { AdminCommunication } from './components/admin/communication/communicati
 import { AdminCourses } from './components/admin/courses/courses';
 import { AdminEnrollments } from './components/admin/enrollments/enrollments';
 import { AdminStudentRegistrations } from './components/admin/student-registrations/student-registrations';
+import { AdminUsers } from './components/admin/admin-users/admin-users';
 import { AdminBranches } from './components/admin/branches/branches';
 import { AuthGuard } from './guards/auth.guard';
 import { StudentAuthGuard } from './guards/student-auth.guard';
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: 'about-cards', component: AdminAboutCards },
       { path: 'teachers', component: AdminTeachers },
       { path: 'honors', component: AdminHonors },
+      { path: 'users', component: AdminUsers },
       { path: 'branches', component: AdminBranches },
       { path: 'courses', component: AdminCourses },
       { path: 'enrollments', component: AdminEnrollments },
