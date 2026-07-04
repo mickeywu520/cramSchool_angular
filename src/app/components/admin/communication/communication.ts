@@ -332,8 +332,11 @@ export class AdminCommunication implements OnInit, OnDestroy {
   }
 
   onExamScoreKeydown(event: KeyboardEvent) {
-    if (event.key !== 'Enter' && event.key !== 'ArrowDown') return;
-    event.preventDefault();
+    if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+    } else {
+      return;
+    }
 
     const current = event.target as HTMLInputElement;
     const studentList = this.students();
@@ -351,13 +354,24 @@ export class AdminCommunication implements OnInit, OnDestroy {
     const col = currentIdx % numCols;
     const row = Math.floor(currentIdx / numCols);
 
-    // Next position: same column, next row
-    let nextRow = row + 1;
-    let nextCol = col;
-    if (nextRow >= numStudents) {
-      // Finished this column, move to next column, first student
-      nextRow = 0;
-      nextCol = (col + 1) % numCols;
+    let nextRow: number;
+    let nextCol: number;
+
+    if (event.key === 'ArrowUp') {
+      nextRow = row - 1;
+      nextCol = col;
+      if (nextRow < 0) {
+        nextRow = numStudents - 1;
+        nextCol = (col - 1 + numCols) % numCols;
+      }
+    } else {
+      // Enter or ArrowDown
+      nextRow = row + 1;
+      nextCol = col;
+      if (nextRow >= numStudents) {
+        nextRow = 0;
+        nextCol = (col + 1) % numCols;
+      }
     }
 
     const nextInputIdx = nextRow * numCols + nextCol;
@@ -528,5 +542,17 @@ export class AdminCommunication implements OnInit, OnDestroy {
 
   trackByStudent(index: number, s: StudentRow): number {
     return s.student_id;
+  }
+
+  /** 計算考試分數平均（僅算有值的學生） */
+  avgExamScore(): number | null {
+    const scores = this.students().map(s => s.exam_score).filter(v => v != null) as number[];
+    return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
+  }
+
+  /** 計算自訂考試列平均 */
+  avgCustomScore(colName: string): number | null {
+    const scores = this.students().map(s => s.custom_scores[colName]).filter(v => v != null && v !== undefined) as number[];
+    return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
   }
 }

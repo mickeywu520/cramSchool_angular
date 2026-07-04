@@ -22,6 +22,7 @@ interface Enrollment {
   id: number;
   student_id: number;
   student_name: string;
+  school: string;
   course_id: number;
   course_name: string;
   status: string;
@@ -183,8 +184,10 @@ export class AdminEnrollments implements OnInit {
   }
 
   exportToExcel() {
-    const names = this.enrollments().map(e => e.student_name).join('\r\n');
-    const blob = new Blob(['\uFEFF學生姓名\r\n' + names], { type: 'text/csv;charset=utf-8;' });
+    const headers = '學生姓名,學校';
+    const rows = this.enrollments().map(e => `${e.student_name},${e.school || ''}`);
+    const csv = '\uFEFF' + headers + '\r\n' + rows.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

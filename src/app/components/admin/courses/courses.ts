@@ -34,6 +34,7 @@ interface Course {
   school_year: string | null;
   semester: string | null;
   is_active: boolean;
+  is_teaching: boolean;
   display_order: number;
 }
 
@@ -152,8 +153,11 @@ export class AdminCourses implements OnInit {
   }
 
   autoName() {
-    const parts = [this.form.category, this.form.grade_level, this.form.subject].filter(Boolean);
-    this.form.name = parts.join(' ');
+    const sy = this.form.school_year || '';
+    const sem = this.form.semester || '';
+    const grade = this.form.grade_level || '';
+    const subj = this.form.subject || '';
+    this.form.name = `${sy}${sem} ${grade}${subj}`;
   }
 
   constructor(private api: ApiService) {}
@@ -203,16 +207,62 @@ export class AdminCourses implements OnInit {
     this.loadCourses();
   }
 
+  // Batch selection
+  selectedIds = signal<number[]>([]);
+
+  toggleSelect(id: number) {
+    this.selectedIds.update(list =>
+      list.includes(id) ? list.filter(i => i !== id) : [...list, id]
+    );
+  }
+
+  toggleAll(checked: boolean) {
+    this.selectedIds.set(checked ? this.courses().map(c => c.id) : []);
+  }
+
+  clearSelection() {
+    this.selectedIds.set([]);
+  }
+
+  async toggleTeaching(course: Course) {
+    const newVal = !course.is_teaching;
+    try {
+      await lastValueFrom(
+        this.api.put(`/admin/courses/${course.id}`, { is_teaching: newVal })
+      );
+      this.courses.update(list =>
+        list.map(c => c.id === course.id ? { ...c, is_teaching: newVal } : c)
+      );
+    } catch (err: any) {
+      this.error.set(err.error?.detail || '操作失敗');
+    }
+  }
+
+  async batchToggle(isTeaching: boolean) {
+    const ids = this.selectedIds();
+    if (ids.length === 0) return;
+    try {
+      await lastValueFrom(
+        this.api.post('/admin/courses/batch-toggle', { course_ids: ids, is_teaching: isTeaching })
+      );
+      this.success.set(`已${isTeaching ? '開課' : '停課'} ${ids.length} 門課程`);
+      this.selectedIds.set([]);
+      this.loadCourses();
+    } catch (err: any) {
+      this.error.set(err.error?.detail || '操作失敗');
+    }
+  }
+
   openCreate() {
     this.editMode.set(false);
     const sy = String(new Date().getFullYear() - 1911);
     this.form = {
       name: '', category: '小學部', subject: '數學', teacher_id: null,
-      grade_level: '小四', day_of_week: 1, days_of_week: '1',
+      grade_level: '小四', day_of_week: null, days_of_week: null,
       start_date: '', end_date: '',
       start_time: '18:30', end_time: '21:30',
       location: '', branch_id: null, school_year: sy, semester: '上',
-      is_active: true, display_order: 0,
+      is_active: true, is_teaching: true, display_order: 0,
     };
     this.startHour = '18'; this.startMinute = '30';
     this.endHour = '21'; this.endMinute = '30';

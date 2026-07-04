@@ -69,10 +69,7 @@
             <p class="text-xs text-gray-500">{{ selectedCourse()?.category }} · {{ selectedCourse()?.subject }}</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <input type="date" [ngModel]="entryDate()" (ngModelChange)="entryDate.set($event); onChangeDate()"
-            class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"/>
-        </div>
+        <!-- 移除右上角多餘日期 -->
       </div>
     </div>
 
@@ -106,15 +103,30 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
+            <label class="text-xs font-bold text-gray-500">上課日期</label>
+            <input type="date" [ngModel]="entryDate()" (ngModelChange)="entryDate.set($event); onChangeDate()"
+              class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"/>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-500">平均分數</label>
+            <div class="mt-1 space-y-1">
+              <div class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                @if (avgExamScore() !== null) {
+                  考試分數：{{ avgExamScore() }}
+                }
+              </div>
+              @for (col of examColumns(); track col.name) {
+                <div class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                  {{ col.name }}：{{ avgCustomScore(col.name) }}
+                </div>
+              }
+            </div>
+          </div>
+          <div>
             <label class="text-xs font-bold text-gray-500">輔導課分數門檻</label>
             <input type="number" [ngModel]="tutoringThreshold()" (ngModelChange)="tutoringThreshold.set($any($event)); onThresholdChange()"
               class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"
               placeholder="ex: 60"/>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-500">上課日期</label>
-            <input type="date" [ngModel]="entryDate()" (ngModelChange)="entryDate.set($event); onChangeDate()"
-              class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"/>
           </div>
         </div>
 
@@ -197,21 +209,6 @@
             <thead>
               <tr class="bg-gray-50 dark:bg-gray-700/50">
                 <th class="sticky left-0 bg-gray-50 dark:bg-gray-700/50 z-10 px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[100px]">姓名</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">到班時間</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">課程進度</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">回家作業</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">考試範圍</th>
-                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[140px]">宣布事項</th>
-                @if (templateMode() !== 'math') {
-                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">作業狀態</th>
-                }
-                @if (templateMode() === 'english') {
-                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">英文單字</th>
-                }
-                @if (templateMode() === 'math') {
-                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">講義作業</th>
-                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">題本作業</th>
-                }
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[80px]">考試分數</th>
                 @for (col of examColumns(); track col.name) {
                   <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[90px]">
@@ -223,7 +220,22 @@
                     </div>
                   </th>
                 }
+                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">課程進度</th>
+                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">回家作業</th>
+                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">考試範圍</th>
+                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">宣布事項</th>
+                @if (templateMode() !== 'math') {
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">作業狀態</th>
+                }
+                @if (templateMode() === 'english') {
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[60px]">英文單字</th>
+                }
+                @if (templateMode() === 'math') {
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">講義作業</th>
+                  <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[70px]">題本作業</th>
+                }
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[80px]">輔導課</th>
+                <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">到班/離班時間</th>
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">備註</th>
                 <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">家長回覆</th>
               </tr>
@@ -234,13 +246,22 @@
                   <td class="sticky left-0 bg-white dark:bg-gray-800 z-10 px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
                     {{ s.student_name }}
                   </td>
+                  <!-- 考試分數 -->
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <input type="time" [(ngModel)]="s.arrival_time" [name]="'arrival_' + s.student_id"
-                      class="w-24 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
-                    <span class="text-gray-300 mx-0.5">-</span>
-                    <input type="time" [(ngModel)]="s.departure_time" [name]="'depart_' + s.student_id"
-                      class="w-24 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    <input type="number" [(ngModel)]="s.exam_score" [name]="'exam_' + s.student_id"
+                      (ngModelChange)="onExamScoreChange()"
+                      (keydown)="onExamScoreKeydown($event)"
+                      class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                   </td>
+                  <!-- 自訂考試列 -->
+                  @for (col of examColumns(); track col.name) {
+                    <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
+                      <input type="number" [(ngModel)]="s.custom_scores[col.name]"
+                        [name]="'cs_' + s.student_id + '_' + col.name"
+                        (keydown)="onExamScoreKeydown($event)"
+                        class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    </td>
+                  }
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
                     <textarea [(ngModel)]="s.progress" [name]="'prog_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
@@ -302,26 +323,20 @@
                       </select>
                     </td>
                   }
-                  <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <input type="number" [(ngModel)]="s.exam_score" [name]="'exam_' + s.student_id"
-                      (ngModelChange)="onExamScoreChange()"
-                      (keydown)="onExamScoreKeydown($event)"
-                      class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
-                  </td>
-                  @for (col of examColumns(); track col.name) {
-                    <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <input type="number" [(ngModel)]="s.custom_scores[col.name]"
-                        [name]="'cs_' + s.student_id + '_' + col.name"
-                        (keydown)="onExamScoreKeydown($event)"
-                        class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
-                    </td>
-                  }
                   <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
                     <select [(ngModel)]="s.tutoring_attendance" [name]="'tutoring_' + s.student_id"
                       class="w-16 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                       <option [ngValue]="false">否</option>
                       <option [ngValue]="true">是</option>
                     </select>
+                  </td>
+                  <!-- 到班/離班時間（移到備註前，左右並排） -->
+                  <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">
+                    <input type="time" [(ngModel)]="s.arrival_time" [name]="'arrival_' + s.student_id"
+                      class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    <span class="text-gray-300 mx-0.5">-</span>
+                    <input type="time" [(ngModel)]="s.departure_time" [name]="'depart_' + s.student_id"
+                      class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
                     <textarea [(ngModel)]="s.notes" [name]="'notes_' + s.student_id" rows="1"

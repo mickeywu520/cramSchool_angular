@@ -48,6 +48,7 @@
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">學校</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長/稱謂</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">電話</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長2/稱謂</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長2電話</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">註冊日期</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">跟進狀態</th>
@@ -63,6 +64,7 @@
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.school }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent_name }}{{ s.parent_title ? ' (' + s.parent_title + ')' : '' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.phone }}</td>
+              <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_name || '-' }}{{ s.parent2_title ? ' (' + s.parent2_title + ')' : '' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_phone || '-' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ formatDate(s.created_at) }}</td>
               <td class="px-3 py-2 text-center">

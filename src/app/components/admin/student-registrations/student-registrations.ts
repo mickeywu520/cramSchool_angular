@@ -41,7 +41,7 @@ export class AdminStudentRegistrations implements OnInit {
   loading = signal(false);
   students = signal<Registration[]>([]);
   search = signal('');
-  filterStatus = signal('待聯繫');
+  filterStatus = signal('');
   filterGrade = signal('');
   filterSchool = signal('');
   savingId = signal<number | null>(null);
@@ -106,10 +106,11 @@ export class AdminStudentRegistrations implements OnInit {
   }
 
   exportToExcel() {
-    const headers = '姓名,年級,學校,家長,電話,家長2電話,註冊日期,跟進狀態';
+    const headers = '姓名,年級,學校,家長,電話,家長2/稱謂,家長2電話,註冊日期,跟進狀態';
     const rows = this.students().map(s => {
       const parent = `${s.parent_name}${s.parent_title ? '(' + s.parent_title + ')' : ''}`;
-      return [s.student_name, s.grade, s.school, parent, s.phone, s.parent2_phone || '', this.formatDate(s.created_at), s.followup_status].join(',');
+      const parent2 = `${s.parent2_name || '-'}${s.parent2_title ? '(' + s.parent2_title + ')' : ''}`;
+      return [s.student_name, s.grade, s.school, parent, s.phone, parent2, s.parent2_phone || '', this.formatDate(s.created_at), s.followup_status].join(',');
     });
     const csv = '\uFEFF' + headers + '\r\n' + rows.join('\r\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
