@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.gateway2go.bond/api/v1',
+    apiUrl: 'https://api.hsedu.com.tw/api/v1',
   firebase: {
     apiKey: 'AIzaSyBWHj8Ia3kcJpzI-383guRYVEt4BlEWOfc',
-    authDomain: 'www.gateway2go.bond',
+    authDomain: 'www.hsedu.com.tw',
     projectId: 'cramschool-b4d52',
     storageBucket: 'cramschool-b4d52.firebasestorage.app',
     messagingSenderId: '81636913641',
