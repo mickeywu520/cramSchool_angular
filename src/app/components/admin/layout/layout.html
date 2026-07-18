@@ -51,6 +51,9 @@
           <span class="text-sm whitespace-nowrap">登出</span>
         }
       </button>
+      @if (sidebarOpen()) {
+        <div class="text-[10px] text-gray-400 text-center pt-2 select-none">v{{ appVersion }}</div>
+      }
     </div>
   </aside>
 

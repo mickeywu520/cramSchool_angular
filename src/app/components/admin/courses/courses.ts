@@ -101,7 +101,6 @@ export class AdminCourses implements OnInit {
   endMinute = '30';
 
   currentGradeLevels = signal<string[]>(this.GRADE_LEVEL_MAP['小學部']);
-  currentSubjects = signal<string[]>(this.SUBJECT_MAP['小學部']);
 
   syncStartTime() {
     this.form.start_time = `${this.startHour}:${this.startMinute}`;
@@ -132,14 +131,9 @@ export class AdminCourses implements OnInit {
   onCategoryChange() {
     const cat = this.form.category;
     const grades = this.GRADE_LEVEL_MAP[cat] || this.GRADE_LEVELS;
-    const subjects = this.SUBJECT_MAP[cat] || this.SUBJECTS;
     this.currentGradeLevels.set(grades);
-    this.currentSubjects.set(subjects);
     if (!grades.includes(this.form.grade_level)) {
       this.form.grade_level = grades[0] || '';
-    }
-    if (grades.length && !subjects.includes(this.form.subject)) {
-      this.form.subject = subjects[0] || '';
     }
     this.autoName();
   }
@@ -257,7 +251,7 @@ export class AdminCourses implements OnInit {
     this.editMode.set(false);
     const sy = String(new Date().getFullYear() - 1911);
     this.form = {
-      name: '', category: '小學部', subject: '數學', teacher_id: null,
+      name: '', category: '小學部', subject: '', teacher_id: null,
       grade_level: '小四', day_of_week: null, days_of_week: null,
       start_date: '', end_date: '',
       start_time: '18:30', end_time: '21:30',

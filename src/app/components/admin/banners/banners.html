@@ -60,7 +60,10 @@
 
         <!-- Info -->
         <div class="p-4">
-          <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ banner.title }}</h3>
+          <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ banner.title || '(無標題)' }}</h3>
+          @if (banner.subtitle) {
+            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">{{ banner.subtitle }}</p>
+          }
           @if (banner.link_url) {
             <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">{{ banner.link_url }}</p>
           }
@@ -131,11 +134,22 @@
           <div class="space-y-4">
             <!-- Title -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">標題 <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">主標題（選填）</label>
               <input
                 type="text"
                 [(ngModel)]="formData().title"
                 placeholder="例如：招生中"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+              />
+            </div>
+
+            <!-- Subtitle -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">副標題（選填）</label>
+              <input
+                type="text"
+                [(ngModel)]="formData().subtitle"
+                placeholder="例如：早鳥優惠倒數中"
                 class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
               />
             </div>
@@ -197,7 +211,7 @@
             </button>
             <button
               (click)="save()"
-              [disabled]="!formData().title || (!formData().image_url && !selectedFile())"
+              [disabled]="!formData().image_url && !selectedFile()"
               class="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold rounded-lg transition-colors"
             >
               {{ isNew() ? '新增' : '儲存' }}

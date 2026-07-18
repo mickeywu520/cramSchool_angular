@@ -3,7 +3,8 @@ import { ApiService } from '../../services/api.service';
 
 interface Slide {
   image: string;
-  tag: string;
+  title: string;
+  subtitle: string;
   link_url?: string;
   is_event?: boolean;
 }
@@ -24,7 +25,7 @@ export class Hero implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.api.get<{
-      banners: { image_url: string; title: string | null; link_url: string | null }[];
+      banners: { image_url: string; title: string | null; subtitle: string | null; link_url: string | null }[];
       announcements: { title: string; content: string; published_at: string }[];
       banner_interval_seconds: number;
     }>('/homepage').subscribe({
@@ -32,12 +33,14 @@ export class Hero implements OnInit, OnDestroy {
         this.intervalMs = Math.max(3000, Math.min(10000, (data.banner_interval_seconds || 5) * 1000));
         const bannerSlides: Slide[] = data.banners.map((b) => ({
           image: b.image_url,
-          tag: b.title || '',
+          title: b.title || '',
+          subtitle: b.subtitle || '',
           link_url: b.link_url || undefined,
         }));
         const eventSlides: Slide[] = data.announcements.map((a) => ({
           image: '',
-          tag: '最新活動',
+          title: '最新活動',
+          subtitle: '',
           link_url: undefined,
           is_event: true,
         }));

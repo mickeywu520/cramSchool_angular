@@ -8,7 +8,7 @@
       @for (slide of slides(); track $index) {
         <img
           [src]="slide.is_event ? '' : slide.image"
-          [alt]="slide.tag"
+          alt=""
           class="w-full h-full object-cover brightness-75 absolute inset-0"
           [class.!hidden]="slide.is_event"
           [style.opacity]="$index === currentIndex() ? 1 : 0"
@@ -18,16 +18,23 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
     </div>
 
-    <div class="relative z-10 space-y-4 md:space-y-6 lg:space-y-8 max-w-md md:max-w-lg lg:max-w-2xl">
-      @if (slides()[currentIndex()].is_event) {
-        <span class="inline-block px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full uppercase tracking-widest">最新活動</span>
-        <h1 class="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
-          {{ slides()[currentIndex()].tag }}
+    <!-- Main title - top right -->
+    @if (slides()[currentIndex()].title.trim()) {
+      <div class="absolute top-6 md:top-8 lg:top-12 right-6 md:right-8 lg:right-12 z-10 text-right">
+        <h1 class="text-white text-3xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
+          {{ slides()[currentIndex()].title }}
         </h1>
-      } @else {
-        <span class="inline-block px-3 py-1 bg-accent-gold text-white text-xs font-bold rounded-full uppercase tracking-widest">{{ slides()[currentIndex()].tag }}</span>
-      }
-    </div>
+      </div>
+    }
+
+    <!-- Subtitle - bottom left -->
+    @if (slides()[currentIndex()].subtitle.trim()) {
+      <div class="relative z-10">
+        <span class="inline-block px-4 py-2 bg-accent-gold text-white text-base md:text-lg lg:text-xl font-bold rounded-lg">
+          {{ slides()[currentIndex()].subtitle }}
+        </span>
+      </div>
+    }
 
     <button class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors" (click)="prev(); $event.stopPropagation()">
       <span class="material-symbols-outlined">chevron_left</span>

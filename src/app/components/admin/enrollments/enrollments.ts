@@ -7,6 +7,7 @@ import { lastValueFrom } from 'rxjs';
 interface StudentInfo {
   id: number;
   student_name: string;
+  grade: string;
   followup_status: string;
 }
 
@@ -45,9 +46,12 @@ export class AdminEnrollments implements OnInit {
   selectedCourseId = signal<number | null>(null);
   addStudentId = signal<number | null>(null);
   studentSearch = signal('');
+  filterGrade = signal('');
   showStudentDropdown = signal(false);
   copySourceCourseId = signal<number | null>(null);
   copying = signal(false);
+
+  gradeOptions = ['全部', '小四', '小五', '小六', '國七', '國八', '國九', '高一', '高二', '高三'];
 
   sortedCourses = computed(() => {
     const gradeOrder: Record<string, number> = {
@@ -117,12 +121,21 @@ export class AdminEnrollments implements OnInit {
 
   async loadAvailableStudents(courseId: number) {
     try {
+      const params: Record<string, any> = {};
+      const grade = this.filterGrade();
+      if (grade) params['grade_level'] = grade;
       const allStudents = await lastValueFrom(
-        this.api.get<StudentInfo[]>('/admin/students')
+        this.api.get<StudentInfo[]>('/admin/students', params)
       );
       const enrolledIds = new Set(this.enrollments().map(e => e.student_id));
       this.allStudents.set(allStudents.filter(s => !enrolledIds.has(s.id) && s.followup_status === '在籍'));
     } catch {}
+  }
+
+  onGradeFilterChange() {
+    if (this.selectedCourseId()) {
+      this.loadAvailableStudents(this.selectedCourseId()!);
+    }
   }
 
   async addStudent() {

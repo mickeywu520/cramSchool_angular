@@ -6,6 +6,7 @@ import { ApiService } from '../../../services/api.service';
 interface Banner {
   id: number;
   title: string;
+  subtitle: string;
   image_url: string;
   link_url: string;
   display_order: number;
@@ -82,7 +83,7 @@ export class AdminBanners implements OnInit {
   openNewForm() {
     if (!this.canAdd) return;
     this.isNew.set(true);
-    this.formData.set({ title: '', image_url: '', link_url: '', display_order: this.banners().length, is_active: true });
+    this.formData.set({ title: '', subtitle: '', image_url: '', link_url: '', display_order: this.banners().length, is_active: true });
     this.previewImage.set(null);
     this.selectedFile.set(null);
     this.showForm.set(true);
@@ -120,11 +121,12 @@ export class AdminBanners implements OnInit {
 
   save() {
     const data = this.formData();
-    if (!data.title || (!data.image_url && !this.selectedFile())) return;
+    if (!data.image_url && !this.selectedFile()) return;
 
     const doSave = (imageUrl: string) => {
       const body = {
-        title: data.title,
+        title: data.title || null,
+        subtitle: data.subtitle || null,
         image_url: imageUrl,
         link_url: data.link_url || '',
         display_order: data.display_order ?? this.banners().length,

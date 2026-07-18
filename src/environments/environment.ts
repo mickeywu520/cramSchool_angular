@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
-    apiUrl: 'https://api.hsedu.com.tw/api/v1',
+  version: '2.5.0',
+  apiUrl: 'https://api.hsedu.com.tw/api/v1',
   firebase: {
     apiKey: 'AIzaSyBWHj8Ia3kcJpzI-383guRYVEt4BlEWOfc',
     authDomain: 'www.hsedu.com.tw',

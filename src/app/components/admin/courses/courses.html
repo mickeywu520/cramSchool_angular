@@ -172,9 +172,8 @@
         </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500">科目</label>
-          <select [(ngModel)]="form.subject" (change)="onSubjectChange()" class="w-full px-3 py-2 rounded-lg border text-sm">
-            @for (s of currentSubjects(); track s) { <option [value]="s">{{ s }}</option> }
-          </select>
+          <input type="text" [(ngModel)]="form.subject" (input)="onSubjectChange()" placeholder="輸入科目名稱"
+            class="w-full px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
         </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500">老師</label>

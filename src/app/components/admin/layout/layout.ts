@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-layout',
@@ -10,6 +11,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class AdminLayout {
   sidebarOpen = signal(true);
+  appVersion = environment.version;
 
   menuItems = [
     { path: '/admin/banners', icon: 'view_carousel', label: 'Banner 輪播管理' },
