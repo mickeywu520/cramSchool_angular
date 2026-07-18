@@ -39,7 +39,10 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           @for (c of getFilteredCourses(); track c.id) {
             <button (click)="selectCourse(c)" type="button"
-              class="text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary hover:shadow-sm transition-all bg-white dark:bg-gray-800/50">
+              class="text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary hover:shadow-sm transition-all bg-white dark:bg-gray-800/50 relative">
+              @if (c.is_teaching === false) {
+                <span class="absolute top-2 right-2 text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">已停課</span>
+              }
               <div class="font-bold text-gray-900 dark:text-white text-sm truncate">{{ c.grade_level }} {{ c.name }}</div>
               <div class="text-xs text-gray-500 mt-1">{{ c.category }} · {{ c.subject }}</div>
               @if (c.branch_name) {

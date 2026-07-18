@@ -12,6 +12,7 @@ interface Course {
   id: number; name: string; category: string; grade_level: string; subject: string;
   branch_id: number | null; branch_name?: string;
   day_of_week?: number; days_of_week?: string;
+  is_teaching?: boolean;
 }
 
 interface StudentRow {
@@ -168,7 +169,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
 
   getFilteredCourses() {
     const dayOfWeek = this.getDayNumber(this.filterDate());
-    return this.courses().filter(c => {
+    const filtered = this.courses().filter(c => {
       if (c.days_of_week) {
         const days = c.days_of_week.split(',').map(Number);
         return days.includes(dayOfWeek);
@@ -177,6 +178,11 @@ export class AdminCommunication implements OnInit, OnDestroy {
         return c.day_of_week === dayOfWeek;
       }
       return true;
+    });
+    return filtered.sort((a, b) => {
+      const aStop = a.is_teaching === false ? 1 : 0;
+      const bStop = b.is_teaching === false ? 1 : 0;
+      return aStop - bStop;
     });
   }
 
