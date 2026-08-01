@@ -31,13 +31,19 @@ interface ProgressData {
 
 interface CourseSummary {
   id: number;
-  course_name: string;
+  name: string;
   category: string;
   subject: string;
   teacher_name: string;
   schedule?: string;
-  room?: string;
+  grade_level?: string;
+  location?: string;
+  days_of_week?: string;
+  start_time?: string;
+  end_time?: string;
 }
+
+const DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
 
 interface ExamScore {
   id: number;
@@ -153,6 +159,17 @@ export class StudentProfile implements OnInit {
 
   get pendingHomeworkCount(): number {
     return this.homework().filter(h => !h.is_completed).length;
+  }
+
+  formatSchedule(c: CourseSummary): string {
+    if (c.schedule) return c.schedule;
+    const days = c.days_of_week
+      ? c.days_of_week.split(',').map(Number).filter(n => !isNaN(n))
+      : [];
+    const dayStr = days.map(d => DAY_NAMES[d] ?? '').filter(Boolean).join('、');
+    const timeStr = [c.start_time, c.end_time].filter(Boolean).join('~');
+    const result = [dayStr, timeStr].filter(Boolean).join(' ');
+    return result || '待安排';
   }
 
   get latestExamScore(): string {

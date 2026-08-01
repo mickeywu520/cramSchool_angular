@@ -17,31 +17,51 @@
   </nav>
   
   <main class="max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto pb-20 md:pb-24 lg:pb-28">
-    <div class="sticky top-[57px] md:top-[73px] z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex">
-      <button 
-        (click)="setTab('elementary')"
-        [class]="activeTab() === 'elementary' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
-      >
-        國小部 (Elementary)
-      </button>
-      <button 
-        (click)="setTab('junior')"
-        [class]="activeTab() === 'junior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
-      >
-        國中部 (Junior High)
-      </button>
-      <button 
-        (click)="setTab('senior')"
-        [class]="activeTab() === 'senior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
-      >
-        高中部 (Senior High)
-      </button>
+    <div class="sticky top-[57px] md:top-[73px] z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+      <div class="flex">
+        <button 
+          (click)="setTab('elementary')"
+          [class]="activeTab() === 'elementary' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+        >
+          國小部 (Elementary)
+        </button>
+        <button 
+          (click)="setTab('junior')"
+          [class]="activeTab() === 'junior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+        >
+          國中部 (Junior High)
+        </button>
+        <button 
+          (click)="setTab('senior')"
+          [class]="activeTab() === 'senior' ? 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base tab-active' : 'flex-1 py-3 md:py-4 text-center font-bold text-sm md:text-base text-gray-400'"
+        >
+          高中部 (Senior High)
+        </button>
+      </div>
+      @if (gradeOptions().length > 0) {
+        <div class="flex gap-2 overflow-x-auto no-scrollbar px-3 md:px-4 pb-2">
+          <button (click)="selectGrade('')"
+            [class]="selectedGrade() === ''
+              ? 'px-3 py-1 rounded-full bg-primary text-white text-xs md:text-sm font-bold whitespace-nowrap'
+              : 'px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700 text-xs md:text-sm font-bold whitespace-nowrap'">
+            全部
+          </button>
+          @for (g of gradeOptions(); track g) {
+            <button (click)="selectGrade(g)"
+              [class]="selectedGrade() === g
+                ? 'px-3 py-1 rounded-full bg-primary text-white text-xs md:text-sm font-bold whitespace-nowrap'
+                : 'px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700 text-xs md:text-sm font-bold whitespace-nowrap'">
+              {{ g }}
+            </button>
+          }
+        </div>
+      }
     </div>
     
     <div class="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
       @if (loading()) {
         <div class="text-center py-12 text-gray-400 text-sm">載入中...</div>
-      } @else if (courses().length === 0) {
+      } @else if (filteredCourses().length === 0) {
         <div class="text-center py-12 text-gray-400 text-sm">
           此學部目前暫無課程資料
         </div>
@@ -52,44 +72,58 @@
             <h3 class="text-lg md:text-xl lg:text-2xl font-extrabold">{{ getTabTitle() }}</h3>
           </div>
 
-          @for (c of courses(); track c.id) {
-            <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
-              <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center gap-3">
-                  <div class="size-10 md:size-12 lg:size-14 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">{{ getIcon(c.subject) }}</span>
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-base md:text-lg lg:text-xl">{{ c.name }}</h4>
-                    @if (c.grade_level) {
-                      <p class="text-xs md:text-sm text-gray-400">{{ c.grade_level }}</p>
-                    }
-                  </div>
-                </div>
-                @if (c.is_early_bird) {
-                  <span class="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">早鳥優惠</span>
-                }
+          @for (group of groupedByGrade(); track group.grade) {
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm md:text-base font-extrabold text-primary">{{ group.grade }}</span>
+                <span class="flex-1 h-px bg-gray-100 dark:bg-gray-700"></span>
+                <span class="text-xs text-gray-400">{{ group.courses.length }} 堂</span>
               </div>
-              @if (c.description) {
-                <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{{ c.description }}</p>
-              }
-              <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
-                @if (formatSchedule(c)) {
-                  <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                    <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
-                    <span>{{ formatSchedule(c) }}</span>
-                  </div>
-                }
-                @if (c.teacher_name) {
-                  <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                    <span class="material-symbols-outlined text-sm md:text-base">person</span>
-                    <span>師資：{{ c.teacher_name }} 老師</span>
-                  </div>
-                }
-                @if (c.price) {
-                  <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                    <span class="material-symbols-outlined text-sm md:text-base">payments</span>
-                    <span>費用：NT$ {{ c.price.toLocaleString() }}</span>
+              <div class="space-y-4">
+                @for (c of group.courses; track c.id) {
+                  <div class="bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-50 dark:border-gray-700">
+                    <div class="flex items-start justify-between mb-4">
+                      <div class="flex items-center gap-3">
+                        <div class="size-10 md:size-12 lg:size-14 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center">
+                          <span class="material-symbols-outlined text-2xl md:text-3xl lg:text-4xl">{{ getIcon(c.subject) }}</span>
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-base md:text-lg lg:text-xl">{{ c.name }}</h4>
+                        </div>
+                      </div>
+                      @if (c.is_early_bird) {
+                        <span class="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 text-[10px] md:text-xs px-2 py-1 rounded font-bold">早鳥優惠</span>
+                      }
+                    </div>
+                    @if (c.description) {
+                      <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{{ c.description }}</p>
+                    }
+                    <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
+                      @if (formatSchedule(c)) {
+                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                          <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                          <span>{{ formatSchedule(c) }}</span>
+                        </div>
+                      }
+                      @if (c.location || c.branch_name) {
+                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                          <span class="material-symbols-outlined text-sm md:text-base">location_on</span>
+                          <span>地點：{{ c.location || c.branch_name }}</span>
+                        </div>
+                      }
+                      @if (c.teacher_name) {
+                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                          <span class="material-symbols-outlined text-sm md:text-base">person</span>
+                          <span>師資：{{ c.teacher_name }} 老師</span>
+                        </div>
+                      }
+                      @if (c.price) {
+                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                          <span class="material-symbols-outlined text-sm md:text-base">payments</span>
+                          <span>費用：NT$ {{ c.price.toLocaleString() }}</span>
+                        </div>
+                      }
+                    </div>
                   </div>
                 }
               </div>

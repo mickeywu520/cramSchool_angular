@@ -98,14 +98,22 @@
               @for (c of courses(); track c.id) {
                 <div class="min-w-[200px] md:min-w-[240px] bg-white dark:bg-card-dark p-4 rounded-2xl bento-shadow border-l-4"
                      [class.border-primary]="$index % 2 === 0" [class.border-accent-gold]="$index % 2 !== 0">
-                  <div class="flex justify-between items-start mb-2">
-                    <span class="text-[10px] md:text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full font-bold">{{ c.schedule || '待安排' }}</span>
-                    <span class="material-symbols-outlined text-gray-300 text-lg">event</span>
-                  </div>
-                  <h4 class="font-bold text-sm md:text-base mb-1">{{ c.course_name }}</h4>
-                  <p class="text-xs md:text-sm text-gray-500 mb-3">{{ c.room || c.category }}</p>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] md:text-xs text-gray-400">{{ c.teacher_name }}</span>
+                  <h4 class="font-bold text-sm md:text-base mb-1">{{ c.name }}</h4>
+                  <div class="space-y-1.5 mt-2">
+                    <div class="flex items-center gap-1.5 text-xs md:text-sm text-gray-500">
+                      <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                      <span>{{ formatSchedule(c) }}</span>
+                    </div>
+                    @if (c.location) {
+                      <div class="flex items-center gap-1.5 text-xs md:text-sm text-gray-500">
+                        <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        <span>{{ c.location }}</span>
+                      </div>
+                    }
+                    <div class="flex items-center gap-1.5 text-xs md:text-sm text-gray-500">
+                      <span class="material-symbols-outlined text-sm text-primary">person</span>
+                      <span>{{ c.teacher_name || '-' }}</span>
+                    </div>
                   </div>
                 </div>
               }

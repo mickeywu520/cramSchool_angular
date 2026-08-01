@@ -21,6 +21,7 @@ interface Registration {
   home_phone: string | null;
   id_number: string | null;
   followup_status: string;
+  remark: string | null;
   email: string;
   created_at: string;
 }
@@ -47,6 +48,9 @@ export class AdminStudentRegistrations implements OnInit {
   savingId = signal<number | null>(null);
   statusOptions = STATUS_OPTIONS;
   selectedStudent = signal<Registration | null>(null);
+  editRemark = signal('');
+  savingDetail = signal(false);
+  detailSaved = signal('');
 
   constructor(private api: ApiService) {}
 
@@ -90,12 +94,54 @@ export class AdminStudentRegistrations implements OnInit {
     }
   }
 
+  async updateRemark(studentId: number, remark: string | null) {
+    const value = (remark || '').trim() || null;
+    this.savingId.set(studentId);
+    try {
+      await lastValueFrom(
+        this.api.put(`/admin/student-registrations/${studentId}`, { remark: value })
+      );
+      this.students.update(list =>
+        list.map(s => (s.id === studentId ? { ...s, remark: value } : s))
+      );
+    } catch {}
+    finally {
+      this.savingId.set(null);
+    }
+  }
+
   showDetail(s: Registration) {
     this.selectedStudent.set(s);
+    this.editRemark.set(s.remark || '');
+    this.detailSaved.set('');
   }
 
   closeDetail() {
     this.selectedStudent.set(null);
+  }
+
+  async saveDetail() {
+    const s = this.selectedStudent();
+    if (!s) return;
+    this.savingDetail.set(true);
+    this.detailSaved.set('');
+    try {
+      await lastValueFrom(
+        this.api.put(`/admin/student-registrations/${s.id}`, {
+          remark: this.editRemark() || null,
+        })
+      );
+      const remark = this.editRemark() || null;
+      this.students.update(list =>
+        list.map(x => (x.id === s.id ? { ...x, remark } : x))
+      );
+      this.selectedStudent.update(sel => sel ? { ...sel, remark } : sel);
+      this.detailSaved.set('已儲存');
+    } catch (err: any) {
+      this.detailSaved.set(err.error?.detail || '儲存失敗');
+    } finally {
+      this.savingDetail.set(false);
+    }
   }
 
   formatDate(d: string): string {

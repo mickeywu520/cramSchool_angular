@@ -191,6 +191,17 @@ export class CommunicationBook implements OnInit {
     return `${d.getMonth() + 1}月${d.getDate()}日`;
   }
 
+  /** 考試分數 = 個人所有分數（主分數 + 自訂欄位）的平均 */
+  examAverage(entry: SessionEntry): number | null {
+    const scores: number[] = [];
+    if (entry.exam_score != null) scores.push(entry.exam_score);
+    for (const v of Object.values(entry.custom_scores || {})) {
+      if (v != null && !isNaN(v)) scores.push(v);
+    }
+    if (scores.length === 0) return null;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
+  }
+
   getInitial(name: string): string {
     return name?.charAt(0) || '?';
   }

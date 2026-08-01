@@ -222,10 +222,13 @@ export class AdminCourses implements OnInit {
     const newVal = !course.is_teaching;
     try {
       await lastValueFrom(
-        this.api.put(`/admin/courses/${course.id}`, { is_teaching: newVal })
+        this.api.put(`/admin/courses/${course.id}`, {
+          is_teaching: newVal,
+          is_active: newVal ? course.is_active : false,
+        })
       );
       this.courses.update(list =>
-        list.map(c => c.id === course.id ? { ...c, is_teaching: newVal } : c)
+        list.map(c => c.id === course.id ? { ...c, is_teaching: newVal, is_active: newVal ? c.is_active : false } : c)
       );
     } catch (err: any) {
       this.error.set(err.error?.detail || '操作失敗');
@@ -244,6 +247,31 @@ export class AdminCourses implements OnInit {
       this.loadCourses();
     } catch (err: any) {
       this.error.set(err.error?.detail || '操作失敗');
+    }
+  }
+
+  async moveUp(index: number) {
+    if (index <= 0) return;
+    const arr = [...this.courses()];
+    [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+    await this.saveOrder(arr);
+  }
+
+  async moveDown(index: number) {
+    const arr = [...this.courses()];
+    if (index >= arr.length - 1) return;
+    [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
+    await this.saveOrder(arr);
+  }
+
+  private async saveOrder(arr: Course[]) {
+    try {
+      await lastValueFrom(
+        this.api.put('/admin/courses/reorder', { order: arr.map(c => c.id) })
+      );
+      this.courses.set(arr);
+    } catch (err: any) {
+      this.error.set(err.error?.detail || '排序失敗');
     }
   }
 

@@ -116,7 +116,15 @@
                 <td class="px-4 py-3">{{ formatTime(c.start_time) }}{{ c.end_time ? '~' + formatTime(c.end_time) : '' }}</td>
                 <td class="px-4 py-3 text-xs text-gray-400">{{ c.start_date || '' }}{{ c.start_date && c.end_date ? ' ~ ' : '' }}{{ c.end_date || '' }}</td>
                 <td class="px-4 py-3">{{ c.branch_name || c.location || '-' }}</td>
-                <td class="px-4 py-3 text-right">
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                  <button (click)="moveUp($index)" [disabled]="$index === 0" type="button"
+                    class="text-gray-400 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed" title="上移">
+                    <span class="material-symbols-outlined text-lg">arrow_upward</span>
+                  </button>
+                  <button (click)="moveDown($index)" [disabled]="$index === courses().length - 1" type="button"
+                    class="text-gray-400 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed" title="下移">
+                    <span class="material-symbols-outlined text-lg">arrow_downward</span>
+                  </button>
                   <button (click)="openEdit(c)" class="text-primary hover:text-primary/80 text-xs font-bold mr-2">編輯</button>
                   <button (click)="deleteCourse(c)" class="text-red-500 hover:text-red-700 text-xs font-bold">刪除</button>
                 </td>

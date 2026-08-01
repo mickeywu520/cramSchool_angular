@@ -60,7 +60,7 @@ export class AdminTeachers implements OnInit {
 
   loadTeachers() {
     this.loading.set(true);
-    this.api.get<{ total: number; teachers: Teacher[] }>('/teachers').subscribe({
+    this.api.get<{ total: number; teachers: Teacher[] }>('/teachers', { include_inactive: true, _: Date.now() }).subscribe({
       next: (data) => {
         this.teachers.set(data.teachers || []);
         this.loading.set(false);

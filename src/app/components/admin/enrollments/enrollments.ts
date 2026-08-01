@@ -9,6 +9,7 @@ interface StudentInfo {
   student_name: string;
   grade: string;
   followup_status: string;
+  remark: string | null;
 }
 
 interface Course {
@@ -17,6 +18,8 @@ interface Course {
   category: string;
   grade_level: string;
   subject: string;
+  school_year: string | null;
+  semester: string | null;
 }
 
 interface Enrollment {
@@ -24,6 +27,7 @@ interface Enrollment {
   student_id: number;
   student_name: string;
   school: string;
+  remark: string | null;
   course_id: number;
   course_name: string;
   status: string;
@@ -60,11 +64,21 @@ export class AdminEnrollments implements OnInit {
       '高一': 7, '高二': 8, '高三': 9,
     };
     return [...this.courses()].sort((a, b) => {
+      const sy = Number(a.school_year) - Number(b.school_year);
+      if (sy !== 0) return sy;
+      const sem = (a.semester || '').localeCompare(b.semester || '', 'zh-Hant');
+      if (sem !== 0) return sem;
       const ga = gradeOrder[a.grade_level] ?? 99;
       const gb = gradeOrder[b.grade_level] ?? 99;
       return ga - gb;
     });
   });
+
+  displayName(s: StudentInfo | { student_name: string; remark?: string | null }): string {
+    const name = s.student_name;
+    const remark = (s as any).remark;
+    return remark ? `${name}（${remark}）` : name;
+  }
 
   filteredStudents = computed(() => {
     const search = this.studentSearch().trim().toLowerCase();

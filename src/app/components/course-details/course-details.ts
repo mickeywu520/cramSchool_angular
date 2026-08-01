@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
@@ -13,10 +13,24 @@ interface CourseItem {
   description: string | null;
   schedule: string | null;
   grade_level: string | null;
+  day_of_week: number | null;
+  days_of_week: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  location: string | null;
+  branch_name: string | null;
   is_early_bird: boolean;
   early_bird_discount: string | null;
   price: number | null;
 }
+
+const DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+
+const GRADE_ORDER: Record<string, number> = {
+  '小四': 1, '小五': 2, '小六': 3,
+  '國七': 4, '國八': 5, '國九': 6,
+  '高一': 7, '高二': 8, '高三': 9,
+};
 
 const SUBJECT_ICONS: Record<string, string> = {
   '數學': 'calculate',
@@ -40,8 +54,23 @@ const SUBJECT_ICONS: Record<string, string> = {
 })
 export class CourseDetails implements OnInit {
   activeTab = signal<'elementary' | 'junior' | 'senior'>('elementary');
+  selectedGrade = signal('');
   courses = signal<CourseItem[]>([]);
   loading = signal(false);
+
+  gradeOptions = computed(() => {
+    const grades = new Set<string>();
+    for (const c of this.courses()) {
+      if (c.grade_level) grades.add(c.grade_level);
+    }
+    return Array.from(grades).sort((a, b) => (GRADE_ORDER[a] ?? 99) - (GRADE_ORDER[b] ?? 99));
+  });
+
+  filteredCourses = computed(() => {
+    const sel = this.selectedGrade();
+    if (!sel) return this.courses();
+    return this.courses().filter(c => c.grade_level === sel);
+  });
 
   private tabCategory: Record<string, string> = {
     elementary: '小學部',
@@ -70,13 +99,19 @@ export class CourseDetails implements OnInit {
       if (tab === 'elementary' || tab === 'junior' || tab === 'senior') {
         this.activeTab.set(tab);
       }
+      this.selectedGrade.set('');
       this.loadCourses();
     });
   }
 
   setTab(tab: 'elementary' | 'junior' | 'senior') {
     this.activeTab.set(tab);
+    this.selectedGrade.set('');
     this.loadCourses();
+  }
+
+  selectGrade(grade: string) {
+    this.selectedGrade.set(grade);
   }
 
   async loadCourses() {
@@ -109,6 +144,32 @@ export class CourseDetails implements OnInit {
 
   formatSchedule(c: CourseItem): string {
     if (c.schedule) return c.schedule;
-    return '';
+    return this.formatTimeFromFields(c);
+  }
+
+  private formatTimeFromFields(c: CourseItem): string {
+    const days = c.days_of_week
+      ? c.days_of_week.split(',').map(Number).filter(n => !isNaN(n))
+      : c.day_of_week != null ? [c.day_of_week] : [];
+    const dayStr = days.map(d => DAY_NAMES[d] ?? '').filter(Boolean).join('、');
+    const timeStr = [c.start_time, c.end_time].filter(Boolean).join('~');
+    return [dayStr, timeStr].filter(Boolean).join(' ');
+  }
+
+  formatTime(t: string | null): string {
+    if (!t) return '';
+    const [h, m] = t.split(':');
+    if (h == null) return t;
+    return `${Number(h) > 12 ? Number(h) - 12 : Number(h)}:${m ?? '00'}${Number(h) >= 12 ? 'PM' : 'AM'}`;
+  }
+
+  groupedByGrade(): { grade: string; courses: CourseItem[] }[] {
+    const groups = new Map<string, CourseItem[]>();
+    for (const c of this.filteredCourses()) {
+      const g = c.grade_level || '其他';
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g)!.push(c);
+    }
+    return Array.from(groups.entries()).map(([grade, courses]) => ({ grade, courses }));
   }
 }

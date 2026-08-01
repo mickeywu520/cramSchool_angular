@@ -51,6 +51,7 @@
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長2/稱謂</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">家長2電話</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">註冊日期</th>
+            <th class="px-3 py-2 text-xs font-bold text-gray-500 text-left whitespace-nowrap border-b border-gray-200 dark:border-gray-600">備註</th>
             <th class="px-3 py-2 text-xs font-bold text-gray-500 text-center whitespace-nowrap border-b border-gray-200 dark:border-gray-600 min-w-[120px]">跟進狀態</th>
           </tr>
         </thead>
@@ -67,6 +68,14 @@
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_name || '-' }}{{ s.parent2_title ? ' (' + s.parent2_title + ')' : '' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ s.parent2_phone || '-' }}</td>
               <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">{{ formatDate(s.created_at) }}</td>
+              <td class="px-3 py-2">
+                <input [(ngModel)]="s.remark" name="remark-{{ s.id }}"
+                  (blur)="updateRemark(s.id, s.remark)"
+                  (keyup.enter)="updateRemark(s.id, s.remark); $event.target.blur()"
+                  [disabled]="savingId() === s.id"
+                  placeholder="無"
+                  class="w-full min-w-[140px] px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white disabled:opacity-50" />
+              </td>
               <td class="px-3 py-2 text-center">
                 <select [ngModel]="s.followup_status"
                   (ngModelChange)="updateStatus(s.id, $event)"
@@ -113,6 +122,29 @@
           <div class="border-t border-gray-100 dark:border-gray-700 my-3"></div>
           <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">跟進狀態</span><span class="col-span-2 text-gray-900 dark:text-white">{{ s.followup_status }}</span></div>
           <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">註冊日期</span><span class="col-span-2 text-gray-900 dark:text-white">{{ formatDate(s.created_at) }}</span></div>
+          <div class="border-t border-gray-100 dark:border-gray-700 my-3"></div>
+          <div class="grid grid-cols-3 gap-2">
+            <span class="font-bold text-gray-500">備註</span>
+            <div class="col-span-2">
+              <input [(ngModel)]="editRemark" name="editRemark"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white text-sm"
+                placeholder="輸入備註（區分同名學生用）"/>
+              <div class="flex items-center gap-3 mt-2">
+                <button (click)="saveDetail()" [disabled]="savingDetail()"
+                  class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1">
+                  @if (savingDetail()) {
+                    <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+                  }
+                  儲存備註
+                </button>
+                @if (detailSaved()) {
+                  <span [class.text-green-600]="detailSaved() === '已儲存'" [class.text-red-600]="detailSaved() !== '已儲存'" class="text-xs font-bold">
+                    {{ detailSaved() }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -92,6 +92,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
   selectedBranchId = signal<number | null>(null);
   courses = signal<Course[]>([]);
   filterDate = signal(new Date().toISOString().slice(0, 10));
+  hideStopped = signal(true);
 
   selectedCourse = signal<Course | null>(null);
   sessionId: number | null = null;
@@ -170,6 +171,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
   getFilteredCourses() {
     const dayOfWeek = this.getDayNumber(this.filterDate());
     const filtered = this.courses().filter(c => {
+      if (this.hideStopped() && c.is_teaching === false) return false;
       if (c.days_of_week) {
         const days = c.days_of_week.split(',').map(Number);
         return days.includes(dayOfWeek);
