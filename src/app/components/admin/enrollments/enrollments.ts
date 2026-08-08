@@ -20,6 +20,7 @@ interface Course {
   subject: string;
   school_year: string | null;
   semester: string | null;
+  is_teaching: boolean;
 }
 
 interface Enrollment {
@@ -63,15 +64,18 @@ export class AdminEnrollments implements OnInit {
       '國七': 4, '國八': 5, '國九': 6,
       '高一': 7, '高二': 8, '高三': 9,
     };
-    return [...this.courses()].sort((a, b) => {
-      const sy = Number(a.school_year) - Number(b.school_year);
-      if (sy !== 0) return sy;
-      const sem = (a.semester || '').localeCompare(b.semester || '', 'zh-Hant');
-      if (sem !== 0) return sem;
-      const ga = gradeOrder[a.grade_level] ?? 99;
-      const gb = gradeOrder[b.grade_level] ?? 99;
-      return ga - gb;
-    });
+    return [...this.courses()]
+      .filter(c => c.is_teaching)
+      .sort((a, b) => {
+        const sy = Number(a.school_year) - Number(b.school_year);
+        if (sy !== 0) return sy;
+        const semA = (a.semester || '').includes('下') ? 0 : 1;
+        const semB = (b.semester || '').includes('下') ? 0 : 1;
+        if (semA !== semB) return semA - semB;
+        const ga = gradeOrder[a.grade_level] ?? 99;
+        const gb = gradeOrder[b.grade_level] ?? 99;
+        return ga - gb;
+      });
   });
 
   displayName(s: StudentInfo | { student_name: string; remark?: string | null }): string {
@@ -150,6 +154,12 @@ export class AdminEnrollments implements OnInit {
     if (this.selectedCourseId()) {
       this.loadAvailableStudents(this.selectedCourseId()!);
     }
+  }
+
+  setTimeoutDropdownClose() {
+    setTimeout(() => {
+      this.showStudentDropdown.set(false);
+    }, 150);
   }
 
   async addStudent() {

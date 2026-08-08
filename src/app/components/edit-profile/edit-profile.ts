@@ -1,9 +1,11 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { StudentContextService } from '../../services/student-context.service';
+import { StudentSwitcher } from '../student-switcher/student-switcher';
 import { lastValueFrom } from 'rxjs';
 
 interface StudentData {
@@ -36,17 +38,18 @@ const AVATAR_COLORS = [
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, StudentSwitcher],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.scss',
 })
-export class EditProfile implements OnInit {
+export class EditProfile implements OnInit, OnDestroy {
   loading = signal(true);
   saving = signal(false);
   error = signal('');
   success = signal('');
 
   student = signal<StudentData | null>(null);
+  private unsub: (() => void) | null = null;
 
   studentName = signal('');
   gender = signal('');
@@ -75,21 +78,41 @@ export class EditProfile implements OnInit {
     '高中一年級', '高中二年級', '高中三年級',
   ];
 
+  /** 學生以身分證字號登入時，個人資料不可修改 */
+  get isStudentAccount(): boolean {
+    return this.auth.isStudentAccount;
+  }
+
   constructor(
     private api: ApiService,
     private auth: AuthService,
+    public ctx: StudentContextService,
     private router: Router,
   ) {}
 
   ngOnInit() {
-    this.loadProfile();
+    this.init();
+  }
+
+  async init() {
+    await this.ctx.loadStudents();
+    if (this.ctx.noStudents) {
+      this.loading.set(false);
+      return;
+    }
+    this.unsub = this.ctx.onStudentChange(() => this.loadProfile());
+    await this.loadProfile();
+  }
+
+  ngOnDestroy() {
+    this.unsub?.();
   }
 
   async loadProfile() {
     this.loading.set(true);
     try {
       const data = await lastValueFrom(
-        this.api.get<StudentData>('/student/me')
+        this.api.get<StudentData>('/student/me', this.ctx.param)
       );
       this.student.set(data);
       this.studentName.set(data.student_name);
@@ -151,7 +174,7 @@ export class EditProfile implements OnInit {
           home_phone: this.homePhone() || null,
           id_number: this.idNumber() || null,
           interested_subjects: selectedSubjects,
-        })
+        }, this.ctx.param)
       );
       this.success.set('資料更新成功');
     } catch (err: any) {

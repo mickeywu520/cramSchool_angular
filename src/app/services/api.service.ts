@@ -8,7 +8,7 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  get<T>(path: string, params?: Record<string, string | number | boolean | null | undefined>) {
+  private buildParams(params?: Record<string, string | number | boolean | null | undefined>): HttpParams {
     let httpParams = new HttpParams();
     if (params) {
       for (const [key, value] of Object.entries(params)) {
@@ -17,24 +17,28 @@ export class ApiService {
         }
       }
     }
-    return this.http.get<T>(`${this.apiUrl}${path}`, { params: httpParams });
+    return httpParams;
+  }
+
+  get<T>(path: string, params?: Record<string, string | number | boolean | null | undefined>) {
+    return this.http.get<T>(`${this.apiUrl}${path}`, { params: this.buildParams(params) });
   }
 
   post<T>(path: string, body?: unknown) {
     return this.http.post<T>(`${this.apiUrl}${path}`, body);
   }
 
-  put<T>(path: string, body?: unknown) {
-    return this.http.put<T>(`${this.apiUrl}${path}`, body);
+  put<T>(path: string, body?: unknown, params?: Record<string, string | number | boolean | null | undefined>) {
+    return this.http.put<T>(`${this.apiUrl}${path}`, body, { params: this.buildParams(params) });
   }
 
-  delete<T>(path: string) {
-    return this.http.delete<T>(`${this.apiUrl}${path}`);
+  delete<T>(path: string, params?: Record<string, string | number | boolean | null | undefined>) {
+    return this.http.delete<T>(`${this.apiUrl}${path}`, { params: this.buildParams(params) });
   }
 
-  upload<T>(path: string, file: File) {
+  upload<T>(path: string, file: File, params?: Record<string, string | number | boolean | null | undefined>) {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<T>(`${this.apiUrl}${path}`, formData);
+    return this.http.post<T>(`${this.apiUrl}${path}`, formData, { params: this.buildParams(params) });
   }
 }

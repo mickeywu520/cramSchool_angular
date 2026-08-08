@@ -11,23 +11,26 @@
     <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-16 md:pb-20 lg:pb-24 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
       <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
       <div class="relative z-10 flex items-center justify-between mb-4">
+        <h1 class="absolute left-1/2 -translate-x-1/2 text-white text-lg md:text-xl lg:text-2xl font-extrabold tracking-wide whitespace-nowrap">數位聯絡簿</h1>
         <a routerLink="/student" class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
           <span class="material-symbols-outlined text-xl md:text-2xl">arrow_back_ios_new</span>
         </a>
-        <h1 class="text-white text-lg md:text-xl lg:text-2xl font-extrabold tracking-wide">數位聯絡簿</h1>
-        <div class="flex items-center gap-2">
-          <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">home</span>
-            回禾笙首頁
-          </a>
-          <button (click)="logout()" type="button"
-            class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">logout</span>
-            登出
-          </button>
-          <button class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
-            <span class="material-symbols-outlined text-xl md:text-2xl">notifications</span>
-          </button>
+        <div class="flex flex-col items-end gap-3">
+          <div class="flex items-center gap-2">
+            <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">home</span>
+              回禾笙首頁
+            </a>
+            <button (click)="logout()" type="button"
+              class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span>
+              登出
+            </button>
+            <button class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
+              <span class="material-symbols-outlined text-xl md:text-2xl">notifications</span>
+            </button>
+          </div>
+          <app-student-switcher></app-student-switcher>
         </div>
       </div>
     </header>
@@ -137,13 +140,11 @@
                   <p class="text-xs text-gray-500 mt-1">到班時間</p>
                   <p class="text-sm font-bold">{{ entry.arrival_time || '-' }}</p>
                 </div>
-                @if (entry.departure_time) {
-                  <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
-                    <span class="material-symbols-outlined text-primary text-xl">logout</span>
-                    <p class="text-xs text-gray-500 mt-1">離班時間</p>
-                    <p class="text-sm font-bold">{{ entry.departure_time }}</p>
-                  </div>
-                }
+                <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                  <span class="material-symbols-outlined text-primary text-xl">logout</span>
+                  <p class="text-xs text-gray-500 mt-1">離班時間</p>
+                  <p class="text-sm font-bold">{{ entry.departure_time || '-' }}</p>
+                </div>
                 <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
                      [class.border-green-200]="entry.handout_status === '完成'">
                   <span class="material-symbols-outlined text-xl"
@@ -193,7 +194,16 @@
                 <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
                   <span class="material-symbols-outlined text-xl text-primary">score</span>
                   <p class="text-xs text-gray-500 mt-1">考試分數</p>
-                  <p class="text-sm font-bold">{{ examAverage(entry) != null ? examAverage(entry) + '分' : '-' }}</p>
+                  @if (examScores(entry).length > 0) {
+                    <div class="text-sm space-y-0.5">
+                      @for (s of examScores(entry); track $index) {
+                        <p class="font-bold">{{ s.label }}: {{ s.score }}</p>
+                      }
+                      <p class="font-bold text-primary">平均: {{ examAverage(entry) }}</p>
+                    </div>
+                  } @else {
+                    <p class="text-sm font-bold">-</p>
+                  }
                 </div>
                 <div class="p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
                      [class.border-amber-200]="entry.tutoring_attendance">
@@ -218,35 +228,87 @@
             </section>
 
             <!-- Parent sign section -->
-            <section>
-              <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">家長簽署</h3>
-              <div class="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                @if (entry.parent_signed) {
-                  <div class="p-4 md:p-5 text-center">
-                    <span class="material-symbols-outlined text-green-500 text-4xl">verified</span>
-                    <p class="text-sm font-bold text-green-600 dark:text-green-400 mt-2">已簽署</p>
-                    @if (entry.parent_signed_at) {
-                      <p class="text-xs text-gray-400 mt-1">{{ entry.parent_signed_at }}</p>
-                    }
-                  </div>
-                } @else {
-                  <div class="p-4 md:p-5 text-center">
-                    <span class="material-symbols-outlined text-gray-300 text-4xl">rate_review</span>
-                    <p class="text-sm text-gray-500 mt-2 mb-4">請確認聯絡簿內容後簽署</p>
-                    <button (click)="signEntry(entry.id)" [disabled]="signing()"
-                      class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all active:scale-95 inline-flex items-center gap-2">
-                      @if (signing()) {
-                        <span class="material-symbols-outlined animate-spin text-lg">refresh</span>
-                        送出中...
-                      } @else {
-                        <span class="material-symbols-outlined text-lg">draw</span>
-                        簽署
+            @if (!auth.isStudentAccount) {
+              <section>
+                <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-3 px-1">家長簽署</h3>
+                <div class="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  @if (entry.parent_signed) {
+                    <div class="p-4 md:p-5 text-center">
+                      <span class="material-symbols-outlined text-green-500 text-4xl">verified</span>
+                      <p class="text-sm font-bold text-green-600 dark:text-green-400 mt-2">已簽署</p>
+                      @if (entry.parent_signed_at) {
+                        <p class="text-xs text-gray-400 mt-1">{{ entry.parent_signed_at }}</p>
                       }
-                    </button>
-                  </div>
-                }
-              </div>
-            </section>
+                    </div>
+                  } @else {
+                    <div class="p-4 md:p-5 text-center">
+                      <span class="material-symbols-outlined text-gray-300 text-4xl">rate_review</span>
+                      <p class="text-sm text-gray-500 mt-2 mb-4">請確認聯絡簿內容後簽署</p>
+                      <button (click)="signEntry(entry.id)" [disabled]="signing()"
+                        class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all active:scale-95 inline-flex items-center gap-2">
+                        @if (signing()) {
+                          <span class="material-symbols-outlined animate-spin text-lg">refresh</span>
+                          送出中...
+} @else if (ctx.noStudents) {
+  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24 flex flex-col">
+    <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-20 md:pb-24 lg:pb-28 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+      <div class="relative z-10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl border-2 border-white/30 flex items-center justify-center text-white font-extrabold text-xl md:text-2xl bg-white/20">
+            <span class="material-symbols-outlined text-2xl">menu_book</span>
+          </div>
+          <div>
+            <h2 class="text-white text-lg md:text-xl font-extrabold">數位聯絡簿</h2>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-3">
+          <div class="flex items-center gap-2">
+            <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">home</span>
+              回禾笙首頁
+            </a>
+            <button (click)="logout()" type="button"
+              class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span>
+              登出
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="px-4 md:px-6 lg:px-8 -mt-10 relative z-20">
+      <div class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-6 md:p-8 bento-shadow border border-gray-100 dark:border-gray-800 text-center">
+        <span class="material-symbols-outlined text-primary text-5xl mb-3">child_care</span>
+        <h3 class="font-extrabold text-base md:text-lg mb-2">此帳號尚未關聯任何學生</h3>
+        <p class="text-sm text-gray-400">請聯絡補習班櫃台協助將小孩帳號綁定到此登入帳號。</p>
+      </div>
+    </main>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
+      <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
+        <span class="text-[10px] md:text-xs font-bold">首頁</span>
+      </a>
+      <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
+        <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
+      </a>
+      <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
+        <span class="text-[10px] md:text-xs font-bold">個人資料</span>
+      </a>
+    </nav>
+  </div>
+} @else {
+                          <span class="material-symbols-outlined text-lg">draw</span>
+                          簽署
+                        }
+                      </button>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
           </div>
         }
       } @else {

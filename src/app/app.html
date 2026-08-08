@@ -1,1 +1,19 @@
 <router-outlet></router-outlet>
+
+@if (session.expired()) {
+  <div class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm p-6 shadow-xl">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="material-symbols-outlined text-3xl text-amber-500">schedule</span>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">登入已過期</h3>
+      </div>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">您的登入狀態已逾時，請重新登入以繼續使用。</p>
+      <div class="flex justify-end">
+        <button (click)="session.goLogin()"
+          class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2 rounded-lg text-sm">
+          重新登入
+        </button>
+      </div>
+    </div>
+  </div>
+}

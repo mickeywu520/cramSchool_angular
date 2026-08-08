@@ -17,7 +17,14 @@ interface CourseItem {
   days_of_week: string | null;
   start_time: string | null;
   end_time: string | null;
+  start_date: string | null;
+  end_date: string | null;
   location: string | null;
+  tutoring_day_of_week: number | null;
+  tutoring_days_of_week: string | null;
+  tutoring_start_time: string | null;
+  tutoring_end_time: string | null;
+  tutoring_location: string | null;
   branch_name: string | null;
   is_early_bird: boolean;
   early_bird_discount: string | null;
@@ -143,8 +150,26 @@ export class CourseDetails implements OnInit {
   }
 
   formatSchedule(c: CourseItem): string {
-    if (c.schedule) return c.schedule;
-    return this.formatTimeFromFields(c);
+    const fromFields = this.formatTimeFromFields(c);
+    if (fromFields) return fromFields;
+    return c.schedule || '';
+  }
+
+  formatWeekdays(c: CourseItem): string {
+    const days = c.days_of_week
+      ? c.days_of_week.split(',').map(Number).filter(n => !isNaN(n))
+      : c.day_of_week != null ? [c.day_of_week] : [];
+    const dayStr = days.map(d => DAY_NAMES[d] ?? '').filter(Boolean).join('、');
+    if (dayStr) return dayStr;
+    const m = (c.schedule || '').match(/(日|一|二|三|四|五|六)(、|日|一|二|三|四|五|六)*/);
+    return m ? m[0] : '待安排';
+  }
+
+  formatTimeRange(c: CourseItem): string {
+    const timeStr = [c.start_time, c.end_time].filter(Boolean).join('~');
+    if (timeStr) return timeStr;
+    const m = (c.schedule || '').match(/(\d{1,2}[:：]?\d{0,2}\s*[-~]\s*\d{1,2}[:：]?\d{0,2})/);
+    return m ? m[1] : '待安排';
   }
 
   private formatTimeFromFields(c: CourseItem): string {
@@ -163,6 +188,15 @@ export class CourseDetails implements OnInit {
     return `${Number(h) > 12 ? Number(h) - 12 : Number(h)}:${m ?? '00'}${Number(h) >= 12 ? 'PM' : 'AM'}`;
   }
 
+  formatTutoringSchedule(c: CourseItem): string {
+    const days = c.tutoring_days_of_week
+      ? c.tutoring_days_of_week.split(',').map(Number).filter(n => !isNaN(n))
+      : c.tutoring_day_of_week != null ? [c.tutoring_day_of_week] : [];
+    const dayStr = days.map(d => DAY_NAMES[d] ?? '').filter(Boolean).join('、');
+    const timeStr = [c.tutoring_start_time, c.tutoring_end_time].filter(Boolean).join('~');
+    return [dayStr, timeStr].filter(Boolean).join(' ');
+  }
+
   groupedByGrade(): { grade: string; courses: CourseItem[] }[] {
     const groups = new Map<string, CourseItem[]>();
     for (const c of this.filteredCourses()) {
@@ -170,6 +204,11 @@ export class CourseDetails implements OnInit {
       if (!groups.has(g)) groups.set(g, []);
       groups.get(g)!.push(c);
     }
-    return Array.from(groups.entries()).map(([grade, courses]) => ({ grade, courses }));
+    return Array.from(groups.entries())
+      .sort((a, b) => (GRADE_ORDER[a[0]] ?? 99) - (GRADE_ORDER[b[0]] ?? 99))
+      .map(([grade, courses]) => ({
+        grade,
+        courses: courses.sort((x, y) => (GRADE_ORDER[x.grade_level ?? ''] ?? 99) - (GRADE_ORDER[y.grade_level ?? ''] ?? 99)),
+      }));
   }
 }

@@ -6,6 +6,16 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { lastValueFrom } from 'rxjs';
 
+interface StudentForm {
+  studentName: string;
+  gender: string;
+  birthDate: string;
+  school: string;
+  grade: string;
+  className: string;
+  idNumber: string;
+}
+
 @Component({
   selector: 'app-register-details',
   imports: [RouterLink, FormsModule, CommonModule],
@@ -19,13 +29,10 @@ export class RegisterDetails implements OnInit {
   email = '';
   password = '';
 
-  studentName = signal('');
-  gender = signal('');
-  birthDate = signal('');
-  school = signal('');
-  grade = signal('');
-  className = signal('');
-  idNumber = signal('');
+  students = signal<StudentForm[]>([
+    this.emptyStudent(),
+  ]);
+
   parentName = signal('');
   parentTitle = signal('');
   phone = signal('');
@@ -49,6 +56,18 @@ export class RegisterDetails implements OnInit {
     private auth: AuthService,
   ) {}
 
+  private emptyStudent(): StudentForm {
+    return {
+      studentName: '',
+      gender: '',
+      birthDate: '',
+      school: '',
+      grade: '',
+      className: '',
+      idNumber: '',
+    };
+  }
+
   ngOnInit() {
     const state = history.state as { email?: string; password?: string };
     if (!state?.email || !state?.password) {
@@ -59,28 +78,58 @@ export class RegisterDetails implements OnInit {
     this.password = state.password;
   }
 
+  get canAddStudent(): boolean {
+    return this.students().length < 3;
+  }
+
+  addStudent() {
+    if (!this.canAddStudent) return;
+    this.students.update(list => [...list, this.emptyStudent()]);
+  }
+
+  removeStudent(index: number) {
+    this.students.update(list => list.filter((_, i) => i !== index));
+  }
+
+  updateStudentField(index: number, field: keyof StudentForm, value: string) {
+    this.students.update(list =>
+      list.map((s, i) => (i === index ? { ...s, [field]: value } : s))
+    );
+  }
+
   async submit() {
     this.error.set('');
 
-    if (!this.studentName() || !this.gender() || !this.birthDate() || !this.school() || !this.grade() || !this.parentName() || !this.phone()) {
-      this.error.set('請填寫所有必填欄位');
+    if (!this.parentName() || !this.phone()) {
+      this.error.set('請填寫家長姓名與聯絡電話');
       return;
+    }
+
+    const list = this.students();
+    for (const s of list) {
+      if (!s.studentName || !s.gender || !s.birthDate || !s.school || !s.grade) {
+        this.error.set('請填寫所有學生的必填欄位');
+        return;
+      }
     }
 
     this.loading.set(true);
 
     try {
+      const students = list.map(s => ({
+        student_name: s.studentName,
+        gender: s.gender,
+        birth_date: s.birthDate,
+        school: s.school,
+        grade: s.grade,
+        class_name: s.className || null,
+        id_number: s.idNumber || null,
+      }));
+
       await lastValueFrom(
         this.api.post('/auth/register', {
           email: this.email,
           password: this.password,
-          student_name: this.studentName(),
-          gender: this.gender(),
-          birth_date: this.birthDate(),
-          school: this.school(),
-          grade: this.grade(),
-          class_name: this.className() || null,
-          id_number: this.idNumber() || null,
           parent_name: this.parentName(),
           parent_title: this.parentTitle() || null,
           phone: this.phone(),
@@ -88,6 +137,7 @@ export class RegisterDetails implements OnInit {
           parent2_title: this.parent2Title() || null,
           parent2_phone: this.parent2Phone() || null,
           home_phone: this.homePhone() || null,
+          students,
         })
       );
 

@@ -3,11 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { tap } from 'rxjs/operators';
+import { SessionService } from './session.service';
+import { StudentContextService } from './student-context.service';
 
 export interface UserInfo {
   id: number;
-  email: string;
+  email?: string | null;
   role: string;
+  auth_provider?: string | null;
   student_id?: number | null;
   student_name?: string | null;
   teacher_id?: number | null;
@@ -30,6 +33,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private session: SessionService,
+    private studentCtx: StudentContextService,
   ) {
     const stored = localStorage.getItem('current_user');
     if (stored) {
@@ -48,6 +53,7 @@ export class AuthService {
           localStorage.setItem('refresh_token', res.refresh_token);
           localStorage.setItem('current_user', JSON.stringify(res.user));
           this.currentUser.set(res.user);
+          this.studentCtx.reset();
         }),
       );
   }
@@ -55,7 +61,7 @@ export class AuthService {
   refreshToken() {
     const refreshToken = localStorage.getItem('refresh_token');
     if (!refreshToken) {
-      this.logout();
+      this.session.showExpired();
       throw new Error('No refresh token');
     }
     return this.http
@@ -73,6 +79,7 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('current_user');
     this.currentUser.set(null);
+    this.studentCtx.reset();
     this.router.navigate(['/register']);
   }
 
@@ -83,5 +90,10 @@ export class AuthService {
   get isAdmin(): boolean {
     const user = this.currentUser();
     return !!user && user.role === 'admin';
+  }
+
+  /** 是否為「學生」以身分證字號登入（學生專屬帳號） */
+  get isStudentAccount(): boolean {
+    return this.currentUser()?.auth_provider === 'id_number';
   }
 }

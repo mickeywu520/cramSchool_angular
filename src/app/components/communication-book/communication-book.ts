@@ -1,9 +1,11 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { StudentContextService } from '../../services/student-context.service';
+import { StudentSwitcher } from '../student-switcher/student-switcher';
 import { lastValueFrom } from 'rxjs';
 
 interface StudentInfo {
@@ -45,14 +47,16 @@ interface WeeklyEntrySummary {
 
 @Component({
   selector: 'app-communication-book',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, StudentSwitcher],
   templateUrl: './communication-book.html',
   styleUrl: './communication-book.scss',
 })
-export class CommunicationBook implements OnInit {
+export class CommunicationBook implements OnInit, OnDestroy {
   loading = signal(true);
   signing = signal(false);
   error = signal('');
+
+  private unsub: (() => void) | null = null;
 
   student = signal<StudentInfo | null>(null);
   entries = signal<SessionEntry[]>([]);
@@ -63,11 +67,25 @@ export class CommunicationBook implements OnInit {
   selectedDate = signal('');
   selectedEntries = signal<SessionEntry[]>([]);
 
-  constructor(private api: ApiService, private auth: AuthService, private router: Router) {}
+  constructor(public api: ApiService, public auth: AuthService, public ctx: StudentContextService, private router: Router) {}
 
   ngOnInit() {
     this.selectedDate.set(new Date().toISOString().slice(0, 10));
-    this.loadData();
+    this.init();
+  }
+
+  async init() {
+    await this.ctx.loadStudents();
+    if (this.ctx.noStudents) {
+      this.loading.set(false);
+      return;
+    }
+    this.unsub = this.ctx.onStudentChange(() => this.loadData());
+    await this.loadData();
+  }
+
+  ngOnDestroy() {
+    this.unsub?.();
   }
 
   async loadData() {
@@ -80,10 +98,11 @@ export class CommunicationBook implements OnInit {
           this.api.get<{ student: StudentInfo; entries: SessionEntry[] }>('/communication/entries', {
             date_from: today,
             date_to: today,
+            ...this.ctx.param,
           })
         ),
         lastValueFrom(
-          this.api.get<{ student: StudentInfo; week_start: string; week_end: string; entries: WeeklyEntrySummary[] }>('/communication/weekly')
+          this.api.get<{ student: StudentInfo; week_start: string; week_end: string; entries: WeeklyEntrySummary[] }>('/communication/weekly', this.ctx.param)
         ),
       ]);
 
@@ -108,6 +127,7 @@ export class CommunicationBook implements OnInit {
         this.api.get<{ entries: SessionEntry[]; student: StudentInfo }>('/communication/entries', {
           date_from: dateStr,
           date_to: dateStr,
+          ...this.ctx.param,
         })
       );
       this.selectedEntries.set(res.entries);
@@ -125,8 +145,10 @@ export class CommunicationBook implements OnInit {
 
     this.signing.set(true);
     try {
+      const sid = this.ctx.param['student_id'];
+      const qs = sid ? `?student_id=${sid}` : '';
       await lastValueFrom(
-        this.api.post(`/communication/entries/${entry.id}/feedback`, {
+        this.api.post(`/communication/entries/${entry.id}/feedback${qs}`, {
           is_signed: true,
         })
       );
@@ -200,6 +222,23 @@ export class CommunicationBook implements OnInit {
     }
     if (scores.length === 0) return null;
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
+  }
+
+  /** 每筆成績（主分數 + 各自訂欄位） */
+  examScores(entry: SessionEntry): { label: string; score: number }[] {
+    const list: { label: string; score: number }[] = [];
+    if (entry.exam_score != null) {
+      list.push({ label: '主分數', score: entry.exam_score });
+    }
+    const custom = entry.custom_scores || {};
+    const keys = Object.keys(custom).sort();
+    for (const k of keys) {
+      const v = custom[k];
+      if (v != null && !isNaN(v)) {
+        list.push({ label: k, score: v });
+      }
+    }
+    return list;
   }
 
   getInitial(name: string): string {

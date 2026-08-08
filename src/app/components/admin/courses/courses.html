@@ -117,14 +117,6 @@
                 <td class="px-4 py-3 text-xs text-gray-400">{{ c.start_date || '' }}{{ c.start_date && c.end_date ? ' ~ ' : '' }}{{ c.end_date || '' }}</td>
                 <td class="px-4 py-3">{{ c.branch_name || c.location || '-' }}</td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                  <button (click)="moveUp($index)" [disabled]="$index === 0" type="button"
-                    class="text-gray-400 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed" title="上移">
-                    <span class="material-symbols-outlined text-lg">arrow_upward</span>
-                  </button>
-                  <button (click)="moveDown($index)" [disabled]="$index === courses().length - 1" type="button"
-                    class="text-gray-400 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed" title="下移">
-                    <span class="material-symbols-outlined text-lg">arrow_downward</span>
-                  </button>
                   <button (click)="openEdit(c)" class="text-primary hover:text-primary/80 text-xs font-bold mr-2">編輯</button>
                   <button (click)="deleteCourse(c)" class="text-red-500 hover:text-red-700 text-xs font-bold">刪除</button>
                 </td>
@@ -180,7 +172,7 @@
         </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500">科目</label>
-          <input type="text" [(ngModel)]="form.subject" (input)="onSubjectChange()" placeholder="輸入科目名稱"
+          <input type="text" [(ngModel)]="form.subject" (ngModelChange)="onSubjectChange()" placeholder="輸入科目名稱"
             class="w-full px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
         </div>
         <div class="space-y-1">
@@ -193,6 +185,16 @@
         <div class="col-span-2 space-y-1">
           <label class="text-xs font-bold text-gray-500">課程名稱（自動帶入）</label>
           <input [(ngModel)]="form.name" class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" placeholder="自動產生（可自訂修改）"/>
+        </div>
+        <div class="col-span-2 grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500">開始日期</label>
+            <input type="date" [(ngModel)]="form.start_date" class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white"/>
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500">結束日期</label>
+            <input type="date" [(ngModel)]="form.end_date" class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white"/>
+          </div>
         </div>
         <div class="col-span-2 space-y-1">
           <label class="text-xs font-bold text-gray-500">上課星期</label>
@@ -208,16 +210,6 @@
                 {{ dayName(d) }}
               </button>
             }
-          </div>
-        </div>
-        <div class="col-span-2 grid grid-cols-2 gap-3">
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-gray-500">開始日期</label>
-            <input type="date" [(ngModel)]="form.start_date" class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white"/>
-          </div>
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-gray-500">結束日期</label>
-            <input type="date" [(ngModel)]="form.end_date" class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white"/>
           </div>
         </div>
         <div class="space-y-1">
@@ -253,6 +245,53 @@
         </div>
       </div>
 
+      <!-- 輔導課 -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">輔導課</h4>
+        <div class="col-span-2 space-y-1 mb-3">
+          <label class="text-xs font-bold text-gray-500">輔導課星期</label>
+          <div class="grid grid-cols-7 gap-1.5 max-w-xs">
+            @for (d of [1,2,3,4,5,6,7]; track d) {
+              <button type="button" (click)="toggleTutoringDay(d)"
+                class="w-full aspect-square rounded-lg text-xs font-bold border transition-colors"
+                [class.bg-primary]="checkedTutoringDays().includes(d)"
+                [class.text-white]="checkedTutoringDays().includes(d)"
+                [class.border-primary]="checkedTutoringDays().includes(d)"
+                [class.text-gray-500]="!checkedTutoringDays().includes(d)"
+                [class.border-gray-300]="!checkedTutoringDays().includes(d)">
+                {{ dayName(d) }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500">輔導課開始時間</label>
+            <div class="flex gap-1">
+              <select [(ngModel)]="tStartHour" (change)="syncTStartTime()" class="flex-1 px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+                @for (h of hourOptions; track h) { <option [value]="h">{{ h }}</option> }
+              </select>
+              <select [(ngModel)]="tStartMinute" (change)="syncTStartTime()" class="flex-1 px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+                <option value="00">00</option>
+                <option value="30">30</option>
+              </select>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500">輔導課結束時間</label>
+            <div class="flex gap-1">
+              <select [(ngModel)]="tEndHour" (change)="syncTEndTime()" class="flex-1 px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+                @for (h of hourOptions; track h) { <option [value]="h">{{ h }}</option> }
+              </select>
+              <select [(ngModel)]="tEndMinute" (change)="syncTEndTime()" class="flex-1 px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+                <option value="00">00</option>
+                <option value="30">30</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="flex items-center gap-6 mt-2">
         <div class="flex items-center gap-2">
           <input type="checkbox" id="isTeaching" [(ngModel)]="form.is_teaching"
@@ -272,6 +311,40 @@
         <button (click)="save()" [disabled]="submitting()"
           class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-lg text-sm">
           {{ submitting() ? '儲存中...' : '儲存' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (deleteTarget()) {
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md p-6">
+      <h3 class="text-lg font-bold mb-2">刪除課程</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        @if (deleteStudents().length > 0) {
+          課程「{{ deleteTarget()!.name }}」內尚有學生名單，是否確認要刪除？
+        } @else {
+          確定刪除「{{ deleteTarget()!.name }}」？
+        }
+      </p>
+      @if (deleteStudents().length > 0) {
+        <div class="mt-3 max-h-40 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+          @for (s of deleteStudents(); track s.id) {
+            <div class="px-3 py-2 text-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-gray-400">person</span>
+              {{ s.name }}
+            </div>
+          }
+        </div>
+      }
+      <div class="flex justify-end gap-2 mt-6">
+        <button (click)="deleteTarget.set(null); deleteStudents.set([])"
+          class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">取消</button>
+        <button (click)="confirmDelete()" [disabled]="deleteLoading()"
+          class="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-lg text-sm">
+          {{ deleteLoading() ? '刪除中...' : '確認刪除' }}
         </button>
       </div>
     </div>

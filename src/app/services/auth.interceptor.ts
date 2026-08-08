@@ -1,6 +1,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
+import { SessionService } from './session.service';
 import { catchError, switchMap, throwError, from } from 'rxjs';
 
 let isRefreshing = false;
@@ -18,6 +19,7 @@ function onRefreshFailed(err: unknown) {
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
+  const session = inject(SessionService);
   const token = localStorage.getItem('access_token');
   if (token) {
     req = req.clone({
@@ -44,7 +46,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             catchError((refreshErr) => {
               isRefreshing = false;
               onRefreshFailed(refreshErr);
-              auth.logout();
+              session.showExpired();
               return throwError(() => refreshErr);
             }),
           );

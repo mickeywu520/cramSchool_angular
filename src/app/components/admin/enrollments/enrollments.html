@@ -69,17 +69,21 @@
             }
           </select>
           <div class="flex-1 min-w-[200px] relative">
-            <input [(ngModel)]="studentSearch" placeholder="搜尋姓名..."
+            <input [(ngModel)]="studentSearch" placeholder="點擊欄位顯示學生清單，或輸入姓名搜尋..."
               (focus)="showStudentDropdown.set(true)" (input)="showStudentDropdown.set(true)"
+              (blur)="setTimeoutDropdownClose()"
               class="w-full px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"/>
-            @if (showStudentDropdown() && studentSearch().trim() && filteredStudents().length > 0) {
+            @if (showStudentDropdown() && filteredStudents().length > 0) {
               <div class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                 @for (s of filteredStudents(); track s.id) {
-                  <button (click)="selectStudent(s.id, s.student_name)" type="button"
+                  <button (mousedown)="selectStudent(s.id, s.student_name)" type="button"
                     class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                     [class.bg-primary/10]="addStudentId() === s.id">
                     {{ displayName(s) }} <span class="text-gray-400 text-xs">({{ s.grade }})</span>
                   </button>
+                }
+                @if (filteredStudents().length === 0) {
+                  <div class="px-3 py-2 text-sm text-gray-400">無符合條件的學生</div>
                 }
               </div>
             }

@@ -38,13 +38,11 @@ export class Faculty implements OnInit, AfterViewInit {
   @ViewChild('teacherList') teacherList!: ElementRef;
 
   selectedFilter = signal<string>('all');
-  selectedBranchId = signal<number | null>(null);
   searchQuery = signal<string>('');
   selectedTeacher = signal<Teacher | null>(null);
   selectedTeacherData = computed(() => this.selectedTeacher() as Teacher);
   highlightTeacher = signal<string>('');
   teachers = signal<Teacher[]>([]);
-  branches = signal<{ id: number; name: string }[]>([]);
 
   constructor(private api: ApiService) {}
 
@@ -57,22 +55,11 @@ export class Faculty implements OnInit, AfterViewInit {
       this.highlightTeacher.set(decodeURIComponent(teacherName));
     }
 
-    this.loadBranches();
     this.loadTeachers();
   }
 
-  loadBranches() {
-    this.api.get<{ id: number; name: string }[]>('/admin/branches').subscribe({
-      next: (data) => this.branches.set(data || []),
-    });
-  }
-
   loadTeachers() {
-    const branchId = this.selectedBranchId();
-    const params: Record<string, string | number> = {};
-    if (branchId) params['branch_id'] = branchId;
-
-    this.api.get<{ total: number; teachers: { id: number; name: string; subject: string; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[] }>('/teachers', params).subscribe({
+    this.api.get<{ total: number; teachers: { id: number; name: string; subject: string; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[] }>('/teachers').subscribe({
       next: (data) => {
         this.teachers.set(
           ((data && data.teachers) || []).map((t) => ({
@@ -90,11 +77,6 @@ export class Faculty implements OnInit, AfterViewInit {
         );
       },
     });
-  }
-
-  setBranchFilter(branchId: number | null) {
-    this.selectedBranchId.set(branchId);
-    this.loadTeachers();
   }
 
   ngAfterViewInit() {

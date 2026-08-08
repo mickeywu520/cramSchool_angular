@@ -99,28 +99,24 @@
                       <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{{ c.description }}</p>
                     }
                     <div class="space-y-2 border-t border-gray-50 dark:border-gray-700 pt-4">
-                      @if (formatSchedule(c)) {
+                      @if (c.start_date || c.end_date) {
                         <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                          <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
-                          <span>{{ formatSchedule(c) }}</span>
+                          <span class="material-symbols-outlined text-sm md:text-base">event</span>
+                          <span>開始日期: {{ c.start_date || '—' }} / 結束日期: {{ c.end_date || '—' }}</span>
                         </div>
                       }
-                      @if (c.location || c.branch_name) {
-                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                          <span class="material-symbols-outlined text-sm md:text-base">location_on</span>
-                          <span>地點：{{ c.location || c.branch_name }}</span>
-                        </div>
-                      }
+                      <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <span class="material-symbols-outlined text-sm md:text-base">calendar_today</span>
+                        <span>星期: {{ formatWeekdays(c) }}</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                        <span class="material-symbols-outlined text-sm md:text-base">schedule</span>
+                        <span>時間: {{ formatTimeRange(c) }}</span>
+                      </div>
                       @if (c.teacher_name) {
                         <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
                           <span class="material-symbols-outlined text-sm md:text-base">person</span>
-                          <span>師資：{{ c.teacher_name }} 老師</span>
-                        </div>
-                      }
-                      @if (c.price) {
-                        <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500">
-                          <span class="material-symbols-outlined text-sm md:text-base">payments</span>
-                          <span>費用：NT$ {{ c.price.toLocaleString() }}</span>
+                          <span>師資: {{ c.teacher_name }} 老師</span>
                         </div>
                       }
                     </div>

@@ -29,6 +29,11 @@ interface Course {
   start_time: string | null;
   end_time: string | null;
   location: string | null;
+  tutoring_day_of_week: number | null;
+  tutoring_days_of_week: string | null;
+  tutoring_start_time: string | null;
+  tutoring_end_time: string | null;
+  tutoring_location: string | null;
   branch_id: number | null;
   branch_name: string | null;
   school_year: string | null;
@@ -93,12 +98,19 @@ export class AdminCourses implements OnInit {
   dragStartY = 0;
   dragMouseX = 0;
   dragMouseY = 0;
+  deleteTarget = signal<Course | null>(null);
+  deleteStudents = signal<{ id: number; name: string }[]>([]);
+  deleteLoading = signal(false);
 
   hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
   startHour = '18';
   startMinute = '30';
   endHour = '21';
   endMinute = '30';
+  tStartHour = '18';
+  tStartMinute = '30';
+  tEndHour = '21';
+  tEndMinute = '30';
 
   currentGradeLevels = signal<string[]>(this.GRADE_LEVEL_MAP['小學部']);
 
@@ -116,6 +128,32 @@ export class AdminCourses implements OnInit {
       const parts = t.split(':');
       this.startHour = parts[0] || '18';
       this.startMinute = parts[1] === '30' ? '30' : '00';
+    }
+  }
+
+  syncTStartTime() {
+    this.form.tutoring_start_time = `${this.tStartHour}:${this.tStartMinute}`;
+  }
+
+  syncTEndTime() {
+    this.form.tutoring_end_time = `${this.tEndHour}:${this.tEndMinute}`;
+  }
+
+  syncTStartFromForm() {
+    const t = this.form.tutoring_start_time || '';
+    if (t) {
+      const parts = t.split(':');
+      this.tStartHour = parts[0] || '18';
+      this.tStartMinute = parts[1] === '30' ? '30' : '00';
+    }
+  }
+
+  syncTEndFromForm() {
+    const t = this.form.tutoring_end_time || '';
+    if (t) {
+      const parts = t.split(':');
+      this.tEndHour = parts[0] || '21';
+      this.tEndMinute = parts[1] === '30' ? '30' : '00';
     }
   }
 
@@ -250,31 +288,6 @@ export class AdminCourses implements OnInit {
     }
   }
 
-  async moveUp(index: number) {
-    if (index <= 0) return;
-    const arr = [...this.courses()];
-    [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
-    await this.saveOrder(arr);
-  }
-
-  async moveDown(index: number) {
-    const arr = [...this.courses()];
-    if (index >= arr.length - 1) return;
-    [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
-    await this.saveOrder(arr);
-  }
-
-  private async saveOrder(arr: Course[]) {
-    try {
-      await lastValueFrom(
-        this.api.put('/admin/courses/reorder', { order: arr.map(c => c.id) })
-      );
-      this.courses.set(arr);
-    } catch (err: any) {
-      this.error.set(err.error?.detail || '排序失敗');
-    }
-  }
-
   openCreate() {
     this.editMode.set(false);
     const sy = String(new Date().getFullYear() - 1911);
@@ -284,10 +297,15 @@ export class AdminCourses implements OnInit {
       start_date: '', end_date: '',
       start_time: '18:30', end_time: '21:30',
       location: '', branch_id: null, school_year: sy, semester: '上',
+      tutoring_day_of_week: null, tutoring_days_of_week: null,
+      tutoring_start_time: '18:30', tutoring_end_time: '21:30',
+      tutoring_location: '',
       is_active: true, is_teaching: true, display_order: 0,
     };
     this.startHour = '18'; this.startMinute = '30';
     this.endHour = '21'; this.endMinute = '30';
+    this.tStartHour = '18'; this.tStartMinute = '30';
+    this.tEndHour = '21'; this.tEndMinute = '30';
     this.dragX = 0; this.dragY = 0;
     this.onCategoryChange();
     this.showModal.set(true);
@@ -299,9 +317,13 @@ export class AdminCourses implements OnInit {
       ...course,
       start_time: this.toTimeDisplay(course.start_time),
       end_time: this.toTimeDisplay(course.end_time),
+      tutoring_start_time: this.toTimeDisplay(course.tutoring_start_time),
+      tutoring_end_time: this.toTimeDisplay(course.tutoring_end_time),
     };
     this.syncStartFromForm();
     this.syncEndFromForm();
+    this.syncTStartFromForm();
+    this.syncTEndFromForm();
     this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
   }
@@ -340,6 +362,8 @@ export class AdminCourses implements OnInit {
         ...this.form,
         start_time: this.toTimeStorage(this.form.start_time),
         end_time: this.toTimeStorage(this.form.end_time),
+        tutoring_start_time: this.toTimeStorage(this.form.tutoring_start_time),
+        tutoring_end_time: this.toTimeStorage(this.form.tutoring_end_time),
       };
       if (this.editMode()) {
         await lastValueFrom(
@@ -362,15 +386,44 @@ export class AdminCourses implements OnInit {
   }
 
   async deleteCourse(course: Course) {
-    if (!confirm(`確定刪除「${course.name}」？`)) return;
+    this.error.set('');
+    if (course.is_teaching) {
+      this.error.set('課程仍在開課期間，無法刪除。若要刪除，請先停課。');
+      return;
+    }
+    try {
+      const enrollments = await lastValueFrom(
+        this.api.get<any[]>('/admin/enrollments', { course_id: String(course.id) })
+      );
+      const active = (enrollments || []).filter(e => e.status === 'active');
+      this.deleteStudents.set(active.map(e => ({ id: e.student_id, name: e.student_name })));
+      this.deleteTarget.set(course);
+      this.deleteLoading.set(false);
+    } catch {
+      this.deleteStudents.set([]);
+      this.deleteTarget.set(course);
+      this.deleteLoading.set(false);
+    }
+  }
+
+  async confirmDelete() {
+    const course = this.deleteTarget();
+    if (!course) return;
+    this.deleteLoading.set(true);
     try {
       await lastValueFrom(
         this.api.delete(`/admin/courses/${course.id}`)
       );
+      this.deleteTarget.set(null);
+      this.deleteStudents.set([]);
       this.success.set('課程已刪除');
       this.loadCourses();
     } catch (err: any) {
       this.error.set(err.error?.detail || '刪除失敗');
+      this.deleteTarget.set(null);
+      this.deleteStudents.set([]);
+    } finally {
+      this.deleteLoading.set(false);
     }
   }
 
@@ -397,6 +450,22 @@ export class AdminCourses implements OnInit {
     }
     this.form.days_of_week = days.length ? days.join(',') : null;
     this.form.day_of_week = days.length ? days[0] : null;
+  }
+
+  checkedTutoringDays(): number[] {
+    const d = this.form.tutoring_days_of_week;
+    return d ? d.split(',').map(Number) : (this.form.tutoring_day_of_week ? [this.form.tutoring_day_of_week] : []);
+  }
+
+  toggleTutoringDay(day: number) {
+    let days = this.checkedTutoringDays();
+    if (days.includes(day)) {
+      days = days.filter(d => d !== day);
+    } else {
+      days = [...days, day].sort();
+    }
+    this.form.tutoring_days_of_week = days.length ? days.join(',') : null;
+    this.form.tutoring_day_of_week = days.length ? days[0] : null;
   }
 
   numberFromEvent(value: string): number | null {
