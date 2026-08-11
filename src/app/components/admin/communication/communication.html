@@ -57,7 +57,7 @@
               @if (c.is_teaching === false) {
                 <span class="absolute top-2 right-2 text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">已停課</span>
               }
-              <div class="font-bold text-gray-900 dark:text-white text-sm truncate">{{ c.grade_level }} {{ c.name }}</div>
+              <div class="font-bold text-gray-900 dark:text-white text-sm truncate">{{ c.name }}</div>
               <div class="text-xs text-gray-500 mt-1">{{ c.category }} · {{ c.subject }}</div>
               @if (c.branch_name) {
                 <div class="text-xs text-gray-400 mt-0.5">{{ c.branch_name }}</div>
@@ -81,7 +81,7 @@
           </button>
           <div>
             <h2 class="font-bold text-gray-900 dark:text-white">
-              {{ selectedCourse()?.grade_level }} {{ selectedCourse()?.name }}
+              {{ selectedCourse()?.name }}
             </h2>
             <p class="text-xs text-gray-500">{{ selectedCourse()?.category }} · {{ selectedCourse()?.subject }}</p>
           </div>
