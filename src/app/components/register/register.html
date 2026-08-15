@@ -35,10 +35,10 @@
           </div>
         }
         <div class="space-y-1">
-          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">信箱或身分證字號</label>
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">信箱、帳號名稱或身分證字號</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">person</span>
-            <input [(ngModel)]="loginEmail" name="loginEmail" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入信箱或身分證字號" type="text"/>
+            <input [(ngModel)]="loginEmail" name="loginEmail" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="請輸入信箱、帳號名稱或身分證字號" type="text"/>
           </div>
         </div>
         <div class="space-y-1">
@@ -52,7 +52,7 @@
           </div>
         </div>
         <div class="flex justify-end">
-          <a class="text-xs md:text-sm font-bold text-primary" href="#">忘記密碼？</a>
+          <a routerLink="/forgot-password" class="text-xs md:text-sm font-bold text-primary">忘記密碼？</a>
         </div>
         <button (click)="handleLogin()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
           登入帳號
@@ -67,6 +67,13 @@
             {{ regError() }}
           </div>
         }
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">帳號名稱</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">badge</span>
+            <input [(ngModel)]="regUsername" name="regUsername" class="w-full pl-12 pr-4 py-3 md:py-4 bg-white dark:bg-gray-800 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-sm md:text-base" placeholder="用於登入的帳號名稱" type="text"/>
+          </div>
+        </div>
         <div class="space-y-1">
           <label class="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">電子郵件</label>
           <div class="relative">

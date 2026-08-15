@@ -28,6 +28,7 @@ export class RegisterDetails implements OnInit {
 
   email = '';
   password = '';
+  username = '';
 
   students = signal<StudentForm[]>([
     this.emptyStudent(),
@@ -68,13 +69,14 @@ export class RegisterDetails implements OnInit {
   }
 
   ngOnInit() {
-    const state = history.state as { email?: string; password?: string };
+    const state = history.state as { email?: string; password?: string; username?: string };
     if (!state?.email || !state?.password) {
       this.router.navigate(['/register']);
       return;
     }
     this.email = state.email;
     this.password = state.password;
+    this.username = state.username ?? '';
   }
 
   get canAddStudent(): boolean {
@@ -128,6 +130,7 @@ export class RegisterDetails implements OnInit {
       await lastValueFrom(
         this.api.post('/auth/register', {
           email: this.email,
+          username: this.username || null,
           password: this.password,
           parent_name: this.parentName(),
           parent_title: this.parentTitle() || null,

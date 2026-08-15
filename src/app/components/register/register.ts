@@ -17,6 +17,7 @@ export class Register {
   loginError = signal('');
   loading = signal(false);
 
+  regUsername = signal('');
   regEmail = signal('');
   regPassword = signal('');
   regConfirm = signal('');
@@ -39,6 +40,7 @@ export class Register {
 
   goToRegisterDetails() {
     this.regError.set('');
+    const username = this.regUsername().trim();
     const email = this.regEmail().trim();
     const password = this.regPassword();
     const confirm = this.regConfirm();
@@ -57,7 +59,7 @@ export class Register {
     }
 
     this.router.navigate(['/register-details'], {
-      state: { email, password },
+      state: { username, email, password },
     });
   }
 

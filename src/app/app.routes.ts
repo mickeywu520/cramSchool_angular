@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Home } from './components/home/home';
 import { Register } from './components/register/register';
 import { RegisterDetails } from './components/register-details/register-details';
+import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { ResetPassword } from './components/reset-password/reset-password';
 import { Faculty } from './components/faculty/faculty';
 import { StudentProfile } from './components/student-profile/student-profile';
 import { EditProfile } from './components/edit-profile/edit-profile';
@@ -26,6 +28,8 @@ export const routes: Routes = [
   { path: '', component: Home },
   { path: 'register', component: Register },
   { path: 'register-details', component: RegisterDetails },
+  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'reset-password', component: ResetPassword },
   { path: 'faculty', component: Faculty },
   { path: 'student', component: StudentProfile, canActivate: [StudentAuthGuard] },
   { path: 'edit-profile', component: EditProfile, canActivate: [StudentAuthGuard] },
