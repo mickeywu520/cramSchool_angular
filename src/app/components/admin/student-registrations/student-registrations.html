@@ -5,9 +5,6 @@
       報名註冊管理
     </h2>
     <div class="flex items-center gap-2 flex-wrap">
-      <input [(ngModel)]="search" name="search" placeholder="搜尋姓名..."
-        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-28"
-        (keyup.enter)="load()"/>
       <select [(ngModel)]="filterStatus" name="filterStatus" (ngModelChange)="load()"
         class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white">
         <option value="">全部狀態</option>
@@ -15,8 +12,15 @@
           <option [value]="opt.value">{{ opt.label }}</option>
         }
       </select>
-      <input [(ngModel)]="filterGrade" name="filterGrade" placeholder="年級..."
-        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-24"
+      <select [(ngModel)]="filterGrade" name="filterGrade" (ngModelChange)="load()"
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white">
+        <option value="">全部年級</option>
+        @for (opt of gradeOptions; track opt) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+      <input [(ngModel)]="search" name="search" placeholder="搜尋姓名..."
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-28"
         (keyup.enter)="load()"/>
       <input [(ngModel)]="filterSchool" name="filterSchool" placeholder="學校..."
         class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white w-28"

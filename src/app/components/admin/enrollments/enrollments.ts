@@ -50,6 +50,8 @@ export class AdminEnrollments implements OnInit {
 
   selectedCourseId = signal<number | null>(null);
   addStudentId = signal<number | null>(null);
+  selectedAddIds = signal<number[]>([]);
+  batchAdding = signal(false);
   studentSearch = signal('');
   filterGrade = signal('');
   showStudentDropdown = signal(false);
@@ -178,6 +180,47 @@ export class AdminEnrollments implements OnInit {
       await this.selectCourse(this.selectedCourseId()!);
     } catch (err: any) {
       this.error.set(err.error?.detail || '選課失敗');
+    }
+  }
+
+  toggleAddSelect(id: number) {
+    this.selectedAddIds.update(list =>
+      list.includes(id) ? list.filter(i => i !== id) : [...list, id]
+    );
+  }
+
+  async batchAddStudents() {
+    const ids = this.selectedAddIds();
+    if (ids.length === 0 || !this.selectedCourseId()) return;
+    this.batchAdding.set(true);
+    this.error.set('');
+    try {
+      const res: any = await lastValueFrom(
+        this.api.post('/admin/enrollments/batch', {
+          student_ids: ids,
+          course_id: this.selectedCourseId(),
+        })
+      );
+      this.success.set(res.message || `已加入 ${ids.length} 名學生`);
+      this.selectedAddIds.set([]);
+      this.studentSearch.set('');
+      await this.selectCourse(this.selectedCourseId()!);
+    } catch (err: any) {
+      this.error.set(err.error?.detail || '批次選課失敗');
+    } finally {
+      this.batchAdding.set(false);
+    }
+  }
+
+  onSelectAllStudents() {
+    const list = this.filteredStudents();
+    const selected = this.selectedAddIds();
+    const allSelected = list.length > 0 && list.every(s => selected.includes(s.id));
+    if (allSelected) {
+      this.selectedAddIds.set(selected.filter(id => !list.some(s => s.id === id)));
+    } else {
+      const merged = new Set([...selected, ...list.map(s => s.id)]);
+      this.selectedAddIds.set(Array.from(merged));
     }
   }
 

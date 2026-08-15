@@ -11,6 +11,7 @@ interface Branch {
 interface Course {
   id: number; name: string; category: string; grade_level: string; subject: string;
   branch_id: number | null; branch_name?: string;
+  school_year?: string; semester?: string;
   day_of_week?: number; days_of_week?: string;
   is_teaching?: boolean;
 }
@@ -181,17 +182,38 @@ export class AdminCommunication implements OnInit, OnDestroy {
       }
       return true;
     });
+    const order = this.branches().reduce<Record<number, number>>((m, b, i) => {
+      m[b.id] = i;
+      return m;
+    }, {});
+    const gradeOrder: Record<string, number> = {
+      '小四': 1, '小五': 2, '小六': 3,
+      '國七': 4, '國八': 5, '國九': 6,
+      '高一': 7, '高二': 8, '高三': 9,
+    };
     return filtered.sort((a, b) => {
       const aStop = a.is_teaching === false ? 1 : 0;
       const bStop = b.is_teaching === false ? 1 : 0;
-      return aStop - bStop;
+      if (aStop !== bStop) return aStop - bStop;
+      const aBranch = a.branch_id != null ? (order[a.branch_id] ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER;
+      const bBranch = b.branch_id != null ? (order[b.branch_id] ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER;
+      if (aBranch !== bBranch) return aBranch - bBranch;
+      const aSy = Number(a.school_year) || 0;
+      const bSy = Number(b.school_year) || 0;
+      if (aSy !== bSy) return aSy - bSy;
+      const aSem = (a.semester || '').includes('下') ? 1 : 0;
+      const bSem = (b.semester || '').includes('下') ? 1 : 0;
+      if (aSem !== bSem) return aSem - bSem;
+      const ag = gradeOrder[a.grade_level] ?? Number.MAX_SAFE_INTEGER;
+      const bg = gradeOrder[b.grade_level] ?? Number.MAX_SAFE_INTEGER;
+      return ag - bg;
     });
   }
 
   async selectCourse(course: Course) {
     this.selectedCourse.set(course);
     this.sessionId = null;
-    this.entryDate.set(new Date().toISOString().slice(0, 10));
+    this.entryDate.set(this.filterDate());
     this.resetClassFields();
     this.examColumns.set([]);
     this.students.set([]);

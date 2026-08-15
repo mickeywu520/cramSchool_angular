@@ -31,7 +31,7 @@ interface CourseItem {
   price: number | null;
 }
 
-const DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+const DAY_NAMES = ['', '一', '二', '三', '四', '五', '六', '日'];
 
 const GRADE_ORDER: Record<string, number> = {
   '小四': 1, '小五': 2, '小六': 3,

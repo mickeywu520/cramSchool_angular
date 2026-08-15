@@ -61,37 +61,44 @@
           </tbody>
         </table>
 
-        <!-- Add Student -->
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex gap-3 flex-wrap">
-          <select [(ngModel)]="filterGrade" (change)="onGradeFilterChange()" class="px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white">
-            @for (g of gradeOptions; track g) {
-              <option [value]="g === '全部' ? '' : g">{{ g }}</option>
-            }
-          </select>
-          <div class="flex-1 min-w-[200px] relative">
-            <input [(ngModel)]="studentSearch" placeholder="點擊欄位顯示學生清單，或輸入姓名搜尋..."
-              (focus)="showStudentDropdown.set(true)" (input)="showStudentDropdown.set(true)"
-              (blur)="setTimeoutDropdownClose()"
-              class="w-full px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"/>
-            @if (showStudentDropdown() && filteredStudents().length > 0) {
-              <div class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                @for (s of filteredStudents(); track s.id) {
-                  <button (mousedown)="selectStudent(s.id, s.student_name)" type="button"
-                    class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                    [class.bg-primary/10]="addStudentId() === s.id">
-                    {{ displayName(s) }} <span class="text-gray-400 text-xs">({{ s.grade }})</span>
-                  </button>
-                }
-                @if (filteredStudents().length === 0) {
-                  <div class="px-3 py-2 text-sm text-gray-400">無符合條件的學生</div>
-                }
-              </div>
+        <!-- Batch Add Students (方案A: checkbox 多選) -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+          <div class="flex gap-3 flex-wrap items-center">
+            <select [(ngModel)]="filterGrade" (change)="onGradeFilterChange()" class="px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white">
+              @for (g of gradeOptions; track g) {
+                <option [value]="g === '全部' ? '' : g">{{ g }}</option>
+              }
+            </select>
+            <input [(ngModel)]="studentSearch" placeholder="輸入姓名搜尋..."
+              class="flex-1 min-w-[180px] px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:outline-none"/>
+            <button (click)="onSelectAllStudents()" type="button"
+              class="px-3 py-2 rounded-lg border text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 bg-white dark:bg-gray-700">
+              全選／取消
+            </button>
+            <button (click)="batchAddStudents()" [disabled]="selectedAddIds().length === 0 || batchAdding()"
+              class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+              @if (batchAdding()) {
+                <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+              }
+              加入所選學生（{{ selectedAddIds().length }}）
+            </button>
+          </div>
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+            @if (filteredStudents().length > 0) {
+              @for (s of filteredStudents(); track s.id) {
+                <label class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm bg-white dark:bg-gray-700 cursor-pointer"
+                  [class.border-primary]="selectedAddIds().includes(s.id)">
+                  <input type="checkbox" [checked]="selectedAddIds().includes(s.id)"
+                    (change)="toggleAddSelect(s.id)"
+                    class="h-4 w-4 text-primary accent-primary"/>
+                  <span class="truncate">{{ displayName(s) }}</span>
+                  <span class="text-gray-400 text-xs whitespace-nowrap">({{ s.grade }})</span>
+                </label>
+              }
+            } @else {
+              <div class="col-span-full text-center py-4 text-sm text-gray-400">無符合條件的學生</div>
             }
           </div>
-          <button (click)="addStudent()" [disabled]="!addStudentId()"
-            class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg text-sm">
-            加入
-          </button>
         </div>
 
         <!-- Batch Copy -->

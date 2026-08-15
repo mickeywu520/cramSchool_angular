@@ -33,6 +33,7 @@ interface SessionEntry {
   homework_workbook: string | null;
   exam_score: number | null;
   custom_scores: Record<string, number>;
+  class_average: number | null;
   tutoring_attendance: boolean;
   notes: string | null;
   parent_signed: boolean;
@@ -228,7 +229,7 @@ export class CommunicationBook implements OnInit, OnDestroy {
   examScores(entry: SessionEntry): { label: string; score: number }[] {
     const list: { label: string; score: number }[] = [];
     if (entry.exam_score != null) {
-      list.push({ label: '主分數', score: entry.exam_score });
+      list.push({ label: '分數', score: entry.exam_score });
     }
     const custom = entry.custom_scores || {};
     const keys = Object.keys(custom).sort();

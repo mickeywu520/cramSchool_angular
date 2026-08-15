@@ -18,23 +18,19 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
     </div>
 
-    <!-- Main title - top right -->
-    @if (slides()[currentIndex()].title.trim()) {
-      <div class="absolute top-6 md:top-8 lg:top-12 right-6 md:right-8 lg:right-12 z-10 text-right">
+    <!-- Main title + subtitle - bottom left (title above subtitle) -->
+    <div class="relative z-10 space-y-2 md:space-y-3">
+      @if (slides()[currentIndex()].title.trim()) {
         <h1 class="text-white text-3xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight">
           {{ slides()[currentIndex()].title }}
         </h1>
-      </div>
-    }
-
-    <!-- Subtitle - bottom left -->
-    @if (slides()[currentIndex()].subtitle.trim()) {
-      <div class="relative z-10">
+      }
+      @if (slides()[currentIndex()].subtitle.trim()) {
         <span class="inline-block px-4 py-2 bg-accent-gold text-white text-base md:text-lg lg:text-xl font-bold rounded-lg">
           {{ slides()[currentIndex()].subtitle }}
         </span>
-      </div>
-    }
+      }
+    </div>
 
     <button class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors" (click)="prev(); $event.stopPropagation()">
       <span class="material-symbols-outlined">chevron_left</span>

@@ -32,6 +32,12 @@ const STATUS_OPTIONS = [
   { value: '離籍', label: '離籍' },
 ];
 
+const GRADE_OPTIONS = [
+  '小一', '小二', '小三', '小四', '小五', '小六',
+  '國七', '國八', '國九',
+  '高一', '高二', '高三',
+];
+
 @Component({
   selector: 'app-admin-student-registrations',
   imports: [FormsModule, CommonModule],
@@ -47,6 +53,7 @@ export class AdminStudentRegistrations implements OnInit {
   filterSchool = signal('');
   savingId = signal<number | null>(null);
   statusOptions = STATUS_OPTIONS;
+  gradeOptions = GRADE_OPTIONS;
   selectedStudent = signal<Registration | null>(null);
   editRemark = signal('');
   savingDetail = signal(false);

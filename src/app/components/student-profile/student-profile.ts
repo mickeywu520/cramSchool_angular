@@ -49,7 +49,7 @@ interface CourseSummary {
   end_time?: string;
 }
 
-const DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+const DAY_NAMES = ['', '一', '二', '三', '四', '五', '六', '日'];
 
 interface ExamScore {
   id: number;
@@ -78,6 +78,7 @@ interface ScorePoint {
   date: string;
   scores: Record<string, number>;
   average: number;
+  class_average: number | null;
 }
 
 interface CourseScoreHistory {
@@ -225,10 +226,10 @@ export class StudentProfile implements OnInit, AfterViewInit, OnDestroy {
       };
     });
 
-    const tooltipLabels = new Map<string, Record<string, number>>();
+    const tooltipLabels = new Map<string, { scores: Record<string, number>; average: number; class_average: number | null }>();
     for (const h of histories) {
       for (const p of h.points) {
-        tooltipLabels.set(`${h.course_id}-${p.date}`, p.scores);
+        tooltipLabels.set(`${h.course_id}-${p.date}`, { scores: p.scores, average: p.average, class_average: p.class_average });
       }
     }
 
@@ -261,11 +262,15 @@ export class StudentProfile implements OnInit, AfterViewInit, OnDestroy {
               label: (item) => {
                 const h = histories[item.datasetIndex];
                 const date = allDates[item.dataIndex];
-                const scores = tooltipLabels.get(`${h.course_id}-${date}`);
-                const detail = scores
-                  ? Object.entries(scores).map(([k, v]) => `  ${k}: ${v}`).join('\n')
+                const info = tooltipLabels.get(`${h.course_id}-${date}`);
+                const lines = info
+                  ? [
+                      ...Object.entries(info.scores).map(([k, v]) => `  ${k}: ${v}`),
+                      `  平均: ${info.average}`,
+                      ...(info.class_average != null ? [`  全班平均: ${info.class_average}`] : []),
+                    ].join('\n')
                   : '';
-                return ` ${h.course_name}: ${item.formattedValue}${detail ? '\n' + detail : ''}`;
+                return ` ${h.course_name}${lines ? '\n' + lines : ''}`;
               },
             },
           },

@@ -200,6 +200,9 @@
                         <p class="font-bold">{{ s.label }}: {{ s.score }}</p>
                       }
                       <p class="font-bold text-primary">平均: {{ examAverage(entry) }}</p>
+                      @if (entry.class_average != null) {
+                        <p class="font-bold text-primary">全班平均: {{ entry.class_average }}</p>
+                      }
                     </div>
                   } @else {
                     <p class="text-sm font-bold">-</p>

@@ -324,6 +324,7 @@ export class AdminCourses implements OnInit {
     this.syncEndFromForm();
     this.syncTStartFromForm();
     this.syncTEndFromForm();
+    this.onCategoryChange();
     this.dragX = 0; this.dragY = 0;
     this.showModal.set(true);
   }
