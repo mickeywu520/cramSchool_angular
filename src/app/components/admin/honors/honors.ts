@@ -42,7 +42,7 @@ export class AdminHonors implements OnInit {
 
   loadHonors() {
     this.loading.set(true);
-    this.api.get<{ total: number; honors: Honor[] }>('/honors').subscribe({
+    this.api.get<{ total: number; honors: Honor[] }>('/honors', { _: Date.now() }).subscribe({
       next: (data) => {
         this.honors.set(data.honors || []);
         this.loading.set(false);

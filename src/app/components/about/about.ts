@@ -1,5 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LinkifyPipe } from '../../pipes/linkify.pipe';
 
 interface AboutCard {
   id: number;
@@ -12,7 +13,7 @@ interface AboutCard {
 
 @Component({
   selector: 'app-about',
-  imports: [],
+  imports: [LinkifyPipe],
   templateUrl: './about.html',
   styleUrl: './about.scss',
 })
