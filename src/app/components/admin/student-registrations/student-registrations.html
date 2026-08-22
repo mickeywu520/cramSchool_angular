@@ -128,6 +128,14 @@
           <div class="grid grid-cols-3 gap-2"><span class="font-bold text-gray-500">註冊日期</span><span class="col-span-2 text-gray-900 dark:text-white">{{ formatDate(s.created_at) }}</span></div>
           <div class="border-t border-gray-100 dark:border-gray-700 my-3"></div>
           <div class="grid grid-cols-3 gap-2">
+            <span class="font-bold text-gray-500">感應卡號</span>
+            <div class="col-span-2">
+              <input [(ngModel)]="editCardNumber" name="editCardNumber"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none dark:text-white text-sm"
+                placeholder="RFID 感應卡號（選填，供刷卡機使用）"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
             <span class="font-bold text-gray-500">備註</span>
             <div class="col-span-2">
               <input [(ngModel)]="editRemark" name="editRemark"
@@ -139,7 +147,7 @@
                   @if (savingDetail()) {
                     <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
                   }
-                  儲存備註
+                  儲存
                 </button>
                 @if (detailSaved()) {
                   <span [class.text-green-600]="detailSaved() === '已儲存'" [class.text-red-600]="detailSaved() !== '已儲存'" class="text-xs font-bold">

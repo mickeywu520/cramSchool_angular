@@ -6,16 +6,37 @@
   >
     <div class="absolute inset-0 z-0">
       @for (slide of slides(); track $index) {
-        <img
-          [src]="slide.is_event ? '' : slide.image"
-          alt=""
-          class="w-full h-full object-cover brightness-75 absolute inset-0"
-          [class.!hidden]="slide.is_event"
-          [style.opacity]="$index === currentIndex() ? 1 : 0"
-          style="transition: opacity 0.5s ease-in-out"
-        >
+        @if (slide.is_event) {
+          <img
+            src=""
+            alt=""
+            class="w-full h-full object-cover absolute inset-0 !hidden"
+          >
+        } @else if (slide.mobile_image) {
+          <img
+            [src]="slide.mobile_image"
+            alt=""
+            class="w-full h-full object-cover absolute inset-0 md:hidden"
+            [style.opacity]="$index === currentIndex() ? 1 : 0"
+            style="transition: opacity 0.5s ease-in-out"
+          >
+          <img
+            [src]="slide.image"
+            alt=""
+            class="w-full h-full object-cover absolute inset-0 hidden md:block"
+            [style.opacity]="$index === currentIndex() ? 1 : 0"
+            style="transition: opacity 0.5s ease-in-out"
+          >
+        } @else {
+          <img
+            [src]="slide.image"
+            alt=""
+            class="w-full h-full object-cover absolute inset-0"
+            [style.opacity]="$index === currentIndex() ? 1 : 0"
+            style="transition: opacity 0.5s ease-in-out"
+          >
+        }
       }
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
     </div>
 
     <!-- Main title + subtitle - bottom left (title above subtitle) -->

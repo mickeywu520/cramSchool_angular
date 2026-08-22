@@ -1,18 +1,21 @@
 import { Component, signal, computed, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { Footer } from '../footer/footer';
 
 interface Teacher {
   id: number;
   name: string;
   subject: string;
+  subjects: string[];
+  subjectsDisplay: string[];
   degree: string;
   experience: string;
   image: string;
   lifePhoto: string;
   philosophy: string;
   highlight: string;
-  subjectId: string;
+  subjectIds: string[];
 }
 
 const SUBJECT_MAP: Record<string, string> = {
@@ -28,9 +31,11 @@ const SUBJECT_MAP: Record<string, string> = {
   '作文': 'chinese',
 };
 
+const SUBJECT_ORDER = ['國文', '英文', '數學', '自然', '社會'];
+
 @Component({
   selector: 'app-faculty',
-  imports: [RouterLink],
+  imports: [RouterLink, Footer],
   templateUrl: './faculty.html',
   styleUrl: './faculty.scss',
 })
@@ -59,21 +64,31 @@ export class Faculty implements OnInit, AfterViewInit {
   }
 
   loadTeachers() {
-    this.api.get<{ total: number; teachers: { id: number; name: string; subject: string; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[] }>('/teachers').subscribe({
+    this.api.get<{ total: number; teachers: { id: number; name: string; subject: string; subjects?: string[]; title: string | null; motto: string | null; description: string | null; photo_url: string | null; life_photo_url: string | null }[] }>('/teachers').subscribe({
       next: (data) => {
         this.teachers.set(
-          ((data && data.teachers) || []).map((t) => ({
-            id: t.id,
-            name: t.name,
-            subject: t.subject + '科',
-            degree: t.title || '',
-            experience: '豐富',
-            image: t.photo_url || '',
-            lifePhoto: t.life_photo_url || '',
-            philosophy: t.description || '',
-            highlight: t.motto || '',
-            subjectId: SUBJECT_MAP[t.subject] || 'all',
-          })),
+          ((data && data.teachers) || []).map((t) => {
+            const subjects = (t.subjects && t.subjects.length ? t.subjects : [t.subject].filter(Boolean));
+            const order = (s: string) => {
+              const i = SUBJECT_ORDER.indexOf(s);
+              return i === -1 ? SUBJECT_ORDER.length : i;
+            };
+            const sorted = [...subjects].sort((a, b) => order(a) - order(b));
+            return {
+              id: t.id,
+              name: t.name,
+              subject: sorted.map((s) => s + '科').join('、'),
+              subjects,
+              subjectsDisplay: sorted.map((s) => s + '科'),
+              degree: t.title || '',
+              experience: '豐富',
+              image: t.photo_url || '',
+              lifePhoto: t.life_photo_url || '',
+              philosophy: t.description || '',
+              highlight: t.motto || '',
+              subjectIds: Array.from(new Set(subjects.map((s) => SUBJECT_MAP[s]).filter(Boolean))),
+            };
+          }),
         );
       },
     });
@@ -126,13 +141,13 @@ export class Faculty implements OnInit, AfterViewInit {
   get filteredTeachers() {
     let filtered = this.teachers();
     if (this.selectedFilter() !== 'all') {
-      filtered = filtered.filter(t => t.subjectId === this.selectedFilter());
+      filtered = filtered.filter(t => t.subjectIds.includes(this.selectedFilter()));
     }
     if (this.searchQuery()) {
       const query = this.searchQuery().toLowerCase();
       filtered = filtered.filter(t =>
         t.name.toLowerCase().includes(query) ||
-        t.subject.toLowerCase().includes(query)
+        t.subjects.some(s => s.toLowerCase().includes(query))
       );
     }
     return filtered;

@@ -7,6 +7,7 @@ interface Teacher {
   id: number;
   name: string;
   subject: string;
+  subjects?: string[];
   title: string;
   motto: string;
   description: string;
@@ -44,6 +45,15 @@ export class AdminTeachers implements OnInit {
 
   subjectOptions = ['國文', '英文', '數學', '自然', '社會'];
 
+  teacherSubjects(teacher: Teacher): string[] {
+    const list = teacher.subjects && teacher.subjects.length ? [...teacher.subjects] : [teacher.subject].filter(Boolean);
+    const order = (s: string) => {
+      const i = this.subjectOptions.indexOf(s);
+      return i === -1 ? this.subjectOptions.length : i;
+    };
+    return list.sort((a, b) => order(a) - order(b));
+  }
+
   async loadBranches() {
     try {
       const res: any = await this.api.get('/admin/branches').toPromise();
@@ -71,7 +81,7 @@ export class AdminTeachers implements OnInit {
 
   openNewForm() {
     this.isNew.set(true);
-    this.formData.set({ name: '', subject: '數學', title: '', motto: '', description: '', photo_url: '', life_photo_url: '', branch_id: null, display_order: this.teachers().length, is_active: true });
+    this.formData.set({ name: '', subjects: [], title: '', motto: '', description: '', photo_url: '', life_photo_url: '', branch_id: null, display_order: this.teachers().length, is_active: true });
     this.photoPreview.set(null);
     this.lifePhotoPreview.set(null);
     this.photoFile.set(null);
@@ -82,12 +92,24 @@ export class AdminTeachers implements OnInit {
   openEditForm(teacher: Teacher) {
     this.isNew.set(false);
     this.editingTeacher.set(teacher);
-    this.formData.set({ ...teacher });
+    this.formData.set({ ...teacher, subjects: [...(teacher.subjects || [teacher.subject].filter(Boolean))] });
     this.photoPreview.set(teacher.photo_url);
     this.lifePhotoPreview.set(teacher.life_photo_url);
     this.photoFile.set(null);
     this.lifePhotoFile.set(null);
     this.showForm.set(true);
+  }
+
+  toggleSubject(sub: string) {
+    this.formData.update(d => {
+      const current = d.subjects || [];
+      const next = current.includes(sub) ? current.filter(s => s !== sub) : [...current, sub];
+      return { ...d, subjects: next };
+    });
+  }
+
+  isSelectedSubject(sub: string): boolean {
+    return !!this.formData().subjects?.includes(sub);
   }
 
   closeForm() {
@@ -128,13 +150,14 @@ export class AdminTeachers implements OnInit {
 
   save() {
     const data = this.formData();
-    if (!data.name || !data.subject) return;
+    const subjects = (data.subjects || []).filter(s => !!s);
+    if (!data.name || subjects.length === 0) return;
 
     const doSave = (photoUrl?: string, lifePhotoUrl?: string) => {
       const body: Record<string, unknown> = {};
 
       if (this.isNew() || data.name) body['name'] = data.name;
-      if (this.isNew() || data.subject) body['subject'] = data.subject;
+      body['subjects'] = subjects;
       if (data.title !== undefined) body['title'] = data.title;
       if (data.motto !== undefined) body['motto'] = data.motto;
       if (data.description !== undefined) body['description'] = data.description;

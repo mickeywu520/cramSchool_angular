@@ -9,6 +9,7 @@ import { Component, signal } from '@angular/core';
 export class Footer {
   lineQRVisible = signal(false);
   fbQRVisible = signal(false);
+  currentYear = new Date().getFullYear();
 
   showLINEQR() {
     this.lineQRVisible.set(true);

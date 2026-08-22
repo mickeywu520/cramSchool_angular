@@ -26,7 +26,7 @@ export class AdminHonors implements OnInit {
   isNew = signal(false);
   editingHonor = signal<Honor | null>(null);
   formData = signal<Partial<Honor>>({});
-  maxHonors = 40;
+  maxHonors = 60;
 
   examTypeOptions = ['會考', '學測', '分科', '其他'];
 

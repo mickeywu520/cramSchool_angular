@@ -13,6 +13,7 @@ interface Course {
   branch_id: number | null; branch_name?: string;
   school_year?: string; semester?: string;
   day_of_week?: number; days_of_week?: string;
+  start_date?: string | null; end_date?: string | null;
   is_teaching?: boolean;
 }
 
@@ -171,8 +172,11 @@ export class AdminCommunication implements OnInit, OnDestroy {
 
   getFilteredCourses() {
     const dayOfWeek = this.getDayNumber(this.filterDate());
+    const filterDate = this.filterDate();
     const filtered = this.courses().filter(c => {
       if (this.hideStopped() && c.is_teaching === false) return false;
+      if (c.start_date && filterDate < c.start_date) return false;
+      if (c.end_date && filterDate > c.end_date) return false;
       if (c.days_of_week) {
         const days = c.days_of_week.split(',').map(Number);
         return days.includes(dayOfWeek);

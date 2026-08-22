@@ -20,7 +20,11 @@
             <img [src]="teacher.photo_url" [alt]="teacher.name" class="w-full h-full object-cover" />
           }
           <span class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">#{{ i + 1 }}</span>
-          <span class="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-md">{{ teacher.subject }}</span>
+          <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
+            @for (sub of teacherSubjects(teacher); track sub) {
+              <span class="bg-primary text-white text-xs px-2 py-1 rounded-md">{{ sub }}</span>
+            }
+          </div>
           @if (!teacher.is_active) {
             <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
               <span class="text-white font-bold text-sm bg-red-500 px-3 py-1 rounded-full">已隱藏</span>
@@ -93,12 +97,12 @@
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">科目 <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">科目（可複選） <span class="text-red-500">*</span></label>
               <div class="flex flex-wrap gap-2">
                 @for (sub of subjectOptions; track sub) {
-                  <button (click)="formData.update(d => ({ ...d, subject: sub }))"
+                  <button (click)="toggleSubject(sub)" type="button"
                     class="px-3 py-1.5 text-sm rounded-lg border transition-colors"
-                    [ngClass]="formData().subject === sub ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'">
+                    [ngClass]="isSelectedSubject(sub) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'">
                     {{ sub }}
                   </button>
                 }
@@ -174,7 +178,7 @@
               class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
               取消
             </button>
-            <button (click)="save()" [disabled]="!formData().name || !formData().subject"
+            <button (click)="save()" [disabled]="!formData().name || !formData().subjects?.length"
               class="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold rounded-lg">
               {{ isNew() ? '新增' : '儲存' }}
             </button>

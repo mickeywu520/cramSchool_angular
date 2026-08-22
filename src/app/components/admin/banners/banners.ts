@@ -8,6 +8,7 @@ interface Banner {
   title: string;
   subtitle: string;
   image_url: string;
+  mobile_image_url?: string | null;
   link_url: string;
   display_order: number;
   is_active: boolean;
@@ -32,6 +33,8 @@ export class AdminBanners implements OnInit {
   formData = signal<Partial<Banner>>({});
   previewImage = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
+  previewMobileImage = signal<string | null>(null);
+  selectedMobileFile = signal<File | null>(null);
   maxBanners = 6;
 
   trackByIndex = (i: number) => i;
@@ -83,9 +86,11 @@ export class AdminBanners implements OnInit {
   openNewForm() {
     if (!this.canAdd) return;
     this.isNew.set(true);
-    this.formData.set({ title: '', subtitle: '', image_url: '', link_url: '', display_order: this.banners().length, is_active: true });
+    this.formData.set({ title: '', subtitle: '', image_url: '', mobile_image_url: null, link_url: '', display_order: this.banners().length, is_active: true });
     this.previewImage.set(null);
     this.selectedFile.set(null);
+    this.previewMobileImage.set(null);
+    this.selectedMobileFile.set(null);
     this.showForm.set(true);
   }
 
@@ -95,6 +100,8 @@ export class AdminBanners implements OnInit {
     this.formData.set({ ...banner });
     this.previewImage.set(banner.image_url);
     this.selectedFile.set(null);
+    this.previewMobileImage.set(banner.mobile_image_url || null);
+    this.selectedMobileFile.set(null);
     this.showForm.set(true);
   }
 
@@ -104,6 +111,8 @@ export class AdminBanners implements OnInit {
     this.formData.set({});
     this.previewImage.set(null);
     this.selectedFile.set(null);
+    this.previewMobileImage.set(null);
+    this.selectedMobileFile.set(null);
   }
 
   onFileSelected(event: Event) {
@@ -119,15 +128,29 @@ export class AdminBanners implements OnInit {
     }
   }
 
+  onMobileFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.selectedMobileFile.set(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewMobileImage.set(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   save() {
     const data = this.formData();
     if (!data.image_url && !this.selectedFile()) return;
 
-    const doSave = (imageUrl: string) => {
+    const doSave = (imageUrl: string, mobileImageUrl: string | null) => {
       const body = {
         title: data.title || null,
         subtitle: data.subtitle || null,
         image_url: imageUrl,
+        mobile_image_url: mobileImageUrl,
         link_url: data.link_url || '',
         display_order: data.display_order ?? this.banners().length,
         is_active: data.is_active ?? true,
@@ -147,14 +170,26 @@ export class AdminBanners implements OnInit {
       }
     };
 
+    const uploadMobile = (imageUrl: string) => {
+      const mobileFile = this.selectedMobileFile();
+      if (mobileFile) {
+        this.api.upload<{ url: string }>('/upload/image/banners', mobileFile).subscribe({
+          next: (res) => doSave(imageUrl, res.url),
+          error: () => doSave(imageUrl, data.mobile_image_url || null),
+        });
+      } else {
+        doSave(imageUrl, data.mobile_image_url || null);
+      }
+    };
+
     const file = this.selectedFile();
     if (file) {
       this.api.upload<{ url: string }>('/upload/image/banners', file).subscribe({
-        next: (res) => doSave(res.url),
-        error: () => doSave(data.image_url || ''),
+        next: (res) => uploadMobile(res.url),
+        error: () => uploadMobile(data.image_url || ''),
       });
     } else {
-      doSave(data.image_url || '');
+      uploadMobile(data.image_url || '');
     }
   }
 

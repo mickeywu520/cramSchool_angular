@@ -20,6 +20,7 @@ interface Registration {
   parent2_phone: string | null;
   home_phone: string | null;
   id_number: string | null;
+  card_number: string | null;
   followup_status: string;
   remark: string | null;
   email: string;
@@ -56,6 +57,7 @@ export class AdminStudentRegistrations implements OnInit {
   gradeOptions = GRADE_OPTIONS;
   selectedStudent = signal<Registration | null>(null);
   editRemark = signal('');
+  editCardNumber = signal('');
   savingDetail = signal(false);
   detailSaved = signal('');
 
@@ -120,6 +122,7 @@ export class AdminStudentRegistrations implements OnInit {
   showDetail(s: Registration) {
     this.selectedStudent.set(s);
     this.editRemark.set(s.remark || '');
+    this.editCardNumber.set(s.card_number || '');
     this.detailSaved.set('');
   }
 
@@ -133,16 +136,18 @@ export class AdminStudentRegistrations implements OnInit {
     this.savingDetail.set(true);
     this.detailSaved.set('');
     try {
+      const remark = this.editRemark().trim() || null;
+      const cardNumber = this.editCardNumber().trim() || null;
       await lastValueFrom(
         this.api.put(`/admin/student-registrations/${s.id}`, {
-          remark: this.editRemark() || null,
+          remark,
+          card_number: cardNumber,
         })
       );
-      const remark = this.editRemark() || null;
       this.students.update(list =>
-        list.map(x => (x.id === s.id ? { ...x, remark } : x))
+        list.map(x => (x.id === s.id ? { ...x, remark, card_number: cardNumber } : x))
       );
-      this.selectedStudent.update(sel => sel ? { ...sel, remark } : sel);
+      this.selectedStudent.update(sel => sel ? { ...sel, remark, card_number: cardNumber } : sel);
       this.detailSaved.set('已儲存');
     } catch (err: any) {
       this.detailSaved.set(err.error?.detail || '儲存失敗');

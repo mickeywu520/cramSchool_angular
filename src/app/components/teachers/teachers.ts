@@ -4,10 +4,12 @@ import { ApiService } from '../../services/api.service';
 
 interface FeaturedTeacher {
   name: string;
-  subject: string;
+  subjects: string[];
   image: string;
   highlight: string;
 }
+
+const SUBJECT_ORDER = ['國文', '英文', '數學', '自然', '社會'];
 
 @Component({
   selector: 'app-teachers',
@@ -22,13 +24,18 @@ export class Teachers implements OnInit {
 
   ngOnInit() {
     this.api
-      .get<{ id: number; name: string; subject: string; photo_url: string | null; motto: string | null }[]>('/teachers/featured')
+      .get<{ id: number; name: string; subject: string; subjects?: string[]; photo_url: string | null; motto: string | null }[]>('/teachers/featured')
       .subscribe({
         next: (data) => {
+          const order = (s: string) => {
+            const i = SUBJECT_ORDER.indexOf(s);
+            return i === -1 ? SUBJECT_ORDER.length : i;
+          };
           this.featuredTeachers.set(
             (data || []).map((t) => ({
               name: t.name,
-              subject: t.subject,
+              subjects: [...(t.subjects && t.subjects.length ? t.subjects : [t.subject].filter(Boolean))]
+                .sort((a, b) => order(a) - order(b)),
               image: t.photo_url || '',
               highlight: t.motto || '',
             })),

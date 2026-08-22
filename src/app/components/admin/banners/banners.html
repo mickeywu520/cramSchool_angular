@@ -56,6 +56,11 @@
           <span class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
             #{{ i + 1 }}
           </span>
+          @if (banner.mobile_image_url) {
+            <span class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">smartphone</span>手機版
+            </span>
+          }
         </div>
 
         <!-- Info -->
@@ -156,7 +161,7 @@
 
             <!-- Image Upload -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">圖片 <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">桌機版圖片 <span class="text-red-500">*</span></label>
               <div
                 class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
                 (click)="fileInput.click()"
@@ -170,6 +175,26 @@
                   </div>
                 }
                 <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+              </div>
+            </div>
+
+            <!-- Mobile Image Upload -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">手機版圖片（選填）</label>
+              <p class="text-xs text-gray-400 mb-2">未上傳時手機版將沿用桌機版圖片。建議尺寸：寬 1080 × 高 1350 px（4:5 直式），避免手機版被裁切。</p>
+              <div
+                class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+                (click)="mobileFileInput.click()"
+              >
+                @if (previewMobileImage()) {
+                  <img [src]="previewMobileImage()" alt="Mobile Preview" class="max-h-40 mx-auto rounded-lg object-cover" />
+                } @else {
+                  <div class="py-4">
+                    <span class="material-symbols-outlined text-4xl text-gray-400">smartphone</span>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">點擊上傳手機版圖片</p>
+                  </div>
+                }
+                <input #mobileFileInput type="file" accept="image/*" (change)="onMobileFileSelected($event)" class="hidden" />
               </div>
             </div>
 

@@ -211,7 +211,7 @@ export class StudentProfile implements OnInit, AfterViewInit, OnDestroy {
 
     const datasets = histories.map((h, i) => {
       const color = colors[i % colors.length];
-      const byDate = new Map(h.points.map(p => [p.date, p.average]));
+      const byDate = new Map(h.points.map(p => [p.date, p.class_average ?? p.average]));
       return {
         label: h.course_name,
         data: allDates.map(d => byDate.has(d) ? (byDate.get(d) ?? null) : null),
@@ -266,8 +266,7 @@ export class StudentProfile implements OnInit, AfterViewInit, OnDestroy {
                 const lines = info
                   ? [
                       ...Object.entries(info.scores).map(([k, v]) => `  ${k}: ${v}`),
-                      `  平均: ${info.average}`,
-                      ...(info.class_average != null ? [`  全班平均: ${info.class_average}`] : []),
+                      `  全班平均: ${info.class_average != null ? info.class_average : '-'}`,
                     ].join('\n')
                   : '';
                 return ` ${h.course_name}${lines ? '\n' + lines : ''}`;

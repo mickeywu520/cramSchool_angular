@@ -2,6 +2,7 @@ import { Component, signal, computed, OnInit } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { Footer } from '../footer/footer';
 import { lastValueFrom } from 'rxjs';
 
 interface CourseItem {
@@ -55,7 +56,7 @@ const SUBJECT_ICONS: Record<string, string> = {
 
 @Component({
   selector: 'app-course-details',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, Footer],
   templateUrl: './course-details.html',
   styleUrl: './course-details.scss',
 })
