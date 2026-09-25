@@ -262,11 +262,11 @@ export class AdminCourses implements OnInit {
       await lastValueFrom(
         this.api.put(`/admin/courses/${course.id}`, {
           is_teaching: newVal,
-          is_active: newVal ? course.is_active : false,
+          is_active: newVal ? true : false,
         })
       );
       this.courses.update(list =>
-        list.map(c => c.id === course.id ? { ...c, is_teaching: newVal, is_active: newVal ? c.is_active : false } : c)
+        list.map(c => c.id === course.id ? { ...c, is_teaching: newVal, is_active: newVal } : c)
       );
     } catch (err: any) {
       this.error.set(err.error?.detail || '操作失敗');
