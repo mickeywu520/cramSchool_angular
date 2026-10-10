@@ -30,6 +30,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((err) => {
       if (err instanceof HttpErrorResponse && err.status === 401 && !req.url.includes('/auth/')) {
+        // 後台人員（admin/maintainer/user）：access 過期即登出，不做靜默續命
+        if (auth.isBackendUser) {
+          session.showExpired();
+          return throwError(() => err);
+        }
         if (!isRefreshing) {
           isRefreshing = true;
 
