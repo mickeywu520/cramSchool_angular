@@ -1,8 +1,10 @@
-import { Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 import { lastValueFrom } from 'rxjs';
+
+const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
 
 interface Branch {
   id: number; name: string;
@@ -118,6 +120,32 @@ export class AdminCommunication implements OnInit, OnDestroy {
   loading = signal(false);
   success = signal('');
   error = signal('');
+
+  /** 目前選擇的上課日期若不在該課程的排課日或課程期間內，回傳提示文字（否則空字串）。 */
+  dateWarning = computed(() => {
+    const course = this.selectedCourse();
+    const dateStr = this.entryDate();
+    if (!course || !dateStr) return '';
+    const range = `${course.start_date || '—'} ~ ${course.end_date || '—'}`;
+    if (course.start_date && dateStr < course.start_date) {
+      return `此日期不在課程期間（${range}）。`;
+    }
+    if (course.end_date && dateStr > course.end_date) {
+      return `此日期不在課程期間（${range}）。`;
+    }
+    let days: number[] = [];
+    if (course.days_of_week) {
+      days = course.days_of_week.split(',').map(Number).filter(n => n >= 1 && n <= 7);
+    } else if (course.day_of_week) {
+      days = [course.day_of_week];
+    }
+    if (days.length === 0) return ''; // 無排課設定時不判斷
+    const dow = this.getDayNumber(dateStr);
+    if (days.includes(dow)) return '';
+    const names = [...days].sort((a, b) => a - b)
+      .map(d => '星期' + WEEKDAY_NAMES[d % 7]).join('、');
+    return `「${course.name}」的排課日為${names}，${dateStr.replace(/-/g, '/')}（星期${WEEKDAY_NAMES[dow % 7]}）沒有這堂課。`;
+  });
 
   constructor(private api: ApiService) {}
 
@@ -493,6 +521,10 @@ export class AdminCommunication implements OnInit, OnDestroy {
   async save() {
     const course = this.selectedCourse();
     if (!course) return;
+    if (this.dateWarning()) {
+      this.error.set(this.dateWarning());
+      return;
+    }
     this.error.set('');
     this.success.set('');
     this.saving.set(true);
@@ -550,6 +582,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
 
   async saveDraft() {
     if (!this.selectedCourse() || this.saving()) return;
+    if (this.dateWarning()) return; // 非排課日不自動暫存，避免建立無效紀錄
     this.saving.set(true);
     try {
       const payload = this.buildPayload();
