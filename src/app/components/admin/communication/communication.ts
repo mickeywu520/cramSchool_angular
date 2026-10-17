@@ -331,9 +331,6 @@ export class AdminCommunication implements OnInit, OnDestroy {
   private async appendMissingEnrolled(rows: StudentRow[]) {
     const course = this.selectedCourse();
     if (!course) return;
-    // 過去堂次維持當時快照；只為今天/未來的堂次併入後來才選課的學生
-    const today = new Date().toISOString().slice(0, 10);
-    if (this.entryDate() < today) return;
     try {
       const list = await lastValueFrom(
         this.api.get<any[]>('/admin/students', { course_id: course.id })
