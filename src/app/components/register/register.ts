@@ -3,6 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
+const REMEMBERED_LOGIN_KEY = 'hsedu_remembered_login';
+
 @Component({
   selector: 'app-register',
   imports: [RouterLink, FormsModule],
@@ -16,6 +18,7 @@ export class Register {
   loginPassword = signal('');
   loginError = signal('');
   loading = signal(false);
+  rememberAccount = signal(false);
 
   regUsername = signal('');
   regEmail = signal('');
@@ -26,7 +29,13 @@ export class Register {
   constructor(
     private router: Router,
     private auth: AuthService,
-  ) {}
+  ) {
+    const saved = localStorage.getItem(REMEMBERED_LOGIN_KEY);
+    if (saved) {
+      this.loginEmail.set(saved);
+      this.rememberAccount.set(true);
+    }
+  }
 
   setActiveTab(tab: 'login' | 'register') {
     this.activeTab.set(tab);
@@ -79,6 +88,11 @@ export class Register {
     this.auth.login(apiEmail, password).subscribe({
       next: (res) => {
         this.loading.set(false);
+        if (this.rememberAccount()) {
+          localStorage.setItem(REMEMBERED_LOGIN_KEY, email);
+        } else {
+          localStorage.removeItem(REMEMBERED_LOGIN_KEY);
+        }
         if (res.user.role === 'admin') {
           this.router.navigate(['/admin/banners']);
         } else {

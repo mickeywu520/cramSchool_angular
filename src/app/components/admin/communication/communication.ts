@@ -274,7 +274,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
       this.classAnnouncements.set(data.class_announcements || '');
       this.examColumns.set(data.exam_columns || []);
       this.entryDate.set(data.entry_date);
-      this.students.set(data.students.map(s => ({
+      const rows: StudentRow[] = data.students.map(s => ({
         student_id: s.student_id,
         student_name: s.student_name,
         arrival_time: s.arrival_time || '',
@@ -294,9 +294,56 @@ export class AdminCommunication implements OnInit, OnDestroy {
         notes: s.notes || '',
         parent_feedback: s.parent_feedback || '',
         parent_signed: s.parent_signed,
-      })));
+      }));
+      // 既有 session 可能是先前建立（含打卡自動建立）的快照，
+      // 之後才選課的學生不會在名單內；併入目前課程的即時選課名單，避免漏人。
+      await this.appendMissingEnrolled(rows);
+      this.students.set(rows);
     } catch {
       this.error.set('無法載入聯絡簿記錄');
+    }
+  }
+
+  private blankStudentRow(s: { id: number; student_name: string }): StudentRow {
+    return {
+      student_id: s.id,
+      student_name: s.student_name,
+      arrival_time: '',
+      departure_time: '',
+      progress: '',
+      homework: '',
+      exam_scope: '',
+      announcements: '',
+      handout_status: '完成',
+      homework_material: '',
+      homework_workbook: '',
+      vocab: '優異',
+      exam_score: null,
+      custom_scores: {},
+      tutoring_attendance: false,
+      reschedule_date: '',
+      notes: '',
+      parent_feedback: '',
+      parent_signed: false,
+    };
+  }
+
+  private async appendMissingEnrolled(rows: StudentRow[]) {
+    const course = this.selectedCourse();
+    if (!course) return;
+    // 過去堂次維持當時快照；只為今天/未來的堂次併入後來才選課的學生
+    const today = new Date().toISOString().slice(0, 10);
+    if (this.entryDate() < today) return;
+    try {
+      const list = await lastValueFrom(
+        this.api.get<any[]>('/admin/students', { course_id: course.id })
+      );
+      const existing = new Set(rows.map(r => r.student_id));
+      for (const s of list) {
+        if (!existing.has(s.id)) rows.push(this.blankStudentRow(s));
+      }
+    } catch {
+      // 併入選課名單失敗時，不影響既有 session 內容
     }
   }
 
@@ -307,27 +354,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
       const list = await lastValueFrom(
         this.api.get<any[]>('/admin/students', { course_id: course.id })
       );
-      this.students.set(list.map(s => ({
-        student_id: s.id,
-        student_name: s.student_name,
-        arrival_time: '',
-        departure_time: '',
-        progress: '',
-        homework: '',
-        exam_scope: '',
-        announcements: '',
-        handout_status: '完成',
-        homework_material: '',
-        homework_workbook: '',
-        vocab: '優異',
-        exam_score: null,
-        custom_scores: {},
-        tutoring_attendance: false,
-        reschedule_date: '',
-        notes: '',
-        parent_feedback: '',
-        parent_signed: false,
-      })));
+      this.students.set(list.map(s => this.blankStudentRow(s)));
     } catch {
       this.error.set('無法載入學生列表');
       this.students.set([]);

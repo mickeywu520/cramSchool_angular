@@ -51,7 +51,12 @@
             </button>
           </div>
         </div>
-        <div class="flex justify-end">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" [(ngModel)]="rememberAccount" name="rememberAccount"
+              class="size-4 rounded border-gray-300 text-primary focus:ring-primary" />
+            <span class="text-xs md:text-sm text-gray-600 dark:text-gray-300">記住我的帳號</span>
+          </label>
           <a routerLink="/forgot-password" class="text-xs md:text-sm font-bold text-primary">忘記密碼？</a>
         </div>
         <button (click)="handleLogin()" class="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-3 md:py-4 rounded-xl shadow-lg transition-all mt-2 text-sm md:text-base">
