@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { apiErrorMessage } from '../../utils/api-error';
 
 const REMEMBERED_LOGIN_KEY = 'hsedu_remembered_login';
 
@@ -101,7 +102,7 @@ export class Register {
       },
       error: (err) => {
         this.loading.set(false);
-        this.loginError.set(err.error?.error?.message || '登入失敗，請檢查帳號密碼');
+        this.loginError.set(apiErrorMessage(err, '登入失敗，請檢查帳號密碼'));
       },
     });
   }

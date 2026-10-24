@@ -1,6 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 interface AdminUser {
@@ -93,7 +94,7 @@ export class AdminUsers implements OnInit {
         this.closeForm();
         await this.loadUsers();
       } catch (err: any) {
-        this.error.set(err.error?.detail || '新增失敗');
+        this.error.set(apiErrorMessage(err, '新增失敗'));
       }
     } else {
       const editing = this.editingUser();
@@ -110,7 +111,7 @@ export class AdminUsers implements OnInit {
         this.closeForm();
         await this.loadUsers();
       } catch (err: any) {
-        this.error.set(err.error?.detail || '更新失敗');
+        this.error.set(apiErrorMessage(err, '更新失敗'));
       }
     }
   }
@@ -124,7 +125,7 @@ export class AdminUsers implements OnInit {
       this.success.set('帳號已刪除');
       await this.loadUsers();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '刪除失敗');
+      this.error.set(apiErrorMessage(err, '刪除失敗'));
     }
   }
 
@@ -137,7 +138,7 @@ export class AdminUsers implements OnInit {
       );
       this.success.set('密碼已重設');
     } catch (err: any) {
-      this.error.set(err.error?.detail || '密碼重設失敗');
+      this.error.set(apiErrorMessage(err, '密碼重設失敗'));
     }
   }
 

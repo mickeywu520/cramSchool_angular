@@ -266,13 +266,20 @@
             </thead>
             <tbody>
               @for (s of students(); track s.student_id) {
-                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30" [class.row-on-leave]="isOnLeave(s)">
                   <td class="sticky left-0 bg-white dark:bg-gray-800 z-10 px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
                     {{ s.student_name }}
+                    @if (leaveBadge(s); as badge) {
+                      <span class="block mt-0.5 text-[10px] font-bold"
+                        [class]="isOnLeave(s) ? 'text-red-500' : 'text-orange-500'">{{ badge }}</span>
+                    }
+                    @if (makeupLabel(s); as mk) {
+                      <span class="block text-[10px] font-medium text-accent-gold">{{ mk }}</span>
+                    }
                   </td>
                   <!-- 考試分數 -->
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <input type="number" [(ngModel)]="s.exam_score" [name]="'exam_' + s.student_id"
+                    <input [disabled]="isOnLeave(s)" type="number" [(ngModel)]="s.exam_score" [name]="'exam_' + s.student_id"
                       (ngModelChange)="onExamScoreChange()"
                       (keydown)="onExamScoreKeydown($event)"
                       class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
@@ -280,31 +287,31 @@
                   <!-- 自訂考試列 -->
                   @for (col of examColumns(); track col.name) {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <input type="number" [(ngModel)]="s.custom_scores[col.name]"
+                      <input [disabled]="isOnLeave(s)" type="number" [(ngModel)]="s.custom_scores[col.name]"
                         [name]="'cs_' + s.student_id + '_' + col.name"
                         (keydown)="onExamScoreKeydown($event)"
                         class="no-spinner exam-score-input w-16 px-1 py-1 text-xs text-center rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                     </td>
                   }
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <textarea [(ngModel)]="s.progress" [name]="'prog_' + s.student_id" rows="1"
+                    <textarea [disabled]="isOnLeave(s)" [(ngModel)]="s.progress" [name]="'prog_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <textarea [(ngModel)]="s.homework" [name]="'hw_' + s.student_id" rows="1"
+                    <textarea [disabled]="isOnLeave(s)" [(ngModel)]="s.homework" [name]="'hw_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <textarea [(ngModel)]="s.exam_scope" [name]="'scope_' + s.student_id" rows="1"
+                    <textarea [disabled]="isOnLeave(s)" [(ngModel)]="s.exam_scope" [name]="'scope_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <textarea [(ngModel)]="s.announcements" [name]="'ann_' + s.student_id" rows="1"
+                    <textarea [disabled]="isOnLeave(s)" [(ngModel)]="s.announcements" [name]="'ann_' + s.student_id" rows="1"
                       class="w-32 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800"></textarea>
                   </td>
                   @if (templateMode() !== 'math') {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <select [(ngModel)]="s.handout_status" [name]="'handout_' + s.student_id"
+                      <select [disabled]="isOnLeave(s)" [(ngModel)]="s.handout_status" [name]="'handout_' + s.student_id"
                         class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                         <option value="">-</option>
                         @for (opt of handoutOptions; track opt) {
@@ -312,14 +319,14 @@
                         }
                       </select>
                       @if (s.handout_status === '調課 (交換)') {
-                        <input type="date" [(ngModel)]="s.reschedule_date" [name]="'resched_' + s.student_id"
+                        <input [disabled]="isOnLeave(s)" type="date" [(ngModel)]="s.reschedule_date" [name]="'resched_' + s.student_id"
                           class="ml-1 w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
                       }
                     </td>
                   }
                   @if (templateMode() === 'english') {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <select [(ngModel)]="s.vocab" [name]="'vocab_' + s.student_id"
+                      <select [disabled]="isOnLeave(s)" [(ngModel)]="s.vocab" [name]="'vocab_' + s.student_id"
                         class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                         @for (v of vocabOptions; track v) {
                           <option [value]="v">{{ v }}</option>
@@ -329,7 +336,7 @@
                   }
                   @if (templateMode() === 'math') {
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <select [(ngModel)]="s.homework_material" [name]="'material_' + s.student_id"
+                      <select [disabled]="isOnLeave(s)" [(ngModel)]="s.homework_material" [name]="'material_' + s.student_id"
                         class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                         <option value="">-</option>
                         @for (opt of homeworkMaterialOptions; track opt) {
@@ -338,7 +345,7 @@
                       </select>
                     </td>
                     <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                      <select [(ngModel)]="s.homework_workbook" [name]="'workbook_' + s.student_id"
+                      <select [disabled]="isOnLeave(s)" [(ngModel)]="s.homework_workbook" [name]="'workbook_' + s.student_id"
                         class="w-22 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                         <option value="">-</option>
                         @for (opt of homeworkWorkbookOptions; track opt) {
@@ -348,7 +355,7 @@
                     </td>
                   }
                   <td class="px-3 py-2 text-center border-b border-gray-100 dark:border-gray-700">
-                    <select [(ngModel)]="s.tutoring_attendance" [name]="'tutoring_' + s.student_id"
+                    <select [disabled]="isOnLeave(s)" [(ngModel)]="s.tutoring_attendance" [name]="'tutoring_' + s.student_id"
                       class="w-16 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white">
                       <option [ngValue]="false">否</option>
                       <option [ngValue]="true">是</option>
@@ -356,14 +363,18 @@
                   </td>
                   <!-- 到班/離班時間（移到備註前，左右並排） -->
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">
-                    <input type="time" [(ngModel)]="s.arrival_time" [name]="'arrival_' + s.student_id"
-                      class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
-                    <span class="text-gray-300 mx-0.5">-</span>
-                    <input type="time" [(ngModel)]="s.departure_time" [name]="'depart_' + s.student_id"
-                      class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    @if (isOnLeave(s)) {
+                      <span class="text-xs font-bold text-red-500">請假</span>
+                    } @else {
+                      <input [disabled]="isOnLeave(s)" type="time" [(ngModel)]="s.arrival_time" [name]="'arrival_' + s.student_id"
+                        class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                      <span class="text-gray-300 mx-0.5">-</span>
+                      <input [disabled]="isOnLeave(s)" type="time" [(ngModel)]="s.departure_time" [name]="'depart_' + s.student_id"
+                        class="w-20 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white"/>
+                    }
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                    <textarea [(ngModel)]="s.notes" [name]="'notes_' + s.student_id" rows="1"
+                    <textarea [disabled]="isOnLeave(s)" [(ngModel)]="s.notes" [name]="'notes_' + s.student_id" rows="1"
                       class="w-28 px-1 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-1 focus:ring-primary focus:outline-none dark:text-white resize-none" maxlength="800" placeholder="備註"></textarea>
                   </td>
                   <td class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 text-xs text-gray-500 max-w-[120px] truncate">

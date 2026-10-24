@@ -1,6 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 interface Branch {
@@ -80,7 +81,7 @@ export class AdminBranches implements OnInit {
       this.showModal.set(false);
       this.loadBranches();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '操作失敗');
+      this.error.set(apiErrorMessage(err, '操作失敗'));
     } finally {
       this.submitting.set(false);
     }
@@ -95,7 +96,7 @@ export class AdminBranches implements OnInit {
       this.success.set('分校已刪除');
       this.loadBranches();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '刪除失敗');
+      this.error.set(apiErrorMessage(err, '刪除失敗'));
     }
   }
 

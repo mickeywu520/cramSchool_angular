@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { apiErrorMessage } from '../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
@@ -69,7 +70,7 @@ export class ResetPassword implements OnInit {
       this.success.set(true);
       this.message.set(res.message || '密碼重設成功，請重新登入');
     } catch (err: any) {
-      this.error.set(err.error?.error?.message || err.error?.detail || '重設失敗，請重新申請');
+      this.error.set(apiErrorMessage(err, '重設失敗，請重新申請'));
     } finally {
       this.loading.set(false);
     }

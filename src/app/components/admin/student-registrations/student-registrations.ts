@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 interface Registration {
@@ -150,7 +151,7 @@ export class AdminStudentRegistrations implements OnInit {
       this.selectedStudent.update(sel => sel ? { ...sel, remark, card_number: cardNumber } : sel);
       this.detailSaved.set('已儲存');
     } catch (err: any) {
-      this.detailSaved.set(err.error?.detail || '儲存失敗');
+      this.detailSaved.set(apiErrorMessage(err, '儲存失敗'));
     } finally {
       this.savingDetail.set(false);
     }

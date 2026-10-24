@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { apiErrorMessage } from '../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
@@ -34,7 +35,7 @@ export class ForgotPassword {
       );
       this.message.set(res.message || '若此信箱或帳號存在，我們已發送重設密碼連結');
     } catch (err: any) {
-      this.error.set(err.error?.error?.message || err.error?.detail || '發送失敗，請稍後再試');
+      this.error.set(apiErrorMessage(err, '發送失敗，請稍後再試'));
     } finally {
       this.loading.set(false);
     }

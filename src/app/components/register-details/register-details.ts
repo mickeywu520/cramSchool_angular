@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { apiErrorMessage } from '../../utils/api-error';
 import { AuthService } from '../../services/auth.service';
 import { lastValueFrom } from 'rxjs';
 
@@ -149,7 +150,7 @@ export class RegisterDetails implements OnInit {
       );
       this.router.navigate(['/student']);
     } catch (err: any) {
-      this.error.set(err.error?.error?.message || err.error?.detail || '註冊失敗，請稍後再試');
+      this.error.set(apiErrorMessage(err, '註冊失敗，請稍後再試'));
     } finally {
       this.loading.set(false);
     }

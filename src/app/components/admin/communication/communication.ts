@@ -2,6 +2,7 @@ import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
@@ -39,6 +40,13 @@ interface StudentRow {
   notes: string;
   parent_feedback: string;
   parent_signed: boolean;
+  leave_status?: string | null;
+  leave_type?: string | null;
+  leave_reason?: string | null;
+  makeup_date?: string;
+  makeup_room?: string;
+  makeup_start?: string;
+  makeup_end?: string;
 }
 
 interface ExamColumn {
@@ -79,9 +87,23 @@ interface StudentRowResponse {
   notes: string | null;
   parent_feedback: string | null;
   parent_signed: boolean;
+  leave_status: string | null;
+  leave_type: string | null;
+  leave_reason: string | null;
+  makeup_date: string | null;
+  makeup_room: string | null;
+  makeup_start: string | null;
+  makeup_end: string | null;
 }
 
 type ViewMode = 'list' | 'editor';
+
+/** 假別代碼 → 中文（與 leave_applications.leave_type 一致） */
+const LEAVE_TYPE_LABEL: Record<string, string> = {
+  sick: '病假',
+  personal: '事假',
+  other: '其他',
+};
 
 @Component({
   selector: 'app-admin-communication',
@@ -322,6 +344,13 @@ export class AdminCommunication implements OnInit, OnDestroy {
         notes: s.notes || '',
         parent_feedback: s.parent_feedback || '',
         parent_signed: s.parent_signed,
+        leave_status: s.leave_status || null,
+        leave_type: s.leave_type || null,
+        leave_reason: s.leave_reason || null,
+        makeup_date: s.makeup_date || '',
+        makeup_room: s.makeup_room || '',
+        makeup_start: s.makeup_start || '',
+        makeup_end: s.makeup_end || '',
       }));
       // 既有 session 可能是先前建立（含打卡自動建立）的快照，
       // 之後才選課的學生不會在名單內；併入目前課程的即時選課名單，避免漏人。
@@ -330,6 +359,29 @@ export class AdminCommunication implements OnInit, OnDestroy {
     } catch {
       this.error.set('無法載入聯絡簿記錄');
     }
+  }
+
+  /** 已核准請假 → 鎖住輸入；待審核只提示（可能被駁回，學生仍會來上課） */
+  isOnLeave(s: StudentRow): boolean {
+    return s.leave_status === 'approved';
+  }
+
+  /** 姓名下方的請假徽章（已駁回不顯示） */
+  leaveBadge(s: StudentRow): string {
+    if (!s.leave_status || s.leave_status === 'rejected') return '';
+    const type = LEAVE_TYPE_LABEL[s.leave_type || ''] || '請假';
+    return s.leave_status === 'approved' ? `請假 · ${type}` : `${type}（待審核）`;
+  }
+
+  /** 已核准的補課資訊：補 11/07 補A 14:00-16:00 */
+  makeupLabel(s: StudentRow): string {
+    if (!s.makeup_date) return '';
+    const day = s.makeup_date.slice(5).replace('-', '/');
+    const room = s.makeup_room ? ` ${s.makeup_room}` : '';
+    const time = s.makeup_start
+      ? ` ${s.makeup_start}${s.makeup_end ? '-' + s.makeup_end : ''}`
+      : '';
+    return `補 ${day}${room}${time}`;
   }
 
   private blankStudentRow(s: { id: number; student_name: string }): StudentRow {
@@ -353,6 +405,13 @@ export class AdminCommunication implements OnInit, OnDestroy {
       notes: '',
       parent_feedback: '',
       parent_signed: false,
+      leave_status: null,
+      leave_type: null,
+      leave_reason: null,
+      makeup_date: '',
+      makeup_room: '',
+      makeup_start: '',
+      makeup_end: '',
     };
   }
 
@@ -544,7 +603,7 @@ export class AdminCommunication implements OnInit, OnDestroy {
       }
       this.success.set('聯絡簿記錄已儲存！');
     } catch (err: any) {
-      this.error.set(err.error?.detail || '儲存失敗，請稍後再試');
+      this.error.set(apiErrorMessage(err, '儲存失敗，請稍後再試'));
     } finally {
       this.saving.set(false);
     }

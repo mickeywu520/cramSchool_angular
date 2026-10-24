@@ -6,3 +6,32 @@
 .no-spinner {
   -moz-appearance: textfield;
 }
+
+// 已核准請假的學生：整列淡灰、欄位唯讀（避免老師誤填）
+tr.row-on-leave {
+  background-color: rgba(243, 244, 246, 0.75);
+
+  // 姓名留在第一格（要顯示請假徽章），其餘欄位淡灰
+  td:not(:first-child) {
+    color: #9ca3af;
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+    cursor: not-allowed;
+  }
+}
+
+.dark tr.row-on-leave {
+  background-color: rgba(55, 65, 81, 0.35);
+
+  input,
+  textarea,
+  select {
+    background-color: #374151 !important;
+    color: #6b7280 !important;
+  }
+}

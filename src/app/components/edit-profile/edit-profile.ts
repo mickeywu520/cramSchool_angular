@@ -3,6 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { apiErrorMessage } from '../../utils/api-error';
 import { AuthService } from '../../services/auth.service';
 import { StudentContextService } from '../../services/student-context.service';
 import { StudentSwitcher } from '../student-switcher/student-switcher';
@@ -178,7 +179,7 @@ export class EditProfile implements OnInit, OnDestroy {
       );
       this.success.set('資料更新成功');
     } catch (err: any) {
-      this.error.set(err.error?.error?.message || err.error?.detail || '更新失敗，請稍後再試');
+      this.error.set(apiErrorMessage(err, '更新失敗，請稍後再試'));
     } finally {
       this.saving.set(false);
     }

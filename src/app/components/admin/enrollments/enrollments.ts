@@ -2,6 +2,7 @@ import { Component, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 interface StudentInfo {
@@ -179,7 +180,7 @@ export class AdminEnrollments implements OnInit {
       this.showStudentDropdown.set(false);
       await this.selectCourse(this.selectedCourseId()!);
     } catch (err: any) {
-      this.error.set(err.error?.detail || '選課失敗');
+      this.error.set(apiErrorMessage(err, '選課失敗'));
     }
   }
 
@@ -206,7 +207,7 @@ export class AdminEnrollments implements OnInit {
       this.studentSearch.set('');
       await this.selectCourse(this.selectedCourseId()!);
     } catch (err: any) {
-      this.error.set(err.error?.detail || '批次選課失敗');
+      this.error.set(apiErrorMessage(err, '批次選課失敗'));
     } finally {
       this.batchAdding.set(false);
     }
@@ -244,7 +245,7 @@ export class AdminEnrollments implements OnInit {
       this.copySourceCourseId.set(null);
       await this.selectCourse(this.selectedCourseId()!);
     } catch (err: any) {
-      this.error.set(err.error?.detail || '複製失敗');
+      this.error.set(apiErrorMessage(err, '複製失敗'));
     } finally {
       this.copying.set(false);
     }
@@ -259,7 +260,7 @@ export class AdminEnrollments implements OnInit {
       this.success.set('已取消選課');
       await this.selectCourse(this.selectedCourseId()!);
     } catch (err: any) {
-      this.error.set(err.error?.detail || '操作失敗');
+      this.error.set(apiErrorMessage(err, '操作失敗'));
     }
   }
 

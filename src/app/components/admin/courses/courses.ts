@@ -2,6 +2,7 @@ import { Component, signal, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 import { lastValueFrom } from 'rxjs';
 
 interface Teacher {
@@ -269,7 +270,7 @@ export class AdminCourses implements OnInit {
         list.map(c => c.id === course.id ? { ...c, is_teaching: newVal, is_active: newVal } : c)
       );
     } catch (err: any) {
-      this.error.set(err.error?.detail || '操作失敗');
+      this.error.set(apiErrorMessage(err, '操作失敗'));
     }
   }
 
@@ -284,7 +285,7 @@ export class AdminCourses implements OnInit {
       this.selectedIds.set([]);
       this.loadCourses();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '操作失敗');
+      this.error.set(apiErrorMessage(err, '操作失敗'));
     }
   }
 
@@ -380,7 +381,7 @@ export class AdminCourses implements OnInit {
       this.showModal.set(false);
       this.loadCourses();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '操作失敗');
+      this.error.set(apiErrorMessage(err, '操作失敗'));
     } finally {
       this.submitting.set(false);
     }
@@ -420,7 +421,7 @@ export class AdminCourses implements OnInit {
       this.success.set('課程已刪除');
       this.loadCourses();
     } catch (err: any) {
-      this.error.set(err.error?.detail || '刪除失敗');
+      this.error.set(apiErrorMessage(err, '刪除失敗'));
       this.deleteTarget.set(null);
       this.deleteStudents.set([]);
     } finally {
