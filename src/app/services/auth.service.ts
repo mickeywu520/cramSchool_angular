@@ -124,6 +124,12 @@ export class AuthService {
     return !!user && user.role === 'admin';
   }
 
+  /** 可以進入後台的角色：admin / maintainer / user / teacher */
+  get canUseAdmin(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'admin' || role === 'maintainer' || role === 'user' || role === 'teacher';
+  }
+
   /** 後台管理角色：admin / maintainer / user。這些角色不做靜默續命，過期即登出。 */
   get isBackendUser(): boolean {
     const role = this.currentUser()?.role;

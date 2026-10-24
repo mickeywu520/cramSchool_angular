@@ -94,8 +94,9 @@ export class Register {
         } else {
           localStorage.removeItem(REMEMBERED_LOGIN_KEY);
         }
-        if (res.user.role === 'admin') {
-          this.router.navigate(['/admin/banners']);
+        if (this.auth.canUseAdmin) {
+          // 老師直接進聯絡簿；其餘後台帳號進 Banner 管理
+          this.router.navigate([res.user.role === 'teacher' ? '/admin/communication' : '/admin/banners']);
         } else {
           this.router.navigate(['/student']);
         }

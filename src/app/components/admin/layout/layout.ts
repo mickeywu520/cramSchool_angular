@@ -5,6 +5,14 @@ import { AuthService } from '../../../services/auth.service';
 import { PendingLeaveService } from '../../../services/pending-leave.service';
 import { environment } from '../../../../environments/environment';
 
+interface MenuItem {
+  path: string;
+  icon: string;
+  label: string;
+  /** 只有 admin 看得到（目前是內部帳號管理） */
+  adminOnly?: boolean;
+}
+
 @Component({
   selector: 'app-admin-layout',
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
@@ -15,7 +23,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   sidebarOpen = signal(true);
   appVersion = environment.version;
 
-  menuItems = [
+  private readonly allMenuItems: MenuItem[] = [
     { path: '/admin/banners', icon: 'view_carousel', label: 'Banner 輪播管理' },
     { path: '/admin/about-cards', icon: 'dashboard_customize', label: '關於我們卡片' },
     { path: '/admin/teachers', icon: 'group', label: '師資介紹管理' },
@@ -28,8 +36,13 @@ export class AdminLayout implements OnInit, OnDestroy {
     { path: '/admin/accounts', icon: 'manage_accounts', label: '家長/學生帳號管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
     { path: '/admin/leaves', icon: 'event_busy', label: '請假審核' },
-    { path: '/admin/users', icon: 'admin_panel_settings', label: '內部帳號管理' },
+    { path: '/admin/users', icon: 'admin_panel_settings', label: '內部帳號管理', adminOnly: true },
   ];
+
+  /** maintainer / user / teacher 看不到 admin 專屬項目 */
+  get menuItems(): MenuItem[] {
+    return this.allMenuItems.filter((m) => !m.adminOnly || this.auth.isAdmin);
+  }
 
   private navSub: Subscription | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;

@@ -25,6 +25,7 @@ import { AdminAccounts } from './components/admin/accounts/accounts';
 import { AdminBranches } from './components/admin/branches/branches';
 import { AdminMakeupRooms } from './components/admin/makeup-rooms/makeup-rooms';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminOnlyGuard } from './guards/admin-only.guard';
 import { StudentAuthGuard } from './guards/student-auth.guard';
 
 export const routes: Routes = [
@@ -50,7 +51,7 @@ export const routes: Routes = [
       { path: 'about-cards', component: AdminAboutCards },
       { path: 'teachers', component: AdminTeachers },
       { path: 'honors', component: AdminHonors },
-      { path: 'users', component: AdminUsers },
+      { path: 'users', component: AdminUsers, canActivate: [AdminOnlyGuard] },
       { path: 'accounts', component: AdminAccounts },
       { path: 'branches', component: AdminBranches },
       { path: 'makeup-rooms', component: AdminMakeupRooms },

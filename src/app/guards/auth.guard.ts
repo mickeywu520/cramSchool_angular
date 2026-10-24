@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(): boolean {
-    if (this.auth.isAdmin) return true;
+    if (this.auth.canUseAdmin) return true;
     this.router.navigate(['/register']);
     return false;
   }
