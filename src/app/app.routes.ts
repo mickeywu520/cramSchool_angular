@@ -23,6 +23,7 @@ import { AdminStudentRegistrations } from './components/admin/student-registrati
 import { AdminUsers } from './components/admin/admin-users/admin-users';
 import { AdminAccounts } from './components/admin/accounts/accounts';
 import { AdminBranches } from './components/admin/branches/branches';
+import { AdminMakeupRooms } from './components/admin/makeup-rooms/makeup-rooms';
 import { AuthGuard } from './guards/auth.guard';
 import { StudentAuthGuard } from './guards/student-auth.guard';
 
@@ -52,6 +53,7 @@ export const routes: Routes = [
       { path: 'users', component: AdminUsers },
       { path: 'accounts', component: AdminAccounts },
       { path: 'branches', component: AdminBranches },
+      { path: 'makeup-rooms', component: AdminMakeupRooms },
       { path: 'courses', component: AdminCourses },
       { path: 'enrollments', component: AdminEnrollments },
       { path: 'student-registrations', component: AdminStudentRegistrations },

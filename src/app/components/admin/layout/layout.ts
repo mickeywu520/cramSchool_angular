@@ -21,6 +21,7 @@ export class AdminLayout implements OnInit, OnDestroy {
     { path: '/admin/teachers', icon: 'group', label: '師資介紹管理' },
     { path: '/admin/honors', icon: 'emoji_events', label: '歷年榜單管理' },
     { path: '/admin/branches', icon: 'business', label: '分校管理' },
+    { path: '/admin/makeup-rooms', icon: 'meeting_room', label: '補課教室' },
     { path: '/admin/courses', icon: 'calendar_month', label: '課程管理' },
     { path: '/admin/enrollments', icon: 'assignment_ind', label: '選課管理' },
     { path: '/admin/student-registrations', icon: 'person_add', label: '報名註冊管理' },

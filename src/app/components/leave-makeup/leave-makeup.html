@@ -222,38 +222,46 @@
                 class="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/40" />
             </div>
 
-            <!-- 補課場次（必選）：同一門課在請假日期之後的場次 -->
+            <!-- 補課場次（必選）：請假日期之後、補課教室還有空位的時段 -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span class="block text-xs md:text-sm font-bold text-gray-500">
-                  補課時段 <span class="text-red-500">*</span>
+                  補課教室與時段 <span class="text-red-500">*</span>
                 </span>
                 @if (optionsLoading()) {
                   <span class="material-symbols-outlined text-primary text-sm animate-spin">refresh</span>
                 }
               </div>
-              <p class="text-[10px] md:text-xs text-gray-400 mb-2">同一門課、請假日期之後的場次；老師會一併核准</p>
+              <p class="text-[10px] md:text-xs text-gray-400 mb-2">到補課教室看影片複習；只列出請假日期之後還有空位的時段，老師會一併核准</p>
 
               @if (optionsLoading()) {
                 <p class="text-[10px] md:text-xs text-gray-400 font-bold py-3 text-center">載入可補課場次...</p>
               } @else if (makeupOptions().length === 0) {
                 <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl px-3 py-2">
                   <p class="text-[10px] md:text-xs font-bold text-orange-700 dark:text-orange-300">
-                    這門課在請假日期之後沒有可補課的場次，請改選其他日期或聯絡老師
+                    請假日期之後沒有可用的補課教室時段，請改選其他日期或聯絡老師
                   </p>
                 </div>
               } @else {
                 <div class="space-y-1.5 max-h-56 overflow-y-auto pr-0.5">
-                  @for (o of makeupOptions(); track o.date) {
+                  @for (o of makeupOptions(); track o.room_id + '-' + o.date + '-' + o.start_time) {
                     <button
                       type="button"
                       (click)="pickMakeupOption(o)"
-                      [class]="isMakeupPicked(o)
-                        ? 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border-2 border-primary bg-primary/10 text-left'
-                        : 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-left'">
+                      [disabled]="optionFull(o)"
+                      [class]="optionFull(o)
+                        ? 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/40 text-left opacity-60 cursor-not-allowed'
+                        : isMakeupPicked(o)
+                          ? 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border-2 border-primary bg-primary/10 text-left'
+                          : 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-left'">
                       <span class="min-w-0">
-                        <span class="block text-xs md:text-sm font-extrabold truncate">{{ formatDate(o.date) }}</span>
-                        <span class="block text-[10px] md:text-xs text-gray-400 tabular-nums">{{ o.start_time }} - {{ o.end_time }}</span>
+                        <span class="block text-xs md:text-sm font-extrabold truncate">{{ o.room_name }}</span>
+                        <span class="block text-[10px] md:text-xs text-gray-400 tabular-nums">
+                          {{ formatDate(o.date) }} {{ o.start_time }} - {{ o.end_time }}
+                          @if (o.branch_name) {
+                            · {{ o.branch_name }}
+                          }
+                        </span>
                       </span>
                       <span class="shrink-0 text-right">
                         <span
@@ -347,6 +355,9 @@
                     @if (a.requested_makeup_date) {
                       <p class="text-[10px] md:text-xs text-accent-gold font-bold truncate">
                         希望補課：{{ formatDate(a.requested_makeup_date) }}
+                        @if (a.requested_room_code) {
+                          · {{ a.requested_room_code }}
+                        }
                         @if (a.requested_makeup_start) {
                           {{ a.requested_makeup_start }}{{ a.requested_makeup_end ? '-' + a.requested_makeup_end : '' }}
                         }

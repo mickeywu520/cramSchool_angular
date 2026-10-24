@@ -1,0 +1,279 @@
+<div class="max-w-5xl mx-auto space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">補課教室</h2>
+      <p class="text-xs text-gray-500 mt-1">播放課程影片複習的空間；家長請假時只能選「還有空位」的時段</p>
+    </div>
+    <button (click)="openCreate()"
+      class="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-1 shrink-0">
+      <span class="material-symbols-outlined text-lg">add_circle</span>
+      新增教室
+    </button>
+  </div>
+
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 space-y-1">
+    <p class="text-xs font-bold text-blue-800 dark:text-blue-300">運作方式</p>
+    <ul class="text-[11px] text-blue-700 dark:text-blue-300 space-y-0.5 list-disc list-inside">
+      <li>教室只需要「編號 + 人數上限」，影片由老師在現場播放</li>
+      <li>設定每週固定時段後，系統自動展開未來 60 天讓家長選</li>
+      <li>名額以「同教室 + 同一天 + 同時段」計算，已滿的時段家長看不到</li>
+    </ul>
+  </div>
+
+  @if (successMsg()) {
+    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-lg text-sm">{{ successMsg() }}</div>
+  }
+  @if (errorMsg()) {
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">{{ errorMsg() }}</div>
+  }
+
+  <!-- 分校篩選 -->
+  @if (branches().length > 1) {
+    <div class="flex items-center gap-2 flex-wrap">
+      <button (click)="branchFilter.set(null)"
+        [class]="branchFilter() === null
+          ? 'px-3 py-1.5 rounded-full text-xs font-bold bg-primary text-white'
+          : 'px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'">
+        全部分校
+      </button>
+      @for (b of branches(); track b.id) {
+        <button (click)="branchFilter.set(b.id)"
+          [class]="branchFilter() === b.id
+            ? 'px-3 py-1.5 rounded-full text-xs font-bold bg-primary text-white'
+            : 'px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'">
+          {{ b.name }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="text-center py-12"><span class="material-symbols-outlined text-4xl text-gray-300 animate-spin">refresh</span></div>
+  } @else if (visibleRooms().length === 0) {
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 py-12 text-center">
+      <span class="material-symbols-outlined text-5xl text-gray-300">meeting_room</span>
+      <p class="text-sm text-gray-400 mt-2">還沒有補課教室，點右上角「新增教室」開始</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (room of visibleRooms(); track room.id) {
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-3"
+          [class.opacity-60]="!room.is_active">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ room.code }}</span>
+                @if (room.name) {
+                  <span class="text-xs text-gray-500 truncate">{{ room.name }}</span>
+                }
+              </div>
+              <p class="text-[11px] text-gray-400 mt-0.5">
+                {{ room.branch_name || '未指定分校' }} · 可容納 {{ room.capacity }} 人
+              </p>
+            </div>
+            <span
+              [class]="room.is_active
+                ? 'shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                : 'shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'">
+              {{ room.is_active ? '啟用中' : '已停用' }}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-gray-400">today</span>
+            <span class="text-xs font-bold text-gray-600 dark:text-gray-300">{{ todayText(room) }}</span>
+          </div>
+
+          <div class="space-y-1.5">
+            @if (room.slots.length === 0) {
+              <p class="text-[11px] text-orange-600 dark:text-orange-300 font-bold">尚未設定時段，家長看不到這間教室</p>
+            }
+            @for (slot of room.slots; track slot.id) {
+              <div class="flex items-center justify-between gap-2 bg-gray-50 dark:bg-gray-700/40 rounded-lg px-2.5 py-1.5">
+                <span class="text-xs font-bold text-gray-700 dark:text-gray-200 tabular-nums">
+                  {{ weekdayLabel(slot.day_of_week) }} {{ slot.start_time }}-{{ slot.end_time }}
+                </span>
+                <span class="flex items-center gap-1.5 shrink-0">
+                  @if (slot.is_today) {
+                    <span class="text-[10px] font-bold"
+                      [class]="(slot.today_seats_left ?? 0) > 0 ? 'text-green-600' : 'text-red-500'">
+                      {{ slotSeatText(room, slot) }}
+                    </span>
+                  }
+                  @if (!slot.is_active) {
+                    <span class="text-[10px] font-bold text-gray-400">停用</span>
+                  }
+                  <button (click)="openEditSlot(room, slot)" title="編輯時段"
+                    class="text-gray-400 hover:text-primary">
+                    <span class="material-symbols-outlined text-base">edit</span>
+                  </button>
+                  <button (click)="deleteSlot(room, slot)" title="刪除時段"
+                    class="text-gray-400 hover:text-red-500">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </span>
+              </div>
+            }
+            <button (click)="openAddSlot(room)"
+              class="w-full py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-[11px] font-bold text-gray-500 hover:border-primary hover:text-primary">
+              ＋ 新增時段
+            </button>
+          </div>
+
+          <div class="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs font-bold">
+            <button (click)="openEdit(room)" class="text-primary hover:text-primary/80">編輯教室</button>
+            <button (click)="toggleRoom(room)" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+              {{ room.is_active ? '停用' : '啟用' }}
+            </button>
+            <button (click)="deleteRoom(room)" class="text-red-500 hover:text-red-700 ml-auto">刪除</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- 教室表單 -->
+@if (roomOpen()) {
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" (click)="closeRoom()">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ roomEditMode() ? '編輯教室' : '新增教室' }}</h3>
+
+      @if (roomError()) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-lg text-xs">{{ roomError() }}</div>
+      }
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">分校</label>
+          <select [(ngModel)]="roomForm.branch_id"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+            <option [ngValue]="null">不分校</option>
+            @for (b of branches(); track b.id) {
+              <option [ngValue]="b.id">{{ b.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">教室編號 <span class="text-red-500">*</span></label>
+          <input [(ngModel)]="roomForm.code" placeholder="例：補A"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">名稱（選填）</label>
+          <input [(ngModel)]="roomForm.name" placeholder="例：影片自習室"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">人數上限 <span class="text-red-500">*</span></label>
+          <input type="number" min="1" [(ngModel)]="roomForm.capacity"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500">備註</label>
+        <textarea rows="2" [(ngModel)]="roomForm.notes" placeholder="例：設備在 3 樓"
+          class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white resize-none"></textarea>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
+        <input type="checkbox" [(ngModel)]="roomForm.is_active" class="rounded" />
+        啟用（家長看得到）
+      </label>
+
+      @if (!roomEditMode()) {
+        <div class="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-gray-500">固定時段（可稍後再補）</p>
+            <button (click)="addFormSlot()" class="text-xs font-bold text-primary">＋ 新增時段</button>
+          </div>
+          @for (slot of roomForm.slots || []; track $index) {
+            <div class="flex items-center gap-2">
+              <select [(ngModel)]="slot.day_of_week"
+                class="w-20 px-2 py-1.5 rounded-lg border text-xs dark:bg-gray-700 dark:text-white">
+                @for (w of weekdays; track w.value) {
+                  <option [ngValue]="w.value">{{ w.label }}</option>
+                }
+              </select>
+              <input type="time" [(ngModel)]="slot.start_time"
+                class="px-2 py-1.5 rounded-lg border text-xs dark:bg-gray-700 dark:text-white" />
+              <span class="text-xs text-gray-400">-</span>
+              <input type="time" [(ngModel)]="slot.end_time"
+                class="px-2 py-1.5 rounded-lg border text-xs dark:bg-gray-700 dark:text-white" />
+              <button (click)="removeFormSlot($index)" class="text-red-500 shrink-0">
+                <span class="material-symbols-outlined text-base">close</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button (click)="closeRoom()"
+          class="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">取消</button>
+        <button (click)="saveRoom()" [disabled]="roomSaving()"
+          class="px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white disabled:opacity-50">
+          {{ roomSaving() ? '儲存中...' : '儲存' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- 時段表單 -->
+@if (slotOpen()) {
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" (click)="closeSlot()">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm p-6 space-y-4" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+        {{ slotEditMode() ? '編輯時段' : '新增時段' }}
+        <span class="text-sm font-normal text-gray-400">{{ slotRoom()?.code }}</span>
+      </h3>
+
+      @if (slotError()) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-lg text-xs">{{ slotError() }}</div>
+      }
+
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500">星期</label>
+        <select [(ngModel)]="slotForm.day_of_week"
+          class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white">
+          @for (w of weekdays; track w.value) {
+            <option [ngValue]="w.value">{{ w.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">開始</label>
+          <input type="time" [(ngModel)]="slotForm.start_time"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500">結束</label>
+          <input type="time" [(ngModel)]="slotForm.end_time"
+            class="w-full px-3 py-2 rounded-lg border text-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
+        <input type="checkbox" [(ngModel)]="slotForm.is_active" class="rounded" />
+        啟用此時段
+      </label>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button (click)="closeSlot()"
+          class="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">取消</button>
+        <button (click)="saveSlot()" [disabled]="slotSaving()"
+          class="px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white disabled:opacity-50">
+          {{ slotSaving() ? '儲存中...' : '儲存' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

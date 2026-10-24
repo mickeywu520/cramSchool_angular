@@ -13,6 +13,8 @@ interface LeaveRow {
   status: string;
   course_name: string | null;
   student_name: string | null;
+  requested_room_id: number | null;
+  requested_room_code: string | null;
   requested_makeup_date: string | null;
   requested_makeup_start: string | null;
   requested_makeup_end: string | null;
@@ -120,13 +122,14 @@ export class AdminLeaves implements OnInit {
     return `${m}月${d}日 (${day})`;
   }
 
-  /** 家長希望的補課時段（給表格顯示） */
+  /** 家長希望的補課教室與時段（給表格顯示） */
   requestedMakeup(row: LeaveRow): string {
     if (!row.requested_makeup_date) return '';
+    const room = row.requested_room_code ? ` · ${row.requested_room_code}` : '';
     const time = row.requested_makeup_start
       ? `${row.requested_makeup_start}${row.requested_makeup_end ? '-' + row.requested_makeup_end : ''}`
       : '';
-    return `${this.formatDate(row.requested_makeup_date)}${time ? ' ' + time : ''}`;
+    return `${this.formatDate(row.requested_makeup_date)}${room}${time ? ' ' + time : ''}`;
   }
 
   review(row: LeaveRow, status: 'approved' | 'rejected') {
@@ -136,7 +139,7 @@ export class AdminLeaves implements OnInit {
     }
 
     const makeup = row.requested_makeup_date
-      ? `\n補課：${this.formatDate(row.requested_makeup_date)} ${row.requested_makeup_start || ''}${row.requested_makeup_end ? '-' + row.requested_makeup_end : ''}`
+      ? `\n補課：${this.formatDate(row.requested_makeup_date)}${row.requested_room_code ? ' · ' + row.requested_room_code : ''} ${row.requested_makeup_start || ''}${row.requested_makeup_end ? '-' + row.requested_makeup_end : ''}`
       : '\n（家長未指定補課時段，核准後需自行排補課）';
     if (!confirm(`確定核准 ${row.student_name || '此學生'} 於 ${this.formatDate(row.leave_date)} 的請假嗎？${makeup}`)) {
       return;

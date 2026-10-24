@@ -27,6 +27,8 @@ interface LeaveRecord {
   status: string;
   course_name: string | null;
   student_name: string | null;
+  requested_room_id: number | null;
+  requested_room_code: string | null;
   requested_makeup_date: string | null;
   requested_makeup_start: string | null;
   requested_makeup_end: string | null;
@@ -48,16 +50,20 @@ interface MakeupRecord {
   notes: string | null;
 }
 
-/** 家長可選的補課場次（同一門課的未來上課日） */
+/** 家長可選的補課場次（補課教室的固定時段） */
 interface MakeupOption {
   date: string;
   weekday: number;
   start_time: string;
   end_time: string;
-  classroom: string | null;
-  enrolled: number;
-  capacity: number | null;
-  makeup_count: number;
+  room_id: number;
+  room_code: string;
+  room_name: string;
+  branch_name: string | null;
+  capacity: number;
+  booked: number;
+  seats_left: number;
+  full: boolean;
 }
 
 /** 日曆上一格 = 一堂課（課程 + 日期） */
@@ -192,7 +198,8 @@ export class LeaveMakeup implements OnInit, OnDestroy {
   leaveDate = '';
   leaveType = 'personal';
   reason = '';
-  // 家長選定的補課場次
+  // 家長選定的補課場次（補課教室 + 日期 + 時段）
+  makeupRoomId: number | null = null;
   makeupDate = '';
   makeupStart = '';
   makeupEnd = '';
@@ -355,7 +362,7 @@ export class LeaveMakeup implements OnInit, OnDestroy {
     void this.loadMakeupOptions();
   }
 
-  /** 載入同一門課「請假日期之後」的場次（後端已過濾上課日與起訖區間） */
+  /** 載入「請假日期之後」可補課的教室場次（後端已依學生分校過濾） */
   async loadMakeupOptions() {
     const courseId = this.courseId;
     if (courseId === null || !this.leaveDate) {
@@ -369,11 +376,14 @@ export class LeaveMakeup implements OnInit, OnDestroy {
         this.api.get<MakeupOption[]>('/leave/makeup-options', {
           course_id: courseId,
           date_from: dateFrom,
+          ...this.ctx.param,
         }),
       );
       const list = opts ?? [];
       this.makeupOptions.set(list);
-      if (this.makeupDate && !list.some((o) => o.date === this.makeupDate)) {
+      // 原本選的場次若已不存在或已額滿，就清掉選擇
+      const picked = this.pickedOption();
+      if (this.makeupDate && (!picked || picked.full)) {
         this.clearMakeup();
       }
     } catch {
@@ -384,6 +394,11 @@ export class LeaveMakeup implements OnInit, OnDestroy {
   }
 
   pickMakeupOption(o: MakeupOption) {
+    if (this.optionFull(o)) {
+      this.errorMsg.set('這個時段已經額滿，請選其他時段');
+      return;
+    }
+    this.makeupRoomId = o.room_id;
     this.makeupDate = o.date;
     this.makeupStart = o.start_time;
     this.makeupEnd = o.end_time;
@@ -391,31 +406,49 @@ export class LeaveMakeup implements OnInit, OnDestroy {
   }
 
   isMakeupPicked(o: MakeupOption): boolean {
-    return this.makeupDate === o.date && this.makeupStart === o.start_time;
+    return (
+      this.makeupRoomId === o.room_id &&
+      this.makeupDate === o.date &&
+      this.makeupStart === o.start_time
+    );
+  }
+
+  /** 目前選定的場次（找不到回 null） */
+  pickedOption(): MakeupOption | null {
+    return (
+      this.makeupOptions().find(
+        (o) =>
+          o.room_id === this.makeupRoomId &&
+          o.date === this.makeupDate &&
+          o.start_time === this.makeupStart,
+      ) ?? null
+    );
   }
 
   clearMakeup() {
+    this.makeupRoomId = null;
     this.makeupDate = '';
     this.makeupStart = '';
     this.makeupEnd = '';
   }
 
-  /** 補課場次是否已滿（第一段只顯示，不強制擋） */
+  /** 補課場次是否已滿（後端硬性阻擋，前端只負責不讓點） */
   optionFull(o: MakeupOption): boolean {
-    if (!o.capacity) return false;
-    return o.enrolled + o.makeup_count >= o.capacity;
+    return o.full === true || o.seats_left <= 0;
   }
 
   optionSeats(o: MakeupOption): string {
-    if (!o.capacity) return '不限人數';
-    const left = Math.max(o.capacity - o.enrolled - o.makeup_count, 0);
-    return left > 0 ? `剩 ${left} 位` : '已滿';
+    return o.seats_left > 0 ? `剩 ${o.seats_left} / ${o.capacity} 位` : '已滿';
   }
 
-  /** 送出前的摘要：請 11月1日 (六) → 補 11月7日 (五) */
+  /** 送出前的摘要：請 11月1日 (六) → 補 11月7日 (五) 補A 14:00-16:00 */
   makeupSummary(): string {
     if (!this.makeupDate) return '';
-    return `補 ${this.formatDate(this.makeupDate)}${this.makeupStart ? ' ' + this.makeupStart : ''}`;
+    const room = this.pickedOption()?.room_name ?? '';
+    const time = this.makeupStart
+      ? ` ${this.makeupStart}${this.makeupEnd ? '-' + this.makeupEnd : ''}`
+      : '';
+    return `補 ${this.formatDate(this.makeupDate)} ${room}${time}`.replace(/\s+/g, ' ').trim();
   }
 
   // ---------- API ----------
@@ -480,8 +513,13 @@ export class LeaveMakeup implements OnInit, OnDestroy {
       this.errorMsg.set('請假日期不可為過去日期');
       return;
     }
-    if (!this.makeupDate || !this.makeupStart || !this.makeupEnd) {
-      this.errorMsg.set('請選擇補課時段（同一門課的未來場次）');
+    if (
+      this.makeupRoomId === null ||
+      !this.makeupDate ||
+      !this.makeupStart ||
+      !this.makeupEnd
+    ) {
+      this.errorMsg.set('請選擇補課教室與時段（請假日期之後）');
       return;
     }
 
@@ -493,6 +531,7 @@ export class LeaveMakeup implements OnInit, OnDestroy {
           leave_date: this.leaveDate,
           leave_type: this.leaveType,
           reason: this.reason.trim() || null,
+          requested_room_id: this.makeupRoomId,
           requested_makeup_date: this.makeupDate,
           requested_makeup_start: this.makeupStart,
           requested_makeup_end: this.makeupEnd,
