@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { StudentContextService } from '../../services/student-context.service';
 import { apiErrorMessage, apiErrorStatus } from '../../utils/api-error';
 
@@ -210,6 +211,8 @@ export class LeaveMakeup implements OnInit, OnDestroy {
   constructor(
     private api: ApiService,
     public ctx: StudentContextService,
+    private auth: AuthService,
+    private router: Router,
   ) {}
 
   async ngOnInit() {
@@ -489,13 +492,17 @@ export class LeaveMakeup implements OnInit, OnDestroy {
     }
   }
 
-  toggleForm() {
-    this.formOpen.update((v) => !v);
+  /** 關閉表單（不送出） */
+  closeForm() {
+    this.formOpen.set(false);
     this.errorMsg.set('');
     this.successMsg.set('');
-    if (this.formOpen()) {
-      void this.loadMakeupOptions();
-    }
+    this.clearMakeup();
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 
   async submit() {
