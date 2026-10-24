@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { StudentContextService } from '../../services/student-context.service';
+import { apiErrorMessage, apiErrorStatus } from '../../utils/api-error';
 
 interface CourseSummary {
   id: number;
@@ -482,7 +483,7 @@ export class LeaveMakeup implements OnInit, OnDestroy {
         this.courseId = courses[0].id;
       }
     } catch (e) {
-      this.errorMsg.set(this.msgOf(e, '載入請假資料失敗，請稍後再試'));
+      this.errorMsg.set(apiErrorMessage(e, '載入請假資料失敗，請稍後再試'));
     } finally {
       this.loading.set(false);
     }
@@ -543,7 +544,16 @@ export class LeaveMakeup implements OnInit, OnDestroy {
       this.formOpen.set(false);
       await this.loadAll();
     } catch (e) {
-      this.errorMsg.set(this.msgOf(e, '送出失敗，請稍後再試'));
+      if (apiErrorStatus(e) === 409) {
+        // 送出前還有位子，送出瞬間被別人排滿：講清楚並馬上刷新清單
+        this.errorMsg.set(
+          `${apiErrorMessage(e, '這個補課時段已經額滿')}，請重新選擇其他時段。`,
+        );
+        this.clearMakeup();
+        await this.loadMakeupOptions();
+        return;
+      }
+      this.errorMsg.set(apiErrorMessage(e, '送出失敗，請稍後再試'));
     } finally {
       this.saving.set(false);
     }
@@ -560,7 +570,7 @@ export class LeaveMakeup implements OnInit, OnDestroy {
       this.successMsg.set('已取消請假申請');
       await this.loadAll();
     } catch (e) {
-      this.errorMsg.set(this.msgOf(e, '取消失敗，請稍後再試'));
+      this.errorMsg.set(apiErrorMessage(e, '取消失敗，請稍後再試'));
     }
   }
 
@@ -585,10 +595,5 @@ export class LeaveMakeup implements OnInit, OnDestroy {
     const days = [...this.parseDays(c.days_of_week)].sort().join('、');
     const time = this.timeRange(c);
     return [days ? `週${days}` : '', time].filter(Boolean).join(' ');
-  }
-
-  private msgOf(e: unknown, fallback: string): string {
-    const err = e as { error?: { message?: string; detail?: string }; message?: string };
-    return err?.error?.message || err?.error?.detail || err?.message || fallback;
   }
 }

@@ -15,6 +15,12 @@
     <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl px-4 py-3 text-sm font-medium flex items-start gap-2">
       <span class="material-symbols-outlined text-base">error</span>
       <span class="flex-1">{{ errorMsg() }}</span>
+      @if (fullSlotRow()) {
+        <button (click)="rejectFromFullSlot()"
+          class="shrink-0 px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-colors">
+          改為駁回（自動帶入原因）
+        </button>
+      }
     </div>
   }
   @if (successMsg()) {
@@ -62,6 +68,11 @@
               <td class="px-4 py-3 whitespace-nowrap">
                 @if (row.requested_makeup_date) {
                   <span class="text-xs font-bold text-accent-gold">{{ requestedMakeup(row) }}</span>
+                  @if (row.requested_slot_full) {
+                    <span class="block text-[11px] font-bold text-red-500 mt-0.5">時段已額滿，無法核准</span>
+                  } @else if (row.requested_seats_left != null) {
+                    <span class="block text-[11px] text-gray-400 mt-0.5">剩 {{ row.requested_seats_left }} 位</span>
+                  }
                 } @else {
                   <span class="text-xs text-gray-400">未指定</span>
                 }
@@ -81,11 +92,20 @@
               <td class="px-4 py-3">
                 <div class="flex items-center justify-end gap-1">
                   @if (row.status === 'pending') {
-                    <button (click)="review(row, 'approved')"
-                      class="px-2.5 py-1 text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 rounded hover:bg-green-100 transition-colors flex items-center gap-1">
-                      <span class="material-symbols-outlined text-sm">check</span>
-                      {{ row.requested_makeup_date ? '核准（含補課）' : '核准' }}
-                    </button>
+                    @if (row.requested_slot_full) {
+                      <button type="button" disabled
+                        title="補課時段已額滿，請按「駁回」並說明原因"
+                        class="px-2.5 py-1 text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded cursor-not-allowed flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">block</span>
+                        補課已額滿
+                      </button>
+                    } @else {
+                      <button (click)="review(row, 'approved')"
+                        class="px-2.5 py-1 text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 rounded hover:bg-green-100 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">check</span>
+                        {{ row.requested_makeup_date ? '核准（含補課）' : '核准' }}
+                      </button>
+                    }
                     <button (click)="review(row, 'rejected')"
                       class="px-2.5 py-1 text-xs font-bold bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-300 rounded hover:bg-red-100 transition-colors flex items-center gap-1">
                       <span class="material-symbols-outlined text-sm">close</span>

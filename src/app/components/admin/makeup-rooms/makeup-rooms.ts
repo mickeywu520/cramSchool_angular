@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { apiErrorMessage } from '../../../utils/api-error';
 
 interface RoomSlot {
   id: number;
@@ -100,7 +101,7 @@ export class AdminMakeupRooms implements OnInit {
         this.loading.set(false);
       },
       error: (e) => {
-        this.errorMsg.set(this.msgOf(e, '載入補課教室失敗'));
+        this.errorMsg.set(apiErrorMessage(e, '載入補課教室失敗'));
         this.loading.set(false);
       },
     });
@@ -228,7 +229,7 @@ export class AdminMakeupRooms implements OnInit {
       },
       error: (e) => {
         this.roomSaving.set(false);
-        this.roomError.set(this.msgOf(e, '儲存失敗'));
+        this.roomError.set(apiErrorMessage(e, '儲存失敗'));
       },
     });
   }
@@ -242,7 +243,7 @@ export class AdminMakeupRooms implements OnInit {
           this.successMsg.set(room.is_active ? '教室已停用' : '教室已啟用');
           this.load();
         },
-        error: (e) => this.errorMsg.set(this.msgOf(e, '切換失敗')),
+        error: (e) => this.errorMsg.set(apiErrorMessage(e, '切換失敗')),
       });
   }
 
@@ -256,7 +257,7 @@ export class AdminMakeupRooms implements OnInit {
         this.successMsg.set(res?.message || '教室已刪除');
         this.load();
       },
-      error: (e) => this.errorMsg.set(this.msgOf(e, '刪除失敗')),
+      error: (e) => this.errorMsg.set(apiErrorMessage(e, '刪除失敗')),
     });
   }
 
@@ -324,7 +325,7 @@ export class AdminMakeupRooms implements OnInit {
       },
       error: (e) => {
         this.slotSaving.set(false);
-        this.slotError.set(this.msgOf(e, '儲存時段失敗'));
+        this.slotError.set(apiErrorMessage(e, '儲存時段失敗'));
       },
     });
   }
@@ -341,12 +342,8 @@ export class AdminMakeupRooms implements OnInit {
           this.successMsg.set(res?.message || '時段已刪除');
           this.load();
         },
-        error: (e) => this.errorMsg.set(this.msgOf(e, '刪除時段失敗')),
+        error: (e) => this.errorMsg.set(apiErrorMessage(e, '刪除時段失敗')),
       });
   }
 
-  private msgOf(e: unknown, fallback: string): string {
-    const err = e as { error?: { message?: string; detail?: string }; message?: string };
-    return err?.error?.message || err?.error?.detail || err?.message || fallback;
-  }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { PendingLeaveService } from '../../../services/pending-leave.service';
+import { apiErrorMessage, apiErrorStatus } from '../../../utils/api-error';
 
 interface LeaveRow {
   id: number;
@@ -18,6 +19,8 @@ interface LeaveRow {
   requested_makeup_date: string | null;
   requested_makeup_start: string | null;
   requested_makeup_end: string | null;
+  requested_seats_left?: number | null;
+  requested_slot_full?: boolean | null;
   review_note: string | null;
   created_at: string;
 }
@@ -63,6 +66,9 @@ export class AdminLeaves implements OnInit {
   rejectSaving = signal(false);
   rejectError = signal('');
 
+  // 核准失敗且原因是「補課時段已滿」時記下這一筆，讓老師一鍵轉成駁回
+  fullSlotRow = signal<LeaveRow | null>(null);
+
   readonly filters: { value: Filter; label: string }[] = [
     { value: 'pending', label: '待審核' },
     { value: 'approved', label: '已核准' },
@@ -90,7 +96,7 @@ export class AdminLeaves implements OnInit {
         this.pendingLeaves.count.set(data.total ?? (data.applications || []).length);
       },
       error: (e) => {
-        this.errorMsg.set(this.msgOf(e, '載入請假清單失敗'));
+        this.errorMsg.set(apiErrorMessage(e, '載入請假清單失敗'));
         this.loading.set(false);
       },
     });
@@ -146,6 +152,7 @@ export class AdminLeaves implements OnInit {
     }
     this.errorMsg.set('');
     this.successMsg.set('');
+    this.fullSlotRow.set(null);
     this.api.post<{ message?: string }>(`/leave/applications/${row.id}/review`, { status }).subscribe({
       next: (res) => {
         // 就地更新，保留在清單上
@@ -155,13 +162,34 @@ export class AdminLeaves implements OnInit {
         this.pendingLeaves.refresh();
         this.filter.set('approved');
       },
-      error: (e) => this.errorMsg.set(this.msgOf(e, '核准失敗')),
+      error: (e) => {
+        if (apiErrorStatus(e) === 409) {
+          // 名額被別人搶先排滿：講清楚下一步，並提供一鍵轉駁回
+          this.errorMsg.set(
+            `${apiErrorMessage(e, '這個補課時段已經額滿')}。這筆申請還在待審核，` +
+              '請改按「駁回」並寫上原因，家長會看到。',
+          );
+          this.fullSlotRow.set(row);
+          this.load(); // 重新整理，讓「已額滿」標記出現在清單上
+          return;
+        }
+        this.errorMsg.set(apiErrorMessage(e, '核准失敗'));
+      },
     });
   }
 
-  openReject(row: LeaveRow) {
+  /** 核准吃到 409 時，一鍵改成「駁回＋帶入原因」 */
+  rejectFromFullSlot() {
+    const row = this.fullSlotRow();
+    if (!row) return;
+    this.openReject(row, '該補課教室時段已額滿，請改選其他時段後重新申請');
+  }
+
+  openReject(row: LeaveRow, presetReason = '') {
     this.rejectTarget.set(row);
-    this.rejectReason = '';
+    // 時段已額滿時，先幫老師把最常見的原因填好（仍可修改）
+    this.rejectReason =
+      presetReason || (row.requested_slot_full ? '該補課教室時段已額滿，請改選其他時段後重新申請' : '');
     this.rejectError.set('');
     this.rejectOpen.set(true);
   }
@@ -196,11 +224,12 @@ export class AdminLeaves implements OnInit {
           );
           this.successMsg.set(res?.message || `已駁回 ${target.student_name || ''} 的請假申請`);
           this.pendingLeaves.refresh();
+          this.fullSlotRow.set(null);
           this.closeReject();
         },
         error: (e) => {
           this.rejectSaving.set(false);
-          this.rejectError.set(this.msgOf(e, '駁回失敗'));
+          this.rejectError.set(apiErrorMessage(e, '駁回失敗'));
         },
       });
   }
@@ -263,13 +292,8 @@ export class AdminLeaves implements OnInit {
         },
         error: (e) => {
           this.makeupSaving.set(false);
-          this.makeupError.set(this.msgOf(e, '排補課失敗'));
+          this.makeupError.set(apiErrorMessage(e, '排補課失敗'));
         },
       });
-  }
-
-  private msgOf(e: unknown, fallback: string): string {
-    const err = e as { error?: { message?: string; detail?: string }; message?: string };
-    return err?.error?.message || err?.error?.detail || err?.message || fallback;
   }
 }
