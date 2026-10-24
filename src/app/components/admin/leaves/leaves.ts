@@ -88,18 +88,23 @@ export class AdminLeaves implements OnInit {
   load() {
     this.loading.set(true);
     this.errorMsg.set('');
-    this.api.get<{ total: number; applications: LeaveRow[] }>('/leave/pending', { _: Date.now() }).subscribe({
-      next: (data) => {
-        this.leaves.set(data.applications || []);
-        this.loading.set(false);
-        // 側邊欄紅點與清單保持同步
-        this.pendingLeaves.count.set(data.total ?? (data.applications || []).length);
-      },
-      error: (e) => {
-        this.errorMsg.set(apiErrorMessage(e, '載入請假清單失敗'));
-        this.loading.set(false);
-      },
-    });
+    // 一次抓「全部」狀態，頁籤切換與重新整理都還看得到歷史
+    this.api
+      .get<{ total: number; applications: LeaveRow[] }>('/leave/applications/all', {
+        _: Date.now(),
+      })
+      .subscribe({
+        next: (data) => {
+          this.leaves.set(data.applications || []);
+          this.loading.set(false);
+          // 側邊欄紅點只算待審核
+          void this.pendingLeaves.refresh();
+        },
+        error: (e) => {
+          this.errorMsg.set(apiErrorMessage(e, '載入請假清單失敗'));
+          this.loading.set(false);
+        },
+      });
   }
 
   filtered(): LeaveRow[] {
