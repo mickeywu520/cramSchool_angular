@@ -5,19 +5,6 @@
       <p class="text-sm text-gray-400 font-bold">載入中...</p>
     </div>
   </div>
-} @else {
-  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24">
-    @if (student(); as s) {
-      <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-16 md:pb-20 lg:pb-24 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-        <div class="relative z-10 flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3 md:gap-4">
-            <div class="relative">
-              @if (s.avatar_url) {
-                <div class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 border-white/30 overflow-hidden bg-white/20"
-                     [style.background-image]="'url(' + s.avatar_url + ')'"
-                     [style.background-size]="'cover'" [style.background-position]="'center'">
-                </div>
 } @else if (ctx.noStudents) {
   <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24 flex flex-col">
     <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-20 md:pb-24 lg:pb-28 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
@@ -58,6 +45,10 @@
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
         <span class="text-[10px] md:text-xs font-bold">首頁</span>
       </a>
+      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
+      </a>
       <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
         <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
@@ -69,6 +60,19 @@
     </nav>
   </div>
 } @else {
+  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24">
+    @if (student(); as s) {
+      <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-16 md:pb-20 lg:pb-24 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+        <div class="relative z-10 flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="relative">
+              @if (s.avatar_url) {
+                <div class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 border-white/30 overflow-hidden bg-white/20"
+                     [style.background-image]="'url(' + s.avatar_url + ')'"
+                     [style.background-size]="'cover'" [style.background-position]="'center'">
+                </div>
+              } @else {
                 <div class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 border-white/30 flex items-center justify-center text-white font-extrabold text-xl md:text-2xl"
                      [style.background-color]="getAvatarColor(s.student_name)">
                   {{ getInitial(s.student_name) }}
@@ -312,6 +316,10 @@
       <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
         <span class="text-[10px] md:text-xs font-bold">首頁</span>
+      </a>
+      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
       </a>
       <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>

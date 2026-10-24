@@ -1,0 +1,268 @@
+<div class="space-y-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white">請假審核</h2>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">審核學生請假申請，並為核准的案件安排補課</p>
+    </div>
+    <button (click)="load()"
+      class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 shrink-0">
+      <span class="material-symbols-outlined">refresh</span>
+      重新整理
+    </button>
+  </div>
+
+  @if (errorMsg()) {
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl px-4 py-3 text-sm font-medium flex items-start gap-2">
+      <span class="material-symbols-outlined text-base">error</span>
+      <span class="flex-1">{{ errorMsg() }}</span>
+    </div>
+  }
+  @if (successMsg()) {
+    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-xl px-4 py-3 text-sm font-medium flex items-start gap-2">
+      <span class="material-symbols-outlined text-base">check_circle</span>
+      <span class="flex-1">{{ successMsg() }}</span>
+    </div>
+  }
+
+  <!-- 篩選 -->
+  <div class="flex flex-wrap gap-2">
+    @for (f of filters; track f.value) {
+      <button (click)="filter.set(f.value)"
+        [class]="filter() === f.value
+          ? 'px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white'
+          : 'px-4 py-2 rounded-lg text-sm font-bold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'">
+        {{ f.label }}
+        <span class="ml-1 opacity-70">{{ countOf(f.value) }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- 表格 -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">學生姓名</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">課程</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">請假日期</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">希望補課</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">假別</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">原因</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">狀態</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filtered(); track row.id) {
+            <tr class="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+              <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ row.student_name || '—' }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ row.course_name || '未指定' }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">{{ formatDate(row.leave_date) }}</td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                @if (row.requested_makeup_date) {
+                  <span class="text-xs font-bold text-accent-gold">{{ requestedMakeup(row) }}</span>
+                } @else {
+                  <span class="text-xs text-gray-400">未指定</span>
+                }
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary font-medium">{{ typeLabel(row.leave_type) }}</span>
+              </td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-[220px]">
+                <span class="block truncate">{{ row.reason || '—' }}</span>
+                @if (row.status === 'rejected' && row.review_note) {
+                  <span class="block text-xs text-red-500 font-medium truncate">駁回：{{ row.review_note }}</span>
+                }
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 text-xs rounded-full font-bold" [class]="statusOf(row.status).cls">{{ statusOf(row.status).label }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1">
+                  @if (row.status === 'pending') {
+                    <button (click)="review(row, 'approved')"
+                      class="px-2.5 py-1 text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 rounded hover:bg-green-100 transition-colors flex items-center gap-1">
+                      <span class="material-symbols-outlined text-sm">check</span>
+                      {{ row.requested_makeup_date ? '核准（含補課）' : '核准' }}
+                    </button>
+                    <button (click)="review(row, 'rejected')"
+                      class="px-2.5 py-1 text-xs font-bold bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-300 rounded hover:bg-red-100 transition-colors flex items-center gap-1">
+                      <span class="material-symbols-outlined text-sm">close</span>
+                      駁回
+                    </button>
+                  }
+                  @if (row.status === 'approved') {
+                    @if (row.requested_makeup_date) {
+                      <span class="px-2.5 py-1 text-xs font-bold bg-accent-gold/15 text-accent-gold rounded flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">event_available</span>
+                        補課已排
+                      </span>
+                    } @else {
+                      <button (click)="openMakeup(row)"
+                        class="px-2.5 py-1 text-xs font-bold bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">event</span>
+                        排補課
+                      </button>
+                    }
+                  }
+                  @if (row.status === 'rejected') {
+                    <span class="text-xs text-gray-400">—</span>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (loading()) {
+      <div class="text-center py-16">
+        <span class="material-symbols-outlined text-4xl text-primary animate-spin">refresh</span>
+        <p class="text-gray-500 dark:text-gray-400 mt-3">載入中...</p>
+      </div>
+    } @else if (filtered().length === 0) {
+      <div class="text-center py-16">
+        <span class="material-symbols-outlined text-5xl text-gray-400">event_available</span>
+        <p class="text-gray-500 dark:text-gray-400 mt-3">
+          {{ filter() === 'pending' ? '目前沒有待審核的請假申請' : '這個分類沒有資料' }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <p class="text-xs text-gray-400">
+    註：待審核清單來自 <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">GET /leave/pending</code>；核准會同時成立請假與家長選的補課時段，駁回必須填寫原因（家長看得到）。
+  </p>
+
+  <!-- 駁回 Modal：原因必填 -->
+  @if (rejectOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">駁回請假申請</h3>
+            <button (click)="closeReject()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          @if (rejectTarget(); as t) {
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              {{ t.student_name || '學生' }} · {{ t.course_name || '未指定課程' }} · 請假 {{ formatDate(t.leave_date) }}
+              @if (t.requested_makeup_date) {
+                <span class="block text-accent-gold font-medium mt-1">希望補課：{{ requestedMakeup(t) }}</span>
+              }
+            </p>
+          }
+
+          @if (rejectError()) {
+            <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg px-3 py-2 text-sm font-medium">
+              {{ rejectError() }}
+            </div>
+          }
+
+          <label for="reject-reason" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+            駁回原因 <span class="text-red-500">*</span>
+          </label>
+          <textarea id="reject-reason" rows="3" [(ngModel)]="rejectReason"
+            placeholder="例如：該補課時段已額滿，請改選其他時段"
+            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none"></textarea>
+          <p class="text-xs text-gray-400 mt-1">這段說明會顯示在家長的請假紀錄中。</p>
+
+          <div class="flex gap-3 mt-6">
+            <button (click)="closeReject()"
+              class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+              取消
+            </button>
+            <button (click)="submitReject()" [disabled]="rejectSaving()"
+              class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold rounded-lg flex items-center justify-center gap-2">
+              @if (rejectSaving()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                送出中...
+              } @else {
+                確認駁回
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 排補課 Modal -->
+  @if (makeupOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">安排補課</h3>
+            <button (click)="closeMakeup()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          @if (makeupTarget(); as t) {
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              {{ t.student_name || '學生' }} · {{ t.course_name || '未指定課程' }} · 原請假 {{ formatDate(t.leave_date) }}
+            </p>
+          }
+
+          @if (makeupError()) {
+            <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg px-3 py-2 text-sm font-medium">
+              {{ makeupError() }}
+            </div>
+          }
+
+          <div class="space-y-4">
+            <div>
+              <label for="makeup-date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">補課日期 <span class="text-red-500">*</span></label>
+              <input id="makeup-date" type="date" [(ngModel)]="makeupDate"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="makeup-start" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">開始時間</label>
+                <input id="makeup-start" type="time" [(ngModel)]="makeupStart"
+                  class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+              </div>
+              <div>
+                <label for="makeup-end" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">結束時間</label>
+                <input id="makeup-end" type="time" [(ngModel)]="makeupEnd"
+                  class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <label for="makeup-room" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">教室</label>
+              <input id="makeup-room" type="text" [(ngModel)]="makeupClassroom" placeholder="例如：302 教室"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+            </div>
+
+            <div>
+              <label for="makeup-notes" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">備註</label>
+              <textarea id="makeup-notes" rows="2" [(ngModel)]="makeupNotes" placeholder="給學生或家長的提醒"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none"></textarea>
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <button (click)="closeMakeup()"
+              class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+              取消
+            </button>
+            <button (click)="saveMakeup()" [disabled]="makeupSaving()"
+              class="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold rounded-lg flex items-center justify-center gap-2">
+              @if (makeupSaving()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                儲存中...
+              } @else {
+                確認安排
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

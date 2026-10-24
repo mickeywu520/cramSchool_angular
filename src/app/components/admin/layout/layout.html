@@ -23,9 +23,26 @@
           routerLinkActive="bg-primary/10 text-primary font-semibold"
           class="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
-          <span class="material-symbols-outlined shrink-0">{{ item.icon }}</span>
+          <span class="relative shrink-0 flex items-center">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <!-- 側邊欄收合時：只在圖示上顯示小紅點 -->
+            @if (item.path === '/admin/leaves' && pendingLeaves.count() > 0 && !sidebarOpen()) {
+              <span
+                class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"
+              ></span>
+            }
+          </span>
           @if (sidebarOpen()) {
             <span class="text-sm whitespace-nowrap">{{ item.label }}</span>
+            <!-- 待審核筆數紅點 -->
+            @if (item.path === '/admin/leaves' && pendingLeaves.count() > 0) {
+              <span
+                class="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center leading-none"
+                [attr.aria-label]="'待審核 ' + pendingLeaves.count() + ' 筆'"
+              >
+                {{ pendingLeaves.count() > 99 ? '99+' : pendingLeaves.count() }}
+              </span>
+            }
           }
         </a>
       }

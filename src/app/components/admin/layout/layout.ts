@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { PendingLeaveService } from '../../../services/pending-leave.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -9,7 +11,7 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit, OnDestroy {
   sidebarOpen = signal(true);
   appVersion = environment.version;
 
@@ -24,13 +26,33 @@ export class AdminLayout {
     { path: '/admin/student-registrations', icon: 'person_add', label: '報名註冊管理' },
     { path: '/admin/accounts', icon: 'manage_accounts', label: '家長/學生帳號管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
+    { path: '/admin/leaves', icon: 'event_busy', label: '請假審核' },
     { path: '/admin/users', icon: 'admin_panel_settings', label: '內部帳號管理' },
   ];
+
+  private navSub: Subscription | null = null;
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     public auth: AuthService,
     public router: Router,
+    public pendingLeaves: PendingLeaveService,
   ) {}
+
+  ngOnInit() {
+    this.pendingLeaves.refresh();
+    // 換頁時重抓，紅點才會跟著最新狀態
+    this.navSub = this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) this.pendingLeaves.refresh();
+    });
+    // 停在同一個頁面時，每 60 秒更新一次（有新申請就會自己跳出來）
+    this.timer = setInterval(() => this.pendingLeaves.refresh(), 60_000);
+  }
+
+  ngOnDestroy() {
+    this.navSub?.unsubscribe();
+    if (this.timer) clearInterval(this.timer);
+  }
 
   toggleSidebar() {
     this.sidebarOpen.update(v => !v);

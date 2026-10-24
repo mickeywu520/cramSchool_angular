@@ -5,6 +5,60 @@
       <p class="text-sm text-gray-400 font-bold">載入中...</p>
     </div>
   </div>
+} @else if (ctx.noStudents) {
+  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24 flex flex-col">
+    <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-20 md:pb-24 lg:pb-28 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+      <div class="relative z-10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl border-2 border-white/30 flex items-center justify-center text-white font-extrabold text-xl md:text-2xl bg-white/20">
+            <span class="material-symbols-outlined text-2xl">menu_book</span>
+          </div>
+          <div>
+            <h2 class="text-white text-lg md:text-xl font-extrabold">數位聯絡簿</h2>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-3">
+          <div class="flex items-center gap-2">
+            <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">home</span>
+              回禾笙首頁
+            </a>
+            <button (click)="logout()" type="button"
+              class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span>
+              登出
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="px-4 md:px-6 lg:px-8 -mt-10 relative z-20">
+      <div class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-6 md:p-8 bento-shadow border border-gray-100 dark:border-gray-800 text-center">
+        <span class="material-symbols-outlined text-primary text-5xl mb-3">child_care</span>
+        <h3 class="font-extrabold text-base md:text-lg mb-2">此帳號尚未關聯任何學生</h3>
+        <p class="text-sm text-gray-400">請聯絡補習班櫃台協助將小孩帳號綁定到此登入帳號。</p>
+      </div>
+    </main>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
+      <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
+        <span class="text-[10px] md:text-xs font-bold">首頁</span>
+      </a>
+      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
+      </a>
+      <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
+        <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
+      </a>
+      <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
+        <span class="text-[10px] md:text-xs font-bold">個人資料</span>
+      </a>
+    </nav>
+  </div>
 } @else {
   <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-20">
 
@@ -249,57 +303,7 @@
                         @if (signing()) {
                           <span class="material-symbols-outlined animate-spin text-lg">refresh</span>
                           送出中...
-} @else if (ctx.noStudents) {
-  <div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#101819] dark:text-[#f9fbfb] pb-16 md:pb-20 lg:pb-24 flex flex-col">
-    <header class="bg-primary pt-8 md:pt-10 lg:pt-12 pb-20 md:pb-24 lg:pb-28 px-4 md:px-6 lg:px-8 rounded-b-[2rem] md:rounded-b-[2.5rem] relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-      <div class="relative z-10 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl border-2 border-white/30 flex items-center justify-center text-white font-extrabold text-xl md:text-2xl bg-white/20">
-            <span class="material-symbols-outlined text-2xl">menu_book</span>
-          </div>
-          <div>
-            <h2 class="text-white text-lg md:text-xl font-extrabold">數位聯絡簿</h2>
-          </div>
-        </div>
-        <div class="flex flex-col items-end gap-3">
-          <div class="flex items-center gap-2">
-            <a routerLink="/" class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
-              <span class="material-symbols-outlined text-sm">home</span>
-              回禾笙首頁
-            </a>
-            <button (click)="logout()" type="button"
-              class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
-              <span class="material-symbols-outlined text-sm">logout</span>
-              登出
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-    <main class="px-4 md:px-6 lg:px-8 -mt-10 relative z-20">
-      <div class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-6 md:p-8 bento-shadow border border-gray-100 dark:border-gray-800 text-center">
-        <span class="material-symbols-outlined text-primary text-5xl mb-3">child_care</span>
-        <h3 class="font-extrabold text-base md:text-lg mb-2">此帳號尚未關聯任何學生</h3>
-        <p class="text-sm text-gray-400">請聯絡補習班櫃台協助將小孩帳號綁定到此登入帳號。</p>
-      </div>
-    </main>
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
-      <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
-        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
-        <span class="text-[10px] md:text-xs font-bold">首頁</span>
-      </a>
-      <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-primary">
-        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
-        <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
-      </a>
-      <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-gray-400">
-        <span class="material-symbols-outlined text-xl md:text-2xl">person</span>
-        <span class="text-[10px] md:text-xs font-bold">個人資料</span>
-      </a>
-    </nav>
-  </div>
-} @else {
+                        } @else {
                           <span class="material-symbols-outlined text-lg">draw</span>
                           簽署
                         }
@@ -324,6 +328,10 @@
       <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
         <span class="text-[10px] md:text-xs font-bold">首頁</span>
+      </a>
+      <a routerLink="/leave-makeup" class="flex flex-col items-center gap-1 text-gray-400">
+        <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">calendar_month</span>
+        <span class="text-[10px] md:text-xs font-bold">請假補課</span>
       </a>
       <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-primary">
         <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>

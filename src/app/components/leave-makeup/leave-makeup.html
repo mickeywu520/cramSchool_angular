@@ -6,147 +6,445 @@
         <span class="material-symbols-outlined text-xl md:text-2xl">arrow_back_ios_new</span>
       </a>
       <h1 class="text-white text-lg md:text-xl lg:text-2xl font-extrabold tracking-wide">請假與補課管理</h1>
-      <button class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md">
+      <button
+        type="button"
+        (click)="rulesOpen.set(!rulesOpen())"
+        class="bg-white/10 p-2 md:p-3 rounded-xl text-white backdrop-blur-md"
+        aria-label="補課規範">
         <span class="material-symbols-outlined text-xl md:text-2xl">help_outline</span>
       </button>
     </div>
+    @if (ctx.showSwitcher) {
+      <div class="relative z-10">
+        <select
+          [value]="ctx.selectedId()"
+          (change)="ctx.select(+$any($event.target).value)"
+          class="w-full bg-white/15 text-white text-sm font-bold rounded-xl px-3 py-2 backdrop-blur-md border border-white/20">
+          @for (s of ctx.students(); track s.id) {
+            <option [value]="s.id" class="text-[#101819]">{{ s.student_name }}</option>
+          }
+        </select>
+      </div>
+    }
   </header>
-  
+
   <main class="px-4 md:px-6 lg:px-8 -mt-8 md:-mt-10 lg:-mt-12 relative z-20 space-y-4 md:space-y-6">
-    <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-      <div>
-        <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">需要請假嗎？</h3>
-        <p class="text-xs md:text-sm text-gray-400 mt-1">提前申請，以便安排補課事宜</p>
+    @if (errorMsg()) {
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-2xl px-4 py-3 text-xs md:text-sm font-bold flex items-start gap-2">
+        <span class="material-symbols-outlined text-base">error</span>
+        <span class="flex-1">{{ errorMsg() }}</span>
       </div>
-      <button class="bg-primary text-white px-4 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform text-sm md:text-base">
-        <span class="material-symbols-outlined text-sm md:text-base">add_circle</span>
-        請假申請
-      </button>
-    </section>
-    
-    <section>
-      <div class="flex items-center justify-between mb-3 px-1">
-        <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">請假紀錄</h3>
-        <button class="text-xs md:text-sm text-primary font-bold">查看全部</button>
+    }
+    @if (successMsg()) {
+      <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-2xl px-4 py-3 text-xs md:text-sm font-bold flex items-start gap-2">
+        <span class="material-symbols-outlined text-base">check_circle</span>
+        <span class="flex-1">{{ successMsg() }}</span>
       </div>
-      <div class="space-y-3">
-        <div class="bg-white dark:bg-card-dark p-3 md:p-4 rounded-2xl bento-shadow border border-gray-50 dark:border-gray-800 flex justify-between items-center">
-          <div class="flex items-center gap-3 md:gap-4">
-            <div class="w-9 md:w-10 h-9 md:h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center text-green-600">
-              <span class="material-symbols-outlined text-lg md:text-xl">check_circle</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-sm md:text-base">11月15日 (三)</h4>
-              <p class="text-xs md:text-sm text-gray-400">事假 - 家族聚餐</p>
-            </div>
+    }
+
+    @if (ctx.noStudents) {
+      <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-6 bento-shadow border border-gray-100 dark:border-gray-800 text-center">
+        <span class="material-symbols-outlined text-4xl text-gray-300">person_off</span>
+        <p class="mt-3 font-bold text-sm md:text-base">尚未綁定學生資料</p>
+        <p class="mt-1 text-xs md:text-sm text-gray-400">請先完成學生資料綁定，才能申請請假。</p>
+      </section>
+    } @else {
+      <!-- 本週課程日曆：點一堂課即可請假 -->
+      <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800">
+        <div class="flex items-start justify-between gap-2 mb-3">
+          <div class="min-w-0">
+            <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">calendar_view_week</span>
+              本週課程
+            </h3>
+            <p class="text-[10px] md:text-xs text-gray-400 mt-1">點擊一堂課即可請假，也可切換週次提前申請</p>
           </div>
-          <span class="text-[10px] md:text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">已核准</span>
-        </div>
-        <div class="bg-white dark:bg-card-dark p-3 md:p-4 rounded-2xl bento-shadow border border-gray-50 dark:border-gray-800 flex justify-between items-center">
-          <div class="flex items-center gap-3 md:gap-4">
-            <div class="w-9 md:w-10 h-9 md:h-10 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-600">
-              <span class="material-symbols-outlined text-lg md:text-xl">pending</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-sm md:text-base">11月22日 (三)</h4>
-              <p class="text-xs md:text-sm text-gray-400">病假 - 醫生看診</p>
-            </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              (click)="shiftWeek(-1)"
+              class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-gray-500 flex items-center justify-center active:scale-95 transition-transform"
+              aria-label="上一週">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button
+              type="button"
+              (click)="goThisWeek()"
+              class="px-2 h-8 rounded-lg bg-primary/10 text-primary text-[10px] md:text-xs font-extrabold active:scale-95 transition-transform">
+              本週
+            </button>
+            <button
+              type="button"
+              (click)="shiftWeek(1)"
+              class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-gray-500 flex items-center justify-center active:scale-95 transition-transform"
+              aria-label="下一週">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
           </div>
-          <span class="text-[10px] md:text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded-full font-bold">待審核</span>
         </div>
-      </div>
-    </section>
-    
-    <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-extrabold text-[#101819] dark:text-white flex items-center gap-2 text-base md:text-lg">
-          <span class="material-symbols-outlined text-primary">calendar_month</span>
-          補課安排
-        </h3>
-        <div class="flex gap-2">
-          <button class="p-1 md:p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-            <span class="material-symbols-outlined text-sm md:text-base">chevron_left</span>
-          </button>
-          <span class="text-sm md:text-base font-bold">2023年 11月</span>
-          <button class="p-1 md:p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-            <span class="material-symbols-outlined text-sm md:text-base">chevron_right</span>
-          </button>
+
+        <p class="text-center text-xs md:text-sm font-extrabold text-gray-500 mb-2 tabular-nums">{{ weekLabel() }}</p>
+
+        @if (!weekHasClass()) {
+          <p class="text-center text-[10px] md:text-xs text-gray-400 font-bold mb-2">
+            這一週沒有課程，按右邊 <span class="text-primary font-extrabold">›</span> 切到下一週
+          </p>
+        }
+
+        <div class="grid grid-cols-7 gap-1 md:gap-2">
+          @for (day of weekGrid(); track day.iso) {
+            <div
+              class="rounded-xl border p-1 md:p-1.5 min-h-[100px] md:min-h-[120px] flex flex-col"
+              [class]="day.isToday
+                ? 'border-primary/40 bg-primary/5'
+                : 'border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/20'">
+              <div class="text-center mb-1">
+                <p class="text-[9px] md:text-[10px] font-bold" [class]="day.isToday ? 'text-primary' : 'text-gray-400'">
+                  週{{ day.weekday }}
+                </p>
+                <p class="text-xs md:text-sm font-extrabold tabular-nums" [class]="day.isToday ? 'text-primary' : ''">
+                  {{ day.dayNum }}
+                </p>
+              </div>
+
+              <div class="space-y-1 flex-1">
+                @for (chip of day.chips; track chip.courseId) {
+                  @let lv = chip.leave;
+                  @let mk = chip.makeup;
+                  <button
+                    type="button"
+                    (click)="pickClass(chip)"
+                    [disabled]="chip.past || (lv && lv.status !== 'rejected')"
+                    class="w-full text-left rounded-lg px-1 py-1 leading-tight transition-colors"
+                    [class]="chipClass(chip)">
+                    <span class="block text-[9px] md:text-[10px] font-extrabold truncate">{{ chip.courseName }}</span>
+                    @if (chip.time) {
+                      <span class="block text-[8px] md:text-[9px] opacity-80 truncate tabular-nums">{{ chip.time }}</span>
+                    }
+                    @if (lv) {
+                      <span class="block text-[8px] md:text-[9px] font-bold truncate">{{ statusOf(lv.status).label }}</span>
+                    }
+                    @if (mk) {
+                      <span class="block text-[8px] md:text-[9px] font-bold truncate">補 {{ formatDate(mk.makeup_date) }}</span>
+                    }
+                  </button>
+                } @empty {
+                  <p class="text-[9px] text-gray-300 dark:text-gray-600 text-center mt-4">—</p>
+                }
+              </div>
+            </div>
+          }
         </div>
-      </div>
-      
-      <div class="grid grid-cols-7 text-center text-[10px] md:text-xs font-bold text-gray-400 mb-2">
-        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
-      </div>
-      <div class="grid grid-cols-7 gap-y-2 mb-4 md:mb-6">
-        <div class="text-xs md:text-sm py-2 text-gray-300">29</div>
-        <div class="text-xs md:text-sm py-2 text-gray-300">30</div>
-        <div class="text-xs md:text-sm py-2 text-gray-300">31</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">1</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">2</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">3</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">4</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">5</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">6</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">7</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">8</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">9</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">10</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">11</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">12</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">13</div>
-        <div class="text-xs md:text-sm py-2 font-bold bg-primary text-white rounded-lg cursor-pointer relative">15
-          <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] md:text-[10px] text-gray-400 font-bold">
+          <span class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-primary/30"></span>可請假
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-orange-300"></span>待審核
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-green-300"></span>已核准
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-accent-gold"></span>已排補課
+          </span>
         </div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">16</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">17</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">18</div>
-        <div class="text-xs md:text-sm py-2 font-bold bg-accent-gold/10 text-accent-gold rounded-lg cursor-pointer ring-1 ring-accent-gold/50">19</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">20</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">21</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">22</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">23</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">24</div>
-        <div class="text-xs md:text-sm py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">25</div>
-      </div>
-      
-      <div class="space-y-3 md:space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-        <h4 class="text-xs md:text-sm font-extrabold text-gray-500 uppercase tracking-wider">即將到來的補課</h4>
-        <div class="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-2xl border-l-4 border-accent-gold">
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <h5 class="font-bold text-sm md:text-base">國二數學 (補：11/15 課程)</h5>
-              <p class="text-[10px] md:text-xs text-gray-500 flex items-center gap-1 mt-1">
-                <span class="material-symbols-outlined text-[12px] md:text-sm">location_on</span>
-                302 教室
+
+        @if (unscheduled().length > 0) {
+          <p class="mt-2 text-[9px] md:text-[10px] text-gray-400 flex items-start gap-1 leading-relaxed">
+            <span class="material-symbols-outlined text-[13px]">info</span>
+            <span>未設定上課星期的課程不會出現在日曆：{{ unscheduledNames() }}（仍可用下方表單請假）</span>
+          </p>
+        }
+      </section>
+
+      <!-- 請假申請入口 -->
+      <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">需要請假嗎？</h3>
+          <p class="text-xs md:text-sm text-gray-400 mt-1">點日曆上的課，或用手動表單申請</p>
+        </div>
+        <button
+          type="button"
+          (click)="toggleForm()"
+          class="bg-primary text-white px-4 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform text-sm md:text-base">
+          <span class="material-symbols-outlined text-sm md:text-base">{{ formOpen() ? 'close' : 'add_circle' }}</span>
+          {{ formOpen() ? '取消' : '請假申請' }}
+        </button>
+      </section>
+
+      <!-- 請假申請表單 -->
+      @if (formOpen()) {
+        <section id="leave-form" class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-primary/20 scroll-mt-4">
+          <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">edit_calendar</span>
+            新增請假申請
+          </h3>
+
+          @if (selectedCourseName()) {
+            <div class="mb-4 bg-primary/5 border border-primary/10 rounded-xl px-3 py-2 flex items-start gap-2">
+              <span class="material-symbols-outlined text-primary text-base">event_available</span>
+              <p class="text-[10px] md:text-xs font-bold text-primary flex-1 min-w-0">
+                請 {{ selectedCourseName() }}{{ leaveDate ? ' · ' + formatDate(leaveDate) : '' }}
+                @if (makeupSummary()) {
+                  <span class="text-accent-gold"> → {{ makeupSummary() }}</span>
+                }
               </p>
             </div>
-            <div class="text-right">
-              <span class="text-xs md:text-sm font-extrabold text-accent-gold">11月19日 (日)</span>
-              <p class="text-[10px] md:text-xs text-gray-400">09:00 - 11:00</p>
+          }
+          <form (ngSubmit)="submit()" class="space-y-4">
+            <div>
+              <label for="leave-course" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假課程</label>
+              <select
+                id="leave-course"
+                name="course_id"
+                [(ngModel)]="courseId"
+                (ngModelChange)="onCourseOrDateChange()"
+                class="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/40">
+                @if (courses().length === 0) {
+                  <option [ngValue]="null">目前沒有可請假的課程</option>
+                }
+                @for (c of courses(); track c.id) {
+                  <option [ngValue]="c.id">{{ c.name }}{{ courseSchedule(c) ? '（' + courseSchedule(c) + '）' : '' }}</option>
+                }
+              </select>
             </div>
-          </div>
-          <div class="flex items-center gap-2 mt-3">
-            <img class="w-4 h-4 md:w-5 md:h-5 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI6DnjbbfCh30xVam4hVyMYhjxNSnNQ7WgwXi19x2MAm52OcuDiU3gnrX-bfNX8Hw7Pj9yNk6_KRF-gKup-DbCb3UnSLEEHHXZl3mNznSTmcKqWPwtQWMHLQdGuZehHz0LwTsv9uCT0K7i5dnIxsA-QV_uB4gdxnOXBlCkv9JgeRiuEhn4SuhsT4Npj1zeXvzcIebvBHhjWy0nP0Z_hgCgQhLm4q4sJ9zANOCj8zg-MEt5cuY52RNRAf9cpzesOBJBFIh0JpuK678"/>
-            <span class="text-[10px] md:text-xs text-gray-500">指導老師：陳大文 老師</span>
-          </div>
+
+            <div>
+              <label for="leave-date" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假日期</label>
+              <input
+                id="leave-date"
+                name="leave_date"
+                type="date"
+                [(ngModel)]="leaveDate"
+                (ngModelChange)="onCourseOrDateChange()"
+                class="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/40" />
+            </div>
+
+            <!-- 補課場次（必選）：同一門課在請假日期之後的場次 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="block text-xs md:text-sm font-bold text-gray-500">
+                  補課時段 <span class="text-red-500">*</span>
+                </span>
+                @if (optionsLoading()) {
+                  <span class="material-symbols-outlined text-primary text-sm animate-spin">refresh</span>
+                }
+              </div>
+              <p class="text-[10px] md:text-xs text-gray-400 mb-2">同一門課、請假日期之後的場次；老師會一併核准</p>
+
+              @if (optionsLoading()) {
+                <p class="text-[10px] md:text-xs text-gray-400 font-bold py-3 text-center">載入可補課場次...</p>
+              } @else if (makeupOptions().length === 0) {
+                <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl px-3 py-2">
+                  <p class="text-[10px] md:text-xs font-bold text-orange-700 dark:text-orange-300">
+                    這門課在請假日期之後沒有可補課的場次，請改選其他日期或聯絡老師
+                  </p>
+                </div>
+              } @else {
+                <div class="space-y-1.5 max-h-56 overflow-y-auto pr-0.5">
+                  @for (o of makeupOptions(); track o.date) {
+                    <button
+                      type="button"
+                      (click)="pickMakeupOption(o)"
+                      [class]="isMakeupPicked(o)
+                        ? 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border-2 border-primary bg-primary/10 text-left'
+                        : 'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-left'">
+                      <span class="min-w-0">
+                        <span class="block text-xs md:text-sm font-extrabold truncate">{{ formatDate(o.date) }}</span>
+                        <span class="block text-[10px] md:text-xs text-gray-400 tabular-nums">{{ o.start_time }} - {{ o.end_time }}</span>
+                      </span>
+                      <span class="shrink-0 text-right">
+                        <span
+                          class="block text-[10px] md:text-xs font-bold"
+                          [class]="optionFull(o) ? 'text-red-500' : 'text-green-600'">
+                          {{ optionSeats(o) }}
+                        </span>
+                        @if (isMakeupPicked(o)) {
+                          <span class="material-symbols-outlined text-primary text-base">check_circle</span>
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <div>
+              <span class="block text-xs md:text-sm font-bold text-gray-500 mb-1">假別</span>
+              <div class="grid grid-cols-3 gap-2">
+                @for (t of leaveTypes; track t.value) {
+                  <button
+                    type="button"
+                    (click)="leaveType = t.value"
+                    [class]="leaveType === t.value
+                      ? 'py-2 rounded-xl text-sm font-bold bg-primary text-white shadow-md shadow-primary/20'
+                      : 'py-2 rounded-xl text-sm font-bold bg-gray-50 dark:bg-gray-800/60 text-gray-500 border border-gray-200 dark:border-gray-700'">
+                    {{ t.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label for="leave-reason" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假原因（選填）</label>
+              <textarea
+                id="leave-reason"
+                name="reason"
+                rows="2"
+                [(ngModel)]="reason"
+                placeholder="例如：家族聚餐、醫生看診"
+                class="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"></textarea>
+            </div>
+
+            <button
+              type="submit"
+              [disabled]="saving()"
+              class="w-full bg-primary text-white py-3 rounded-xl font-extrabold text-sm md:text-base shadow-lg shadow-primary/20 active:scale-[0.99] transition-transform disabled:opacity-50 flex items-center justify-center gap-2">
+              @if (saving()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                送出中...
+              } @else {
+                <span class="material-symbols-outlined text-base">send</span>
+                送出請假＋補課申請
+              }
+            </button>
+          </form>
+        </section>
+      }
+
+      <!-- 請假紀錄 -->
+      <section>
+        <div class="flex items-center justify-between mb-3 px-1">
+          <h3 class="font-extrabold text-[#101819] dark:text-white text-base md:text-lg">請假紀錄</h3>
+          <span class="text-xs md:text-sm text-gray-400 font-bold">{{ applications().length }} 筆</span>
         </div>
+
+        @if (loading()) {
+          <div class="bg-white dark:bg-card-dark p-6 rounded-2xl bento-shadow border border-gray-50 dark:border-gray-800 text-center">
+            <span class="material-symbols-outlined text-primary text-3xl animate-spin">refresh</span>
+            <p class="mt-2 text-xs text-gray-400 font-bold">載入中...</p>
+          </div>
+        } @else if (applications().length === 0) {
+          <div class="bg-white dark:bg-card-dark p-6 rounded-2xl bento-shadow border border-gray-50 dark:border-gray-800 text-center">
+            <span class="material-symbols-outlined text-4xl text-gray-300">event_available</span>
+            <p class="mt-2 text-xs md:text-sm text-gray-400 font-bold">目前沒有請假紀錄</p>
+          </div>
+        } @else {
+          <div class="space-y-3">
+            @for (a of applications(); track a.id) {
+              <div class="bg-white dark:bg-card-dark p-3 md:p-4 rounded-2xl bento-shadow border border-gray-50 dark:border-gray-800 flex justify-between items-center gap-3">
+                <div class="flex items-center gap-3 md:gap-4 min-w-0">
+                  <div class="w-9 md:w-10 h-9 md:h-10 rounded-xl flex items-center justify-center shrink-0" [class]="statusOf(a.status).iconCls">
+                    <span class="material-symbols-outlined text-lg md:text-xl">{{ statusOf(a.status).icon }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <h4 class="font-bold text-sm md:text-base">{{ formatDate(a.leave_date) }}</h4>
+                    <p class="text-xs md:text-sm text-gray-400 truncate">
+                      {{ a.course_name || '未指定課程' }} · {{ typeLabel(a.leave_type) }}{{ a.reason ? ' - ' + a.reason : '' }}
+                    </p>
+                    @if (a.requested_makeup_date) {
+                      <p class="text-[10px] md:text-xs text-accent-gold font-bold truncate">
+                        希望補課：{{ formatDate(a.requested_makeup_date) }}
+                        @if (a.requested_makeup_start) {
+                          {{ a.requested_makeup_start }}{{ a.requested_makeup_end ? '-' + a.requested_makeup_end : '' }}
+                        }
+                      </p>
+                    }
+                    @if (a.status === 'rejected' && a.review_note) {
+                      <p class="text-[10px] md:text-xs text-red-500 font-bold flex items-start gap-1 mt-0.5">
+                        <span class="material-symbols-outlined text-[13px]">info</span>
+                        <span class="flex-1">駁回原因：{{ a.review_note }}</span>
+                      </p>
+                    }
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="text-[10px] md:text-xs px-2 py-1 rounded-full font-bold" [class]="statusOf(a.status).cls">
+                    {{ statusOf(a.status).label }}
+                  </span>
+                  @if (a.status === 'pending') {
+                    <button
+                      type="button"
+                      (click)="cancel(a)"
+                      class="text-gray-300 hover:text-red-500 transition-colors"
+                      aria-label="取消請假">
+                      <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- 補課安排（唯讀） -->
+      <section class="bg-white dark:bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 bento-shadow border border-gray-100 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-extrabold text-[#101819] dark:text-white flex items-center gap-2 text-base md:text-lg">
+            <span class="material-symbols-outlined text-primary">calendar_month</span>
+            補課安排
+          </h3>
+          <span class="text-xs md:text-sm text-gray-400 font-bold">{{ makeups().length }} 筆</span>
+        </div>
+
+        @if (makeups().length === 0) {
+          <div class="text-center py-6">
+            <span class="material-symbols-outlined text-4xl text-gray-300">event_busy</span>
+            <p class="mt-2 text-xs md:text-sm text-gray-400 font-bold">尚無補課安排</p>
+            <p class="mt-1 text-[10px] md:text-xs text-gray-400">老師核准請假後，你選的補課時段會自動成立</p>
+          </div>
+        } @else {
+          <div class="space-y-3 md:space-y-4">
+            @for (m of makeups(); track m.id) {
+              <div class="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-2xl border-l-4 border-accent-gold">
+                <div class="flex justify-between items-start gap-3 mb-2">
+                  <div class="min-w-0">
+                    <h5 class="font-bold text-sm md:text-base truncate">{{ m.course_name || '補課' }}</h5>
+                    <p class="text-[10px] md:text-xs text-gray-500 flex items-center gap-1 mt-1">
+                      <span class="material-symbols-outlined text-[12px] md:text-sm">location_on</span>
+                      {{ m.classroom || '教室待公告' }}
+                    </p>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <span class="text-xs md:text-sm font-extrabold text-accent-gold">{{ formatDate(m.makeup_date) }}</span>
+                    <p class="text-[10px] md:text-xs text-gray-400">{{ m.start_time }} - {{ m.end_time }}</p>
+                  </div>
+                </div>
+                @if (m.notes) {
+                  <p class="text-[10px] md:text-xs text-gray-500 mt-2">{{ m.notes }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- 補課規範 -->
+      <div class="bg-primary/5 rounded-2xl md:rounded-3xl p-3 md:p-4 border border-primary/10">
+        <button type="button" (click)="rulesOpen.set(!rulesOpen())" class="w-full flex items-center gap-3 md:gap-4 text-left">
+          <div class="w-10 md:w-12 h-10 md:h-12 bg-white dark:bg-card-dark rounded-xl flex items-center justify-center text-primary shadow-sm shrink-0">
+            <span class="material-symbols-outlined text-xl md:text-2xl">info</span>
+          </div>
+          <div class="flex-1">
+            <h4 class="font-bold text-sm md:text-base">補課規範說明</h4>
+            <p class="text-[10px] md:text-xs text-gray-500">點擊查看完整請假與補課規則</p>
+          </div>
+          <span class="material-symbols-outlined text-gray-300">{{ rulesOpen() ? 'expand_less' : 'chevron_right' }}</span>
+        </button>
+        @if (rulesOpen()) {
+          <p class="mt-3 pt-3 border-t border-primary/10 text-[10px] md:text-xs text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+            {{ rules() || '目前沒有規範說明' }}
+          </p>
+        }
       </div>
-    </section>
-    
-    <div class="bg-primary/5 rounded-2xl md:rounded-3xl p-3 md:p-4 flex items-center gap-3 md:gap-4 border border-primary/10">
-      <div class="w-10 md:w-12 h-10 md:h-12 bg-white dark:bg-card-dark rounded-xl flex items-center justify-center text-primary shadow-sm">
-        <span class="material-symbols-outlined text-xl md:text-2xl">info</span>
-      </div>
-      <div class="flex-1">
-        <h4 class="font-bold text-sm md:text-base">補課規範說明</h4>
-        <p class="text-[10px] md:text-xs text-gray-500">請於請假後一週內完成補課預約...</p>
-      </div>
-      <span class="material-symbols-outlined text-gray-300">chevron_right</span>
-    </div>
+    }
   </main>
-  
+
   <div class="h-4 md:h-6"></div>
-  
+
   <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-card-dark/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center z-50">
     <a routerLink="/student" class="flex flex-col items-center gap-1 text-gray-400">
       <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">home</span>
@@ -159,10 +457,6 @@
     <a routerLink="/communication-book" class="flex flex-col items-center gap-1 text-gray-400">
       <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">menu_book</span>
       <span class="text-[10px] md:text-xs font-bold">聯絡簿</span>
-    </a>
-    <a routerLink="/order" class="flex flex-col items-center gap-1 text-gray-400">
-      <span class="material-symbols-outlined fill-1 text-xl md:text-2xl">restaurant_menu</span>
-      <span class="text-[10px] md:text-xs font-bold">訂餐系統</span>
     </a>
     <a routerLink="/edit-profile" class="flex flex-col items-center gap-1 text-gray-400">
       <span class="material-symbols-outlined text-xl md:text-2xl">person</span>

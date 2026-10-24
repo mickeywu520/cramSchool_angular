@@ -16,6 +16,7 @@ import { AdminAboutCards } from './components/admin/about-cards/about-cards';
 import { AdminTeachers } from './components/admin/teachers/teachers';
 import { AdminHonors } from './components/admin/honors/honors';
 import { AdminCommunication } from './components/admin/communication/communication';
+import { AdminLeaves } from './components/admin/leaves/leaves';
 import { AdminCourses } from './components/admin/courses/courses';
 import { AdminEnrollments } from './components/admin/enrollments/enrollments';
 import { AdminStudentRegistrations } from './components/admin/student-registrations/student-registrations';
@@ -36,7 +37,7 @@ export const routes: Routes = [
   { path: 'edit-profile', component: EditProfile, canActivate: [StudentAuthGuard] },
   { path: 'communication-book', component: CommunicationBook, canActivate: [StudentAuthGuard] },
   { path: 'course-details', component: CourseDetails },
-  { path: 'leave-makeup', component: LeaveMakeup },
+  { path: 'leave-makeup', component: LeaveMakeup, canActivate: [StudentAuthGuard] },
   { path: 'order', redirectTo: '/student' },
   {
     path: 'admin',
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: 'enrollments', component: AdminEnrollments },
       { path: 'student-registrations', component: AdminStudentRegistrations },
       { path: 'communication', component: AdminCommunication },
+      { path: 'leaves', component: AdminLeaves },
     ],
   },
   { path: '**', redirectTo: '' }
