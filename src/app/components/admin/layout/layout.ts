@@ -33,9 +33,9 @@ export class AdminLayout implements OnInit, OnDestroy {
     { path: '/admin/courses', icon: 'calendar_month', label: '課程管理' },
     { path: '/admin/enrollments', icon: 'assignment_ind', label: '選課管理' },
     { path: '/admin/student-registrations', icon: 'person_add', label: '報名註冊管理' },
-    { path: '/admin/accounts', icon: 'manage_accounts', label: '家長/學生帳號管理' },
     { path: '/admin/communication', icon: 'menu_book', label: '數位聯絡簿' },
     { path: '/admin/leaves', icon: 'event_busy', label: '請假審核' },
+    { path: '/admin/accounts', icon: 'manage_accounts', label: '家長/學生帳號管理' },
     { path: '/admin/users', icon: 'admin_panel_settings', label: '內部帳號管理', adminOnly: true },
   ];
 
