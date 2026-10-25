@@ -193,7 +193,7 @@
           }
           <form (ngSubmit)="submit()" class="space-y-4">
             <div>
-              <label for="leave-course" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假課程</label>
+              <label for="leave-course" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假課程 <span class="text-red-500">*</span><span class="ml-0.5 text-[10px] md:text-xs font-medium text-gray-400">(必選)</span></label>
               <select
                 id="leave-course"
                 name="course_id"
@@ -210,7 +210,7 @@
             </div>
 
             <div>
-              <label for="leave-date" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假日期</label>
+              <label for="leave-date" class="block text-xs md:text-sm font-bold text-gray-500 mb-1">請假日期 <span class="text-red-500">*</span><span class="ml-0.5 text-[10px] md:text-xs font-medium text-gray-400">(必填)</span></label>
               <input
                 id="leave-date"
                 name="leave_date"
@@ -224,7 +224,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span class="block text-xs md:text-sm font-bold text-gray-500">
-                  補課教室與時段 <span class="text-red-500">*</span>
+                  補課教室與時段 <span class="text-red-500">*</span><span class="ml-0.5 text-[10px] md:text-xs font-medium text-gray-400">(必選)</span>
                 </span>
                 @if (optionsLoading()) {
                   <span class="material-symbols-outlined text-primary text-sm animate-spin">refresh</span>
